@@ -297,12 +297,12 @@ namespace FRIED
     sInt kinit,krinit;
     sInt u,sign,xm,run;
     BitDecoder coder;
-    static sBool tables = sFALSE;
+    static bool tables = false;
 
     if(!tables)
     {
       CalcGolombTables();
-      tables = sTRUE;
+      tables = true;
     }
 
     coder.Init(bits,nbmax);

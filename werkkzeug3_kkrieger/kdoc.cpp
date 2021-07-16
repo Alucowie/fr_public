@@ -35,7 +35,7 @@ struct SYSTEMTIME
 typedef sU64 FILETIME;
 
 extern "C" void __stdcall GetSystemTime(SYSTEMTIME *lpSystemTime);
-extern "C" sBool __stdcall SystemTimeToFileTime(const SYSTEMTIME *lpSystemTime,FILETIME *lpFileTime);
+extern "C" bool __stdcall SystemTimeToFileTime(const SYSTEMTIME *lpSystemTime, FILETIME *lpFileTime);
 #endif
 
 #if sOP_PERFORMANCE
@@ -110,24 +110,24 @@ sInt KOp::Calc(KEnvironment *env,sInt flags)
   if(Changed||!Cache)
     sCopyMem(DataAnim,DataEdit,DataMax*4);
 
-  SkipCalc = sTRUE;
+  SkipCalc = true;
   pops = env->ExecuteAnim(this,AnimCode);
 
 // find changed
 
   changed = Changed;
   if(Cache==0 && (flags&KCF_NEED))
-    changed = sTRUE;
+    changed = true;
   if(Cache && !changed)
     flags &= ~KCF_NEED;
 
 // skip exec calculation
 
-  SkipExec = sFALSE;
+  SkipExec = false;
   if(Convention&OPC_SKIPEXEC)
-    SkipExec = sTRUE;
+    SkipExec = true;
   if(AnimCode[0]!=KA_END)
-    SkipExec = sFALSE;
+    SkipExec = false;
 
 // recursion
 
@@ -653,7 +653,7 @@ void KOp::ExecInput(KEnvironment *kenv,sInt i)
 }
 
 
-void KOp::ExecEvent(KEnvironment *kenv,KEvent *event,sBool)
+void KOp::ExecEvent(KEnvironment *kenv, KEvent *event, bool)
 {
   sVector save[8];
   KEvent *ce;
@@ -752,25 +752,25 @@ void KOp::Change(sInt input)
 #endif
 }
 
-sBool KOp::CheckOutput(sInt kc)
+bool KOp::CheckOutput(sInt kc)
 {
-  if(!this) return sFALSE;
+  if(!this) return false;
 #if sPLAYER
   if(!Cache || CacheFreed)
   {
     if(!Result)
-      return sFALSE;
+      return false;
     else if(kc!=KC_ANY && Result!=kc)
-      return sFALSE;
+      return false;
   }
   else
     if(kc!=KC_ANY && Cache->ClassId!=kc)
-      return sFALSE;
+      return false;
 #else
-  if(!Cache) return sFALSE;
-  if(kc!=KC_ANY && Cache->ClassId!=kc) return sFALSE;
+  if(!Cache) return false;
+  if(kc != KC_ANY && Cache->ClassId != kc) return false;
 #endif
-  return sTRUE;
+  return true;
 }
 
 void KOp::UpdateVar(sInt start,sInt count)
@@ -799,7 +799,7 @@ void KOp::UpdateVar(sInt start,sInt count)
   }
 }
 
-sBool AnimCodeWritesTo(sU8 *code,sInt offset)
+bool AnimCodeWritesTo(sU8 *code, sInt offset)
 {
   sU8 mask,val;
 
@@ -809,14 +809,14 @@ sBool AnimCodeWritesTo(sU8 *code,sInt offset)
     {
       mask = code[0];
       val = code[1];
-      if((mask&1) && val+0==offset) return sTRUE;
-      if((mask&2) && val+1==offset) return sTRUE;
-      if((mask&4) && val+2==offset) return sTRUE;
-      if((mask&8) && val+3==offset) return sTRUE;
+      if((mask&1) && val+0==offset) return true;
+      if((mask&2) && val+1==offset) return true;
+      if((mask&4) && val+2==offset) return true;
+      if((mask&8) && val+3==offset) return true;
     }
     code += CalcCmdSize(code);
   }
-  return sFALSE;
+  return false;
 }
 
 #if sPLAYER
@@ -828,7 +828,7 @@ void KOp::CalcUsed()
     {
       Result = Cache->ClassId;
       Cache->Release();
-      CacheFreed = sTRUE;
+      CacheFreed = true;
       // sollte die variable nicht auch auf 0 gesetzt werden?
       // nein, sollte sie nicht! -ryg
     }
@@ -1067,7 +1067,7 @@ sInt KEnvironment::ExecuteAnim(struct KOp *op,sU8 *bytecode)
   sU8 bval;
   sF32 *destfloat;
   sF32 fval;
-  sBool changed,cp;
+  bool changed, cp;
   sInt i;
   sMatrix *mat;
 
@@ -1587,11 +1587,11 @@ void KEvent::Stop()
 
 static KClass KClasses[256];
 
-static sBool DistributeAnimR(KOp *start)
+static bool DistributeAnimR(KOp *start)
 {
   sInt i;
 
-  sBool flag = start->GetAnimCode()[0] != KA_END;
+  bool flag = start->GetAnimCode()[0] != KA_END;
 
   for(i=0;i<start->GetInputCount();i++)
     if(start->GetInput(i))
@@ -1686,7 +1686,7 @@ void KDoc::Init(const sU8 *&dataPtr)
     op->ExecHandler = cls->ExecHandler;
     op->WheelSpeed = (sDInt) cls->Packing; // abuse, yes.
     op->OpId = i;
-    op->AnimFlag = sTRUE; // first, assume that ops are all animated
+    op->AnimFlag = true; // first, assume that ops are all animated
 
     if(typeByte & 0x80)
       max = 1;
@@ -2542,7 +2542,7 @@ void __stdcall Exec_Misc_Trigger(KOp *op,KEnvironment *kenv,
   KEvent *ev;
   KOp *eop;
   TriggerMem *mem;
-  sBool doit;
+  bool doit;
 
   eop = op->GetLink(0);
 

@@ -202,11 +202,11 @@ public:
   void PopM(sMatrix &m)         { Pop(&m.i.x,16); }
   void *PopO()                  { return ((void **)Stack)[--Index]; }
 
-  sBool Execute(sScript *,sInt offset=0);
+  bool Execute(sScript *, sInt offset=0);
   sChar *GetOutput()            { return OutBuffer; }
 
-  virtual sBool Extern(sInt id,sInt offset,sInt type,sF32 *data,sBool store);
-  virtual sBool UseObject(sInt id,void *object);
+  virtual bool Extern(sInt id, sInt offset, sInt type, sF32 *data, bool store);
+  virtual bool UseObject(sInt id, void *object);
 };
 
 /****************************************************************************/
@@ -248,7 +248,7 @@ class sScriptCompiler
   sChar String[4096];
 
   sInt Scan();
-  sBool Match(sInt token);
+  bool Match(sInt token);
 
   // error messages
 
@@ -310,12 +310,12 @@ public:
 
   // compiler
 
-  sBool Compiler(sScript *,const sChar *source,sText *Errors);
+  bool Compiler(sScript *, const sChar *source, sText *Errors);
 
   // diagnostics
 
   void PrintToken();
-  sBool Disassemble(sScript *script,sText *out,sBool verbose=1);
+  bool Disassemble(sScript *script, sText *out, bool verbose=1);
   void PrintSymbols();
 
   // symbol table
@@ -323,7 +323,7 @@ public:
   sArray<sScriptSymbol> Locals;                   // symbols defined by outside for use in this source
   sArray<sScriptSymbol> Symbols;                  // symbols defined by this source
   sScriptSymbol *FindSymbol(const sChar *name);
-  virtual sBool ExternSymbol(sChar *group,sChar *name,sU32 &groupid,sU32 &offset);
+  virtual bool ExternSymbol(sChar *group, sChar *name, sU32 &groupid, sU32 &offset);
   void ClearLocals();
   void AddLocal(const sChar *name,sInt type,sInt flags,sInt global,sInt offset);
 };

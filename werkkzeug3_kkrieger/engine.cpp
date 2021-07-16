@@ -295,7 +295,7 @@ EngMesh::EngMesh()
   BoneInfos = 0;
   PartCount = 0;
   PartBBs = 0;
-  Preloaded = sFALSE;
+  Preloaded = false;
   Mtrl.Init();
   Jobs.Init();
   Animation = 0;
@@ -552,7 +552,7 @@ void EngMesh::PaintJob(sInt jobId,GenMaterialPass *pass,const EngPaintInfo &pain
   // preparation
   sInt program = job->Program; 
   SVCache *svCache;
-  sBool svUpdate;
+  bool svUpdate;
 
   if(program == MPP_SHADOW)
   {
@@ -561,11 +561,11 @@ void EngMesh::PaintJob(sInt jobId,GenMaterialPass *pass,const EngPaintInfo &pain
       !paintInfo.LightId || paintInfo.LightId != svCache->LightId
       || paintInfo.LightPos != svCache->LightPos
       || paintInfo.LightRange != svCache->LightRange)
-      svUpdate = sTRUE;
+      svUpdate = true;
     else
-      svUpdate = sFALSE;
+      svUpdate = false;
 
-    svUpdate = sTRUE;
+    svUpdate = true;
 
     if(svUpdate)
     {
@@ -592,7 +592,7 @@ void EngMesh::PaintJob(sInt jobId,GenMaterialPass *pass,const EngPaintInfo &pain
     vert = (sVertexTSpace3Big *) paintInfo.BoneData;
 
   sInt handle = job->Geometry;
-  sBool bigInd = job->VertexCount >= (program == MPP_SHADOW ? 32768 : 65536);
+  bool bigInd = job->VertexCount >= (program == MPP_SHADOW ? 32768 : 65536);
   sInt bigFlag = bigInd ? sGEO_IND32B : 0;
 
   // create geobuffers if necessary
@@ -749,7 +749,7 @@ void EngMesh::PaintJob(sInt jobId,GenMaterialPass *pass,const EngPaintInfo &pain
           sSystem->GeoFlush(handle,BoneInfos ? sGEO_VERTEX|sGEO_INDEX : sGEO_INDEX);
 
 #if 0 && !sINTRO // DEBUG PAINT CODE
-          Engine->DebugPaintStart(sFALSE);
+          Engine->DebugPaintStart(false);
 
           // show non-culled faces
           sInt *vind = job->VertexBuffer;
@@ -1101,7 +1101,7 @@ void EngMesh::Preload()
   vp.Window.Init(0,0,1,1);
   sSystem->SetViewport(vp);
 
-  sBool mayDeleteVert = BoneInfos ? sFALSE : sTRUE;
+  bool mayDeleteVert = BoneInfos ? false : true;
   EngPaintInfo paintInfo;
 
   paintInfo.LightId = 0;
@@ -1118,7 +1118,7 @@ void EngMesh::Preload()
       GenMaterialPass *pass = &mtrl->Passes[j];
 
       if(pass->Program != MPP_STATIC && pass->Program != MPP_SHADOW)
-        mayDeleteVert = sFALSE;
+        mayDeleteVert = false;
       else
       {
         pass->Mtrl->Set(env);
@@ -1133,7 +1133,7 @@ void EngMesh::Preload()
     Vert = 0;
   }
 
-  Preloaded = sTRUE;
+  Preloaded = true;
 }
 
 /****************************************************************************/
@@ -1341,7 +1341,7 @@ void EngMesh::PrepareJob(Job *job,GenMesh *mesh)
 
   // check whether we understand the program used
   sInt program = job->Program;
-  sBool isShadow = program == MPP_SHADOW;
+  bool isShadow = program == MPP_SHADOW;
 
   switch(program)
   {
@@ -1816,10 +1816,10 @@ void EngMesh::FillVertexBuffer(GenMinMesh *mesh)
   }
 
   // find out whether we need bones
-  sBool needBones = sFALSE;
+  bool needBones = false;
   for(sInt i=1;i<mesh->Clusters.Count;i++)
     if(mesh->Clusters[i].AnimType == 2)
-      needBones = sTRUE;
+      needBones = true;
 
   // create bone structures
   if(needBones)
@@ -1925,7 +1925,7 @@ void EngMesh::PrepareJob(Job *job,GenMinMesh *mesh)
   CalcBoundingBox(mesh,job->MtrlId,job->BBox);
 
   sInt program = job->Program;
-  sBool isShadow = program == MPP_SHADOW;
+  bool isShadow = program == MPP_SHADOW;
 
   switch(program)
   {
@@ -2613,8 +2613,8 @@ void Engine_::StartFrame()
   SectorJobs = 0;
   AmbientLight = 0;
 
-  WeaponLightSet = sFALSE;
-  CurrentSectorPaint = sTRUE;
+  WeaponLightSet = false;
+  CurrentSectorPaint = true;
   Mem.Flush();
   BigMem.Flush();
 }
@@ -2689,7 +2689,7 @@ void Engine_::AddLightJob(const EngLight &light)
       if(!WeaponLightSet || newTime > oldTime)
       {
         WeaponLight = light;
-        WeaponLightSet = sTRUE;
+        WeaponLightSet = true;
       }
     }
     else
@@ -2741,8 +2741,8 @@ void Engine_::AddSectorJob(GenScene *sector,KOp *sectorData,const sMatrix &matri
   sector->Next = SectorJobs;
   sector->Sector = sectorData;
   sector->SectorMatrix = matrix;
-  sector->SectorPaint = sFALSE;
-  sector->SectorVisited = sFALSE;
+  sector->SectorPaint = false;
+  sector->SectorVisited = false;
   sector->PortalBox.Init(1e+15f,1e+15f,-1e+15f,-1e+15f);
   SectorJobs = sector;
 }
@@ -2760,7 +2760,7 @@ void Engine_::ProcessPortals(KEnvironment *kenv,KKriegerCell *observerCell)
   {
     for(GenScene *job=SectorJobs;job;job=job->Next)
     {
-      job->SectorPaint = sTRUE;
+      job->SectorPaint = true;
       job->PortalBox = unitBox;
     }
   }
@@ -2776,7 +2776,7 @@ void Engine_::ProcessPortals(KEnvironment *kenv,KKriegerCell *observerCell)
     {
       if(job->Sectors[2] && (job->Sectors[0]->SectorPaint || job->Sectors[1]->SectorPaint))
       {
-        job->Sectors[2]->SectorPaint = sTRUE;
+        job->Sectors[2]->SectorPaint = true;
         job->Sectors[2]->PortalBox = unitBox;
       }
     }
@@ -2791,7 +2791,7 @@ void Engine_::ProcessPortals(KEnvironment *kenv,KKriegerCell *observerCell)
     {
       const sFRect &box = job->PortalBox;
 
-      job->SectorPaint = sFALSE; // paint sectors exactly once
+      job->SectorPaint = false; // paint sectors exactly once
       CurrentSectorPaint = box.x1 > box.x0 && box.y1 > box.y0;
 
       Frustum.FromViewProject(ViewProject,box);
@@ -2804,7 +2804,7 @@ void Engine_::ProcessPortals(KEnvironment *kenv,KKriegerCell *observerCell)
   }
 
   // restore frustum and sector paint flags
-  CurrentSectorPaint = sTRUE;
+  CurrentSectorPaint = true;
   Frustum.FromViewProject(ViewProject,unitBox);
   Frustum.Normalize();
 #endif
@@ -2812,7 +2812,7 @@ void Engine_::ProcessPortals(KEnvironment *kenv,KKriegerCell *observerCell)
 
 /****************************************************************************/
 
-void Engine_::Paint(KEnvironment *kenv,sBool specular)
+void Engine_::Paint(KEnvironment *kenv, bool specular)
 {
   // Insert weapon light into list of light jobs, if necessary.
   if(WeaponLightSet)
@@ -2870,7 +2870,7 @@ void Engine_::DebugPaintBoundingBoxes(sU32 color)
 }
 
 // Prepare debug painting (set up material)
-void Engine_::DebugPaintStart(sBool world)
+void Engine_::DebugPaintStart(bool world)
 {
   if(world)
     Env.ModelSpace.Init();
@@ -3099,7 +3099,7 @@ void Engine_::PortalVisR(GenScene *start,sInt thresh,const sFRect &box)
 
   // Tag this sector for painting
   start->SectorVisited++;
-  start->SectorPaint = sTRUE;
+  start->SectorPaint = true;
   start->PortalBox.Or(box);
 
   // Go through portals to find adjacent ones
@@ -3112,7 +3112,7 @@ void Engine_::PortalVisR(GenScene *start,sInt thresh,const sFRect &box)
         // Found an adjacent portal that hasn't been visited yet?
         if(job->Sectors[i] == start && !job->Sectors[i^1]->SectorVisited)
         {
-          sBool needClip = sFALSE;
+          bool needClip = false;
           sVector tv[8];
           sFRect nbox;
 
@@ -3127,12 +3127,12 @@ void Engine_::PortalVisR(GenScene *start,sInt thresh,const sFRect &box)
             if(tv[j].z >= 0.0f) // in, adjust box accordingly
               ProjectAndInclude(tv[j],nbox);
             else // at least one out, we need to clip
-              needClip = sTRUE;
+              needClip = true;
           }
 
           if(needClip)
           {
-            sBool foundCross = sFALSE;
+            bool foundCross = false;
 
             for(sInt j=0;j<12;j++)
             {
@@ -3146,7 +3146,7 @@ void Engine_::PortalVisR(GenScene *start,sInt thresh,const sFRect &box)
                 v.Lin4(*v1,*v2,v1->z / (v1->z - v2->z));
 
                 ProjectAndInclude(v,nbox);
-                foundCross = sTRUE;
+                foundCross = true;
               }
             }
 
@@ -3181,7 +3181,7 @@ void Engine_::BuildPaintJobs()
     sInt passIndex = sRange(effect->Pass + job->PassAdjust,ENG_MAXPASS-1,0);
 
     if(effect->NeedCurrentRender)
-      NeedCurrentRender[passIndex] = sTRUE;
+      NeedCurrentRender[passIndex] = true;
     
     PaintJob *pjob = Mem.Alloc<PaintJob>();
     pjob->SortKey = (passIndex << 24) | (effect->Usage << 16);
@@ -3253,7 +3253,7 @@ void Engine_::BuildPaintJobs()
         // visible)
         sAABox bbox;
         bbox.Rotate34(mesh->Jobs[jobId].BBox,Matrices[matrixId]);
-        sBool cullVisible = !mesh->Animation && sCullBBox(bbox,Frustum.Planes,5);
+        bool cullVisible = !mesh->Animation && sCullBBox(bbox, Frustum.Planes, 5);
 
         if(cullVisible && usage != ENGU_SHADOW)
           continue;

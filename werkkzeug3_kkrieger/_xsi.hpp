@@ -130,7 +130,7 @@ public:
 
   sVector BaseS,BaseR,BaseT;
   sVector TransS,TransR,TransT;
-  sBool Visible;
+  bool Visible;
   sInt Index;                     // use at your will    
   sInt Usage;
 
@@ -179,7 +179,7 @@ class sXSILoader : public sObject
 
 public:
 
-  sBool Error;
+  bool Error;
   const sChar *Scan;
   sInt Version;
 
@@ -193,7 +193,7 @@ public:
   void Tag();
   void Clear();
 
-  sBool LoadXSI(sChar *path);
+  bool LoadXSI(sChar *path);
   void Optimise();
   void DebugStats();
 };

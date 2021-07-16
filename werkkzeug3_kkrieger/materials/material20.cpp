@@ -36,7 +36,7 @@
 sMaterial20Base::sMaterial20Base(const sMaterial20Para &para)
 {
   Para = para;
-  UseSRT = sFALSE;
+  UseSRT = false;
   Setup = sINVALID;
   TexCount = 0;
 
@@ -59,7 +59,8 @@ sMaterial20Base::~sMaterial20Base()
     sSystem->MtrlRemSetup(Setup);
 }
 
-void sMaterial20Base::DefaultStates(sU32 *&states,sBool alphaTest,sBool zFill,sBool stencilTest,sInt alphaBlend)
+void sMaterial20Base::DefaultStates(sU32 *&states, bool alphaTest, bool zFill,
+                                    bool stencilTest, sInt alphaBlend)
 {
   sU32 *st = states;
 
@@ -154,7 +155,7 @@ void sMaterial20Base::AddSampler(sU32 *&states,sInt handle,sU32 flags)
 
   TexCount++;
   if(((flags >> 12) & 0x0f) >= 2)
-    UseSRT = sTRUE;
+    UseSRT = true;
 }
 
 void sMaterial20Base::UseTex(sU32 *&states,sInt index,sInt *handles)
@@ -168,10 +169,10 @@ void sMaterial20Base::UseTex(sU32 *&states,sInt index,sInt *handles)
   {
     sSystem->AddRefTexture(Tex[index]);
     AddSampler(states,handle,flags);
-    used = sTRUE;
+    used = true;
   }
   else
-    used = sFALSE;
+    used = false;
 }
 
 void sMaterial20Base::Compile(const sU32 *states,const sU32 *vs,const sU32 *ps)
@@ -211,7 +212,7 @@ sMaterial20ZFill::sMaterial20ZFill(const sMaterial20Para &para,sInt *tex)
 {
   sU32 states[256],*st=states;
   
-  DefaultStates(st,tex[3] != sINVALID,sTRUE,sFALSE,sFALSE);
+  DefaultStates(st, tex[3] != sINVALID, true, false, false);
   UseTex(st,3,tex);
 
   // states done
@@ -262,7 +263,7 @@ sMaterial20Tex::sMaterial20Tex(const sMaterial20Para &para,sInt *tex)
   : sMaterial20Base(para)
 {
   sU32 states[256],*st=states;
-  DefaultStates(st,sFALSE,sFALSE,sFALSE,0);
+  DefaultStates(st, false, false, false, 0);
 
   for(sInt i=0;i<3;i++)
     UseTex(st,i,tex);
@@ -326,7 +327,7 @@ sMaterial20Light::sMaterial20Light(const sMaterial20Para &para,sInt *tex,sU32 te
 {
   sU32 states[256],*st=states;
 
-  DefaultStates(st,sFALSE,sFALSE,sTRUE,(para.Flags & 4) ? 2 : 1);
+  DefaultStates(st, false, false, true, (para.Flags & 4) ? 2 : 1);
 
   // input render target
   TexTarget = texTarget;
@@ -436,7 +437,7 @@ sMaterial20Fat::sMaterial20Fat(const sMaterial20Para &para,sInt *tex)
 {
   sU32 states[256],*st=states;
 
-  DefaultStates(st,sFALSE,sFALSE,sTRUE,(para.Flags & 4) ? 2 : 1);
+  DefaultStates(st, false, false, true, (para.Flags & 4) ? 2 : 1);
   for(sInt i=0;i<2;i++)
     UseTex(st,i+4,tex);
 
@@ -524,7 +525,7 @@ sMaterial20Envi::sMaterial20Envi(const sMaterial20Para &para,sInt *tex)
 {
   sU32 states[256],*st=states;
 
-  DefaultStates(st,sFALSE,sFALSE,sFALSE,1);
+  DefaultStates(st, false, false, false, 1);
 
   // envi
   UseTex(st,6,tex);
@@ -582,7 +583,7 @@ sMaterial20VColor::sMaterial20VColor(const sMaterial20Para &para,sInt *tex)
 {
   sU32 states[256],*st=states;
 
-  DefaultStates(st,sFALSE,sFALSE,sFALSE,3);
+  DefaultStates(st, false, false, false, 3);
 
   // states done
   *st++ = ~0U;                            *st++ = ~0U;

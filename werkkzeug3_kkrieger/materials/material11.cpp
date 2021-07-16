@@ -26,7 +26,7 @@ void sMaterial11::FreeEverything()
 
 void sMaterial11::LoadDefaults()
 {
-  HasTexSRT = sFALSE;
+  HasTexSRT = false;
   Setup = sINVALID;
 
   BaseFlags = sMBF_ZON;
@@ -114,9 +114,9 @@ void sMaterial11::CopyFrom(const sMaterial11 *x)
 
 /****************************************************************************/
 
-void sMaterial11::DefaultCombiner(sBool *tex)
+void sMaterial11::DefaultCombiner(bool *tex)
 {
-  sBool mytex[4];
+  bool mytex[4];
   sInt i;
   sU32 light;
 
@@ -282,7 +282,7 @@ static void makeStencilStates(sU32 *&pt,sU32 flags)
   pt = data;
 }
 
-sBool sMaterial11::Compile()
+bool sMaterial11::Compile()
 {
   static const sU32 psatoc[16] =
   {
@@ -376,7 +376,7 @@ sBool sMaterial11::Compile()
 //*** initialize compile
 
   Setup = sINVALID;
-  HasTexSRT = sFALSE;
+  HasTexSRT = false;
   data = states;
   error = 0;
   vs = 0;
@@ -514,7 +514,7 @@ sBool sMaterial11::Compile()
     combinermask |= 1 << sMCS_TEX1;
 
 // prepare other information
-  HasTexSRT = sFALSE;
+  HasTexSRT = false;
 
   for(i=0;i<4;i++)
   {
@@ -523,7 +523,7 @@ sBool sMaterial11::Compile()
     if(combinermask & (1 << comb))
     {
       if((TFlags[i]&sMTF_TRANSMASK) >= sMTF_TRANS1)
-        HasTexSRT = sTRUE;
+        HasTexSRT = true;
     }
 
     pssrc13[comb] = XSALL|X_T|TFile[i];

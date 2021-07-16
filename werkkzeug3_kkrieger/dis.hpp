@@ -66,7 +66,7 @@ class DisFilter
   DataBuffer Buffer[NBUFFERS];
   sInt FuncTablePos;
   sU32 FuncTable[255];
-  sBool NextFunc;
+  bool NextFunc;
   sU32 LastJump;
   class DebugInfo *Info;
   CoreInstructionSet Instrs;

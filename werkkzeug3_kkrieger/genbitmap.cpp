@@ -77,7 +77,7 @@ static GenBitmap *NewBitmap(sInt xs,sInt ys)
   return bm;
 }
 
-static sBool CheckBitmap(GenBitmap *&bm,GenBitmap **inbm=0)
+static bool CheckBitmap(GenBitmap *&bm, GenBitmap **inbm = 0)
 {
   GenBitmap *oldbm = bm;
   
@@ -3394,7 +3394,7 @@ GenBitmap * __stdcall Bitmap_Cell(sInt xs,sInt ys,sU32 col0,sU32 col1,sU32 col2,
   sInt val,mdist;
   sU64 c0,c1,cc,cb;
   sU64 *tile;
-  sBool cut;
+  bool cut;
 
   SCRIPTVERIFY(max>=1 && max<=256);
 
@@ -3412,7 +3412,7 @@ GenBitmap * __stdcall Bitmap_Cell(sInt xs,sInt ys,sU32 col0,sU32 col1,sU32 col2,
       cells[i][2] = 0xffff;
     px = ((cells[i][0])&0x3fff)-0x2000;
     py = ((cells[i][1])&0x3fff)-0x2000; 
-    cut = sFALSE;
+    cut = false;
     for(j=0;j<i && !cut;j++)
     {
       dx = ((cells[j][0]-px)&0x3fff)-0x2000;
@@ -3420,7 +3420,7 @@ GenBitmap * __stdcall Bitmap_Cell(sInt xs,sInt ys,sU32 col0,sU32 col1,sU32 col2,
       dist = dx*dx+dy*dy;
       if(dist<mdist)
       {
-        cut = sTRUE;
+        cut = true;
       }
     }
     if(cut)

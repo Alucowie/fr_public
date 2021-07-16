@@ -267,7 +267,6 @@ typedef unsigned short            sChar;    // type for strings
 #else
 typedef char                      sChar;    // type for strings
 #endif
-typedef signed char               sBool;    // not so usefull, don't use
 typedef void*                     sPtr;     // not so usefull, don't use
 typedef const void*               sCPtr;    // not so usefull, don't use
 
@@ -327,8 +326,10 @@ sInt sGetPower2(sInt val);
 sF32 sFGetRnd();
 sF32 sFGetRnd(sF32 max);
 sU32 sDec3(sF32 x,sF32 y,sF32 z);
-void sHermite(sF32 *d,sF32 *p0,sF32 *p1,sF32 *p2,sF32 *p3,sInt count,sF32 fade,sF32 t,sF32 c,sF32 b,sBool ignoretime=0);
-void sHermiteD(sF32 *d,sF32 *dd,sF32 *p0,sF32 *p1,sF32 *p2,sF32 *p3,sInt count,sF32 fade,sF32 t,sF32 c,sF32 b,sBool ignoretime=0);
+void sHermite(sF32 *d, sF32 *p0, sF32 *p1, sF32 *p2, sF32 *p3, sInt count,
+              sF32 fade, sF32 t, sF32 c, sF32 b, bool ignoretime=0);
+void sHermiteD(sF32 *d, sF32 *dd, sF32 *p0, sF32 *p1, sF32 *p2, sF32 *p3,
+               sInt count, sF32 fade, sF32 t, sF32 c, sF32 b, bool ignoretime=0);
 __forceinline sF32 sFade(sF32 a,sF32 b,sF32 fade)												{return a+(b-a)*fade;}
 #endif
 
@@ -720,7 +721,7 @@ __forceinline sInt sDivShift30(sInt var_a,sInt var_b)
 }
 #endif
 
-sBool sNormalFloat(sF32 value);
+bool sNormalFloat(sF32 value);
 
 #pragma warning (default : 4035) 
 
@@ -797,14 +798,14 @@ sInt sScanHex(const sChar *&scan);
 #if !sMOBILE
 sF32 sScanFloat(const sChar *&scan);
 #endif
-sBool sScanString(const sChar *&scan,sChar *buffer,sInt size);
-sBool sScanName(const sChar *&scan,sChar *buffer,sInt size);
+bool sScanString(const sChar *&scan, sChar *buffer, sInt size);
+bool sScanName(const sChar *&scan, sChar *buffer, sInt size);
 void sScanSpace(const sChar *&scan);
-sBool sScanCycle(const sChar *cycle,sInt index,sInt &start,sInt &len);
+bool sScanCycle(const sChar *cycle, sInt index, sInt &start, sInt &len);
 
 void sCopyString(sChar *d,const sChar *s,sInt size);
 sInt sCmpString(const sChar *a,const sChar *b);
-sBool sFormatString(sChar *buffer,sInt size,const sChar *format,const sChar **fp); // return sFALSE if text is truncated!
+bool sFormatString(sChar *buffer, sInt size, const sChar *format, const sChar **fp); // return sFALSE if text is truncated!
 
 /****************************************************************************/
 /***                                                                      ***/
@@ -820,7 +821,7 @@ private:
   sInt Size;
   sInt Used;
   sU8 *Mem;
-  sBool Delete;
+  bool Delete;
 public:
   void Init();
   void Init(sInt size);
@@ -919,11 +920,11 @@ extern sF32 sReadF24(const sU8 *&data);
 #define sMAGIC_END      0x3e3e3e3e          // '>>>>'
 
 void sWriteString(sU32 *&,sChar *);
-sBool sReadString(sU32 *&,sChar *,sInt max);
+bool sReadString(sU32 *&, sChar *, sInt max);
 sU32 *sWriteBegin(sU32 *&,sU32 cid,sInt version);
 void sWriteEnd(sU32 *&,sU32 *header);
 sInt sReadBegin(sU32 *&,sU32 cid);
-sBool sReadEnd(sU32 *&);
+bool sReadEnd(sU32 *&);
 
 /****************************************************************************/
 /***                                                                      ***/
@@ -1043,9 +1044,9 @@ struct sRect
   __forceinline sInt XSize() const {return x1-x0;}
   __forceinline sInt YSize() const {return y1-y0;}
     void Init(const struct sFRect &r);
-  sBool Hit(sInt x,sInt y);
-  sBool Hit(const sRect &);
-  sBool Inside(const sRect &);
+  bool Hit(sInt x, sInt y);
+  bool Hit(const sRect &);
+  bool Inside(const sRect &);
   void And(const sRect &r);
   void Or(const sRect &r);
   void Sort();
@@ -1064,8 +1065,8 @@ struct sFRect
   __forceinline sF32 XSize() const {return x1-x0;}
   __forceinline sF32 YSize() const {return y1-y0;}
   void Init(const struct sRect &r);
-  sBool Hit(sF32 x,sF32 y);
-  sBool Hit(const sFRect &);
+  bool Hit(sF32 x, sF32 y);
+  bool Hit(const sFRect &);
   void And(const sFRect &r);
   void Or(const sFRect &r);
   void Sort();
@@ -1311,8 +1312,8 @@ struct sAABox
   void Rotate34(const sAABox &a,const sMatrix &m);
   void Or(const sAABox &b);
   void And(const sAABox &b);
-  sBool Intersects(const sAABox &b);
-  sBool IntersectsSphere(const sVector &center,sF32 radius);
+  bool Intersects(const sAABox &b);
+  bool IntersectsSphere(const sVector &center, sF32 radius);
 };
 
 /****************************************************************************/
@@ -1346,7 +1347,7 @@ struct sFrustum
 
 /****************************************************************************/
 
-sBool sCullBBox(const sAABox &box,const sCullPlane *planes,sInt planeCount);
+bool sCullBBox(const sAABox &box, const sCullPlane *planes, sInt planeCount);
 
 /****************************************************************************/
 
@@ -1385,7 +1386,7 @@ public:
   const sChar &operator[](sInt i) const { return Buffer[i]; }
   sChar &operator[](sInt i)    { return Buffer[i]; }
   sInt Count() const           { return sGetStringLen(Buffer); }
-  sBool IsEmpty() const        { return Buffer[0]==0; }
+  bool IsEmpty() const         { return Buffer[0]==0; }
   sInt Size() const            { return size; }
   void Write(sU32 *&data)      { sWriteString(data,Buffer); }
   void Read(sU32 *&data)       { sReadString(data,Buffer,size); }
@@ -1459,9 +1460,9 @@ public:
   virtual ~sObject()              { sBroker->DeleteObject(this); }
   virtual sU32 GetClass()         { return sCID_OBJECT; }
   virtual void Tag();
-  virtual sBool Write(sU32 *&);
-  virtual sBool Read(sU32 *&);
-  virtual sBool Merge(sU32 *&);
+  virtual bool Write(sU32 *&);
+  virtual bool Read(sU32 *&);
+  virtual bool Merge(sU32 *&);
   virtual void Clear();
   virtual void Copy(sObject *);
   sU32 TagVal;
@@ -1520,7 +1521,7 @@ public:
   sInt GetCount()                 { return Count; }
   void Swap(sInt i);
   void Swap(sInt i,sInt j);
-  sBool IsInside(Type *o);
+  bool IsInside(Type *o);
 };
 
 
@@ -1554,7 +1555,7 @@ public:
   sInt GetCount()                 { return Count; }
   void Swap(sInt i);
   void Swap(sInt i,sInt j);
-  sBool IsInside(Type *o);
+  bool IsInside(Type *o);
 };
 
 /****************************************************************************/
@@ -1694,7 +1695,7 @@ template <class Type> void sList<Type>::Swap(sInt i,sInt j)
   sSwap(Array[i],Array[j]);
 }
 
-template <class Type> sBool sList<Type>::IsInside(Type *o)               
+template <class Type> bool sList<Type>::IsInside(Type *o)
 { 
   for(sInt i=0;i<Count;i++) 
     if(Array[i]==o) 
@@ -1815,7 +1816,7 @@ template <class Type> void sObjList<Type>::Swap(sInt i,sInt j)
   sSwap(Array[i],Array[j]);
 }
 
-template <class Type> sBool sObjList<Type>::IsInside(Type *o)               
+template <class Type> bool sObjList<Type>::IsInside(Type *o)
 { 
   for(sInt i=0;i<Count;i++) 
     if(Array[i]==o) 
@@ -1933,7 +1934,7 @@ public:
   void AddHead(Type *o);
   void Swap(sInt i);
   void Swap(sInt i,sInt j);
-  sBool IsInside(Type *o);
+  bool IsInside(Type *o);
 */
 };
 
@@ -1964,7 +1965,7 @@ public:
   void AddHead(Type *o);
   void Swap(sInt i);
   void Swap(sInt i,sInt j);
-  sBool IsInside(Type *o);
+  bool IsInside(Type *o);
 */
 };
 
@@ -1991,8 +1992,8 @@ public:
   void Init(sInt xs,sInt ys);
   void Copy(sObject *);
   void Clear();
-  sBool Write(sU32 *&);
-  sBool Read(sU32 *&);
+  bool Write(sU32 *&);
+  bool Read(sU32 *&);
 };
 
 #endif
@@ -2019,12 +2020,12 @@ public:
   sInt Used;                            // this counter may be wrong!
 
   void Init(const sChar *,sInt len=-1);
-  sBool Realloc(sInt size);             // reallocate to exactly this size
-  sBool Grow(sInt size=0);              // reallocate to a large chunk, at least of this size
+  bool Realloc(sInt size);              // reallocate to exactly this size
+  bool Grow(sInt size=0);               // reallocate to a large chunk, at least of this size
   void Clear();
   void Copy(sObject *);
-  sBool Write(sU32 *&);
-  sBool Read(sU32 *&);
+  bool Write(sU32 *&);
+  bool Read(sU32 *&);
 
   void FixUsed();
   void Print(const sChar *);                 // these require correct Used-counter!
@@ -2072,7 +2073,7 @@ private:
 protected:
   sU8 *Stream;                      // the loaded data
   sInt StreamSize;
-  sBool StreamDelete;
+  bool StreamDelete;
 
 public:
   sInt Status;                      // 0=error, 1=ready, 2=pause, 3=playing
@@ -2080,17 +2081,17 @@ public:
 
   sMusicPlayer();
   virtual ~sMusicPlayer();
-  sBool Load(sChar *name);          // load from file, memory is deleted automatically
-  sBool Load(sU8 *data,sInt size,sBool ownMem=sFALSE);  // load from buffer, memory is deleted automatically if ownMem is set
-  sBool LoadCache(sChar *name);     // loads cached render buffer for "name"
-  sBool LoadAndCache(sChar *name);  // load with caching
-  sBool LoadAndCache(sChar *name,sU8 *data,sInt size,sBool ownMem=sFALSE); // load with caching from mem
+  bool Load(sChar *name);           // load from file, memory is deleted automatically
+  bool Load(sU8 *data, sInt size, bool ownMem=sFALSE); // load from buffer, memory is deleted automatically if ownMem is set
+  bool LoadCache(sChar *name);      // loads cached render buffer for "name"
+  bool LoadAndCache(sChar *name);   // load with caching
+  bool LoadAndCache(sChar *name, sU8 *data, sInt size, bool ownMem=sFALSE); // load with caching from mem
   void AllocRewind(sInt bytes);     // allocate a rewindbuffer
-  sBool Start(sInt songnr);         // initialize and start playing
+  bool Start(sInt songnr);          // initialize and start playing
   void Stop();                      // stop playing
-  sBool Handler(sS16 *buffer,sInt samples,sInt Volume=256); // return sFALSE if all following calls to handler will just return silence
+  bool Handler(sS16 *buffer, sInt samples, sInt Volume=256); // return sFALSE if all following calls to handler will just return silence
 
-  virtual sBool Init(sInt songnr)=0;
+  virtual bool Init(sInt songnr)=0;
   virtual sInt Render(sS16 *buffer,sInt samples)=0;   // return number of samples actually rendered, 0 for eof
   virtual sInt GetTuneLength() = 0; // in samples
 };

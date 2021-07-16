@@ -102,7 +102,7 @@ class KEnvironment;               // glue everything together
 
 sInt CalcCmdSize(sU8 *bytecode);         // calc size of one single bytecode command
 sInt CalcCodeSize(sU8 *bytecode);        // returns size of bytecode fragment
-sBool AnimCodeWritesTo(sU8 *code,sInt offset);  // find if offset is changed by code
+bool AnimCodeWritesTo(sU8 *code, sInt offset);  // find if offset is changed by code
 
 /****************************************************************************/
 
@@ -247,7 +247,7 @@ struct KInstanceMem               // used for instance-storage. derive from this
   KInstanceMem **DeleteChild;     // recurse to this child when DeleteChain(). 
   KInstanceMem **DeleteChild2;    // recurse to this child when DeleteChain(). 
   sVector *DeleteArray;           // call delete[] on this when DeleteChain().
-  sBool Reset;                    // set true on first encounter, automatically reset
+  bool Reset;                     // set true on first encounter, automatically reset
   void DeleteChain();             // delete a list of KInstanceMem, beginning with *this. can be called on 0-pointers
 };
 
@@ -410,7 +410,7 @@ struct KOp                        // Operator
   sInt Result;                    // class of result
   KObject *Cache;                 // result pointers, depending on class
 #if sPLAYER
-  sBool CacheFreed;               // cache is freed
+  bool CacheFreed;                // cache is freed
 #endif
   sInt Changed;                   // cache is dirty
   sInt DataInvalid;               // this operator has been animated, please copy DataCopy to Data
@@ -435,9 +435,9 @@ struct KOp                        // Operator
   sInt CycleFlag;                 // for cyclic check
   sInt CycleChangeFlag;           // for cyclic check
   sInt CacheSize;                 // for memory management
-  sBool Blocked;                  // for memory management
+  bool Blocked;                   // for memory management
 #endif
-  sBool AnimFlag;                 // op is (somehow) animated
+  bool AnimFlag;                  // op is (somehow) animated
   sInt VarStart;                  // animated variable range of this op
   sInt VarCount;                  // (generated during Init_, used during Exec_)
   KInstanceMem *SceneMemLink;     // linked list of instance memory used for scenejobs
@@ -472,19 +472,19 @@ public:
 
 // interface
 
-  sInt Calc(KEnvironment *,sInt flags);   // recursivly calculate, returns sTRUE when changed
+  sInt Calc(KEnvironment *,sInt flags);   // recursivly calculate, returns true when changed
   KObject *Call(KEnvironment *);  // InitHandler Recursion just call this op
 
   void ExecWithNewMem(KEnvironment *,KInstanceMem **link);
-  void ExecEvent(KEnvironment *,KEvent *,sBool newmem);// ExecHandler Recursion, set and reset variables for event
+  void ExecEvent(KEnvironment *, KEvent *, bool newmem); // ExecHandler Recursion, set and reset variables for event
   void Exec(KEnvironment *);      // (*ExecHandler)(op,kenv,...)
 
   void ExecInputs(KEnvironment *);// ExecHandler Recursion
   void ExecInput(KEnvironment *,sInt i);// ExecHandler Recursion
   void Change(sInt input=-1);     // do all stuff needed to update change status
-  sBool CheckOutput(sInt kc);     // check that this op outputs a valid object of the specified type. this also checks the THIS pointer for 0, so you may call it on zero pointers
+  bool CheckOutput(sInt kc);      // check that this op outputs a valid object of the specified type. this also checks the THIS pointer for 0, so you may call it on zero pointers
   void UpdateVar(sInt start,sInt count);
-  sBool IsWrittenTo(sInt offset); // checks if offset is written to in bytecode
+  bool IsWrittenTo(sInt offset);  // checks if offset is written to in bytecode
 /*
   sU32 GetU(sInt i) {return DataU[i];}            // getter for ops
   sS32 GetS(sInt i) {return DataS[i];}
@@ -523,7 +523,7 @@ public:
   void SetAnimCode(sU8 *AnimCode,sInt size);
   void CopyEditToAnim();
   void Uncache();
-  sBool HasAnim()              {return GetAnimCode()[0] != KA_END;}
+  bool HasAnim() { return GetAnimCode()[0] != KA_END; }
 
   sU8  *GetEditPtr (sInt i) {return ((sU8 *)DataEdit)+i;}
   sU32 *GetEditPtrU(sInt i) {return ((sU32*)DataEdit)+i;}

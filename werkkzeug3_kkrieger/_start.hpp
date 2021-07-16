@@ -39,7 +39,7 @@ struct sDirEntry;                 // load a directory
 
 // implement this to write a program
 
-sBool sAppHandler(sInt code,sDInt value);  
+bool sAppHandler(sInt code, sDInt value);
 
 // codes for sAppHandler. called in this order
 
@@ -202,8 +202,8 @@ struct sScreenInfo
 {
   sInt XSize;                     // width of screen
   sInt YSize;                     // height of screen
-  sBool FullScreen;               // is this fullscreen?
-  sBool LowQuality;               // low quality mode (for reduced video memory usage);
+  bool FullScreen;                // is this fullscreen?
+  bool LowQuality;                // low quality mode (for reduced video memory usage);
   sInt ShaderLevel;               // supported Shader level
   sF32 PixelRatio;                // usually 1:1, but 1280x1024 is different
 };
@@ -450,8 +450,8 @@ public:
   void Init(sChar *name,sInt height,sInt widht=0,sInt style=0);
   sInt GetWidth(sChar *,sInt len=-1);
   void Print(sBitmap *,sChar *,sInt x,sInt y,sU32 color=0xffffffff,sInt len=-1);
-  sBool Prepare(sBitmap *,sChar *,sHostFontLetter *);
-  sBool PrepareCheck(sInt xs,sInt ys,sChar *);
+  bool Prepare(sBitmap *, sChar *, sHostFontLetter *);
+  bool PrepareCheck(sInt xs, sInt ys, sChar *);
 
   // alternative to print
 
@@ -475,7 +475,7 @@ struct sDirEntry
 {
   sChar Name[256];                // filename        
   sInt Size;                      // size of file in bytes
-  sBool IsDir;                    // this is a directory, size is 0
+  bool IsDir;                     // this is a directory, size is 0
   sU8 pad[3];                     // pad it up..
 };
 
@@ -507,7 +507,7 @@ typedef void (*sSoundHandler)(sS16 *steriobuffer,sInt samples,void *user);
 
 struct sGeoBuffer                 // a vertex or indexbuffer
 {
-  sBool Type;                     // 0 = unused, 1 = index, 2 = vertex
+  bool Type;                      // 0 = unused, 1 = index, 2 = vertex
   sInt Size;                      // Size of the buffer in bytes
   sInt Used;                      // first free byte
   sInt UserCount;                 // counts active allocations. increased with alloc, decreased with free. if decreased to zero, the buffer is assumed to be completly free'ed and Used is reset
@@ -518,7 +518,7 @@ struct sGeoBuffer                 // a vertex or indexbuffer
   };
 
   void Init();                    // clear all field of structure
-  sBool Alloc(sInt count,sInt size,sInt &first,sInt type);  // alloc space for COUNT elements of size SIZE, return first aligned byte index in FIRST if it fits.
+  bool Alloc(sInt count, sInt size, sInt &first, sInt type);  // alloc space for COUNT elements of size SIZE, return first aligned byte index in FIRST if it fits.
   void Free();
 };
 
@@ -670,7 +670,7 @@ struct sSampleBuffer
 struct sSample
 {
   sSampleBuffer Buffers[sMAXSAMPLEBUFFER];
-  sBool Is3D;
+  bool Is3D;
   sInt Count;
   sInt LRU;
   sInt Uses;
@@ -705,7 +705,7 @@ struct sSystem_
   void SetStates(sU32 *stream);
   void SetState(sU32 token,sU32 value);
 
-  void AllocBufferInternal(sGeoBufferRef &ref,sInt size,sBool stat,sInt index,void **ptr);
+  void AllocBufferInternal(sGeoBufferRef &ref, sInt size, bool stat, sInt index, void **ptr);
 
 #if !sINTRO_XXX                   // uncommenting this makes everything LARGER!
   sInt CmdFullscreen;
@@ -761,7 +761,7 @@ struct sSystem_
 
 // DirectSound
 
-  sBool InitDS();
+  bool InitDS();
   void ExitDS();
   void FillDS();
   void MarkDS();
@@ -771,7 +771,7 @@ struct sSystem_
 
 // direct input
 
-  sBool InitDI();
+  bool InitDI();
   void ExitDI();
   void PollDI();
   void AddAKey(sU32 *Scans,sInt ascii);
@@ -791,7 +791,7 @@ struct sSystem_
   sInt LastVB;
   sInt LastVSize;
   sInt LastIB;
-  sBool MtrlReset;
+  bool MtrlReset;
 
 #if !sINTRO
   sPerfInfo PerfLast;
@@ -849,8 +849,8 @@ struct sSystem_
   sU32 GetCpuMask() { return CpuMask; }                   // sCPU_???
   sU32 GetGpuMask() { return GpuMask; }                   // sGPU_???
   sInt GetShaderLevel() { return HardwareShaderLevel; }     // sPS_??
-  void ContinuousUpdate(sBool b) { WConstantUpdate = b; } // false->don't update when no focus
-  void SetResponse(sBool fastresponse) {WResponse = fastresponse;} // enable fast responding but low performance mode
+  void ContinuousUpdate(bool b) { WConstantUpdate = b; }  // false->don't update when no focus
+  void SetResponse(bool fastresponse) { WResponse = fastresponse; } // enable fast responding but low performance mode
 #endif
   sChar *GetCmdLine();
 
@@ -861,14 +861,14 @@ struct sSystem_
 
 // windows user interface access
 
-  sBool FileRequester(sChar *buffer,sInt size,sU32 flags);
+  bool FileRequester(sChar *buffer, sInt size, sU32 flags);
 
 // input
 
   void GetInput(sInt id,sInputData &data);                // get mouse or joystick
   sU32 GetKeyboardShiftState();                           // get current keyboard shift state (synchrone)
   void GetKeyName(sChar *buffer,sInt size,sU32 key);      // get user-readable key name with qualifier
-  sBool GetAbortKey();                                    // was abort key pressed since last call of ClearAbortKey()? (asynchrone)
+  bool GetAbortKey();                                     // was abort key pressed since last call of ClearAbortKey()? (asynchrone)
   void ClearAbortKey();                                   // clear the abort-key-status
   sInt GetTime();                                         // get current time in milliseconds
   void GetPerf(sPerfInfo &,sInt mode);
@@ -876,21 +876,21 @@ struct sSystem_
   void PerfKalib();                                       // calibrate performancecounter, done by sPerfMon or system
   sU32 PerfTime();                                        // get µsec exact time 
 
-  sBool GetWinMouse(sInt &x,sInt &y);                     // get windows cursor position
-  sBool GetWinMouseAbs(sInt &x,sInt &y);                  // get windows cursor position (screen coordinates)
+  bool GetWinMouse(sInt &x, sInt &y);                     // get windows cursor position
+  bool GetWinMouseAbs(sInt &x, sInt &y);                  // get windows cursor position (screen coordinates)
   void SetWinMouse(sInt x,sInt y);                        // set windows cursor position
   void SetWinTitle(sChar *name);                          // set window title
   void MoveWindow(sInt dx,sInt dy);                       // drag the window around
   void SetWinMode(sInt mode);                             // 0=normal, 1=max, 2=min
   sInt GetWinMode();                                      // siehe oben
-  void HideWinMouse(sBool hide);                          // hide windows cursor
+  void HideWinMouse(bool hide);                           // hide windows cursor
 
 // sound
 
   void SetSoundHandler(sSoundHandler hnd,sInt align=0,void *user=0);     // sets a new soundhandler. resets current sample
   sInt GetCurrentSample();                                // gets sample# played at last flip.
 #if sLINK_KKRIEGER
-  sInt SampleAdd(sS16 *data,sInt size,sInt buffers=1,sInt usehandle=-1,sBool is3d=sFALSE);   // size is in stereo samples, buffers is for DX-Sucking-Buffers
+  sInt SampleAdd(sS16 *data, sInt size, sInt buffers=1, sInt usehandle=-1, bool is3d=sFALSE);   // size is in stereo samples, buffers is for DX-Sucking-Buffers
   void SampleRem(sInt handle);
   void SampleRemAll();
   sInt SamplePlay(sInt handle,sF32 volume=1.0f,sF32 pan=0,sInt freq=44100);
@@ -907,22 +907,22 @@ struct sSystem_
   sU8 *LoadFile(const sChar *name);                             // load file entirely
   sU8 *LoadFileIfNewerThan(const sChar *name,const sChar *other,sInt &size);  // for caching
   sChar *LoadText(const sChar *name);                           // load file entirely and add trailing zero
-  sBool SaveFile(const sChar *name,const sU8 *data,sInt size);  // save file entirely  
+  bool SaveFile(const sChar *name, const sU8 *data, sInt size); // save file entirely
   sU64 GetFileStamp(const sChar *name);                         // get a number. when it changes, the file has changed...
 
   sDirEntry *LoadDir(const sChar *name);                        // load directory. ends with dir[n].Name[0]==0
-  sBool MakeDir(const sChar *name);                             // create new directory
-  sBool CheckDir(const sChar *name);                            // check if path is valid
-  sBool CheckFile(const sChar *name);                           // check if file exists is valid
-  sBool RenameFile(const sChar *oldname,const sChar *newname);  // rename file (old and new are complete path)
-  sBool DeleteFile(const sChar *name);                          // delete file from disk
+  bool MakeDir(const sChar *name);                              // create new directory
+  bool CheckDir(const sChar *name);                             // check if path is valid
+  bool CheckFile(const sChar *name);                            // check if file exists is valid
+  bool RenameFile(const sChar *oldname, const sChar *newname);  // rename file (old and new are complete path)
+  bool DeleteFile(const sChar *name);                           // delete file from disk
   void GetCurrentDir(sChar *buffer,sInt size);            // get current dir as "c:/nxn/genthree"
   sU32 GetDriveMask();                                    // get bitmask of available drives
 
   
 
   sBitmap *LoadBitmap(const sU8 *data,sInt size);               // load bitmap using windows loader
-  sBool LoadBitmapCore(const sU8 *data,sInt size,sInt &x,sInt &y,sU8 *&d);   // simplified version for intro
+  bool LoadBitmapCore(const sU8 *data, sInt size, sInt &x, sInt &y, sU8 *&d); // simplified version for intro
 
 // font
 
@@ -936,16 +936,16 @@ struct sSystem_
 
 // graphics
 
-  sBool GetScreenInfo(sInt i,sScreenInfo &info);          // get screen size and availability
+  bool GetScreenInfo(sInt i, sScreenInfo &info);          // get screen size and availability
   sInt GetScreenCount();                                  // get number of screens
-  sBool GetFullscreen();                                  // at least one screen is fullscreen
+  bool GetFullscreen();                                   // at least one screen is fullscreen
   void Reset(sU32 flags,sInt x,sInt y,sInt x2,sInt y2);   // set new screen config
 
   void SetGamma(sF32 gamma);
 
   void Clear(sU32 flags,sU32 color=0);          // clear.
   void SetViewport(const sViewport &vp);        // set viewport.
-  void GrabScreen(sInt sourceRT,const sRect &win,sInt tex,sBool stretch=sTRUE);   // grab screen
+  void GrabScreen(sInt sourceRT, const sRect &win, sInt tex, bool stretch=sTRUE); // grab screen
   void Begin2D(sU32 **buffer,sInt &stride);
   void End2D();
 
@@ -959,7 +959,7 @@ struct sSystem_
   void UpdateTexture(sInt handle,sBitmap *bm);    // update texture bitmap (must be same size)
   void UpdateTexture(sInt handle,sU16 *,sInt miptresh=0);         // update texture (new version)
   void ReadTexture(sInt handle,sU16 *data);
-  sBool StreamTextureStart(sInt h,sInt l,sBitmapLock &);  // start texture streaming (handle,mipmap,result)
+  bool StreamTextureStart(sInt h, sInt l, sBitmapLock &); // start texture streaming (handle,mipmap,result)
   void StreamTextureEnd();                      // done writing texture
   void FlushTexture(sInt handle);                         // let that texture relaod
 
@@ -988,7 +988,7 @@ struct sSystem_
 
 // video recorder
 #if !sPLAYER
-  sBool VideoStart(sChar *filename,sF32 fpsrate,sInt xRes,sInt yRes);
+  bool VideoStart(sChar *filename, sF32 fpsrate, sInt xRes, sInt yRes);
   void VideoViewport(sViewport &vp);
   sInt VideoWriteFrame(sF32 &u1,sF32 &v1); // returns rendertarget tex
   void VideoEnd();

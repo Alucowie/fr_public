@@ -48,7 +48,7 @@ sInt DebugInfo::MakeString(sChar *string)
   return i;
 }
 
-bool virtAddressComp(const DISymbol &a,const DISymbol &b)
+bool virtAddressComp(const DISymbol &a, const DISymbol &b)
 {
   return a.VA < b.VA;
 }
@@ -307,7 +307,7 @@ void DebugInfo::FinishAnalyze()
   }
 }
 
-sBool DebugInfo::FindSymbol(sU32 VA,DISymbol **sym)
+bool DebugInfo::FindSymbol(sU32 VA, DISymbol **sym)
 {
   sInt l,r,x;
 
@@ -324,27 +324,27 @@ sBool DebugInfo::FindSymbol(sU32 VA,DISymbol **sym)
     else
     {
       *sym = &Symbols[x]; // we found a match
-      return sTRUE;
+      return true;
     }
   }
 
   *sym = (l + 1 < Symbols.Count) ? &Symbols[l+1] : 0;
-  return sFALSE;
+  return false;
 }
 
 static sChar ReportBuffer[1024*1024];
 
-bool symPackedSizeComp(const DISymbol &a,const DISymbol &b)
+bool symPackedSizeComp(const DISymbol &a, const DISymbol &b)
 {
   return a.PackedSize > b.PackedSize;
 }
 
-bool namePackedSizeComp(const DISymNameSp &a,const DISymNameSp &b)
+bool namePackedSizeComp(const DISymNameSp &a, const DISymNameSp &b)
 {
   return a.PackedSize > b.PackedSize;
 }
 
-bool filePackedSizeComp(const DISymFile &a,const DISymFile &b)
+bool filePackedSizeComp(const DISymFile &a, const DISymFile &b)
 {
   return a.PackedSize > b.PackedSize;
 }
@@ -494,7 +494,7 @@ void ReorderBuffer::Add(sU32 newVA,sU32 newSize,sU32 oldVA,sU32 oldSize)
   item->OldSize = oldSize;
 }
 
-static bool reorderComp(const ReorderItem &a,const ReorderItem &b)
+static bool reorderComp(const ReorderItem &a, const ReorderItem &b)
 {
   return a.NewVA < b.NewVA;
 }
@@ -510,7 +510,7 @@ void ReorderBuffer::Finish()
     sVERIFY(Reorder[i].NewVA + Reorder[i].NewSize <= Reorder[i+1].NewVA);
 }
 
-sBool ReorderBuffer::Find(sU32 addr,ReorderItem **reord)
+bool ReorderBuffer::Find(sU32 addr, ReorderItem **reord)
 {
   sInt l,r,x;
 
@@ -526,12 +526,12 @@ sBool ReorderBuffer::Find(sU32 addr,ReorderItem **reord)
     else
     {
       *reord = &Reorder[x]; // we got a match
-      return sTRUE;
+      return true;
     }
   }
 
   *reord = (l + 1 < Reorder.Count) ? &Reorder[l + 1] : 0;
-  return sFALSE;
+  return false;
 }
 
 /****************************************************************************/

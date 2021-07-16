@@ -21,7 +21,7 @@ struct MAPFileReader::Section
   sU32 Start;
   sU32 Length;
   DIString Name;
-  sBool Seen;
+  bool Seen;
   sInt Class;
 };
 
@@ -38,18 +38,18 @@ sInt MAPFileReader::ScanString(const sChar *&string, DebugInfo &to)
   return to.MakeString(buffer);
 }
 
-sBool MAPFileReader::IsHexString(const sChar *str,sInt count)
+bool MAPFileReader::IsHexString(const sChar *str, sInt count)
 {
   while(count--)
   {
     if(!(*str>='0' && *str<='9' || *str>='A' && *str<='F' ||
       *str>='a' && *str<='f'))
-      return sFALSE;
+      return false;
 
     str++;
   }
 
-  return sTRUE;
+  return true;
 }
 
 MAPFileReader::Section *MAPFileReader::GetSection(sInt num,sU32 offs)
@@ -68,7 +68,7 @@ MAPFileReader::Section *MAPFileReader::GetSection(sInt num,sU32 offs)
 
 /****************************************************************************/
 
-sBool MAPFileReader::ReadDebugInfo(sChar *fileName,DebugInfo &to)
+bool MAPFileReader::ReadDebugInfo(sChar *fileName, DebugInfo &to)
 {
   PUnDecorateSymbolName UnDecorateSymbolName = 0;
 
@@ -86,7 +86,7 @@ sBool MAPFileReader::ReadDebugInfo(sChar *fileName,DebugInfo &to)
 
   text = (sChar *) sSystem->LoadFile(fileBuf);
   if(!text)
-    return sFALSE;
+    return false;
 
   // load dbghelp.dll to resolve symbol names if available
   void *module = LoadLibraryA("dbghelp.dll");
@@ -141,7 +141,7 @@ sBool MAPFileReader::ReadDebugInfo(sChar *fileName,DebugInfo &to)
         else
           sec->Class = DIC_UNKNOWN;
 
-        sec->Seen = sFALSE;
+        sec->Seen = false;
       }
       else // assume name definition
       {
@@ -168,7 +168,7 @@ sBool MAPFileReader::ReadDebugInfo(sChar *fileName,DebugInfo &to)
             sym->Size = 0;
             sym->Class = DIC_END;
             
-            sec->Seen = sTRUE;
+            sec->Seen = true;
           }
 
           if(UnDecorateSymbolName)
@@ -218,7 +218,7 @@ sBool MAPFileReader::ReadDebugInfo(sChar *fileName,DebugInfo &to)
   Sections.Exit();
   delete[] text;
 
-  return sTRUE;
+  return true;
 }
 
 /****************************************************************************/

@@ -47,7 +47,7 @@ struct GenMinVert                 // a vertex
   sF32 Weights[KMM_MAXBONE];      // bone weights
   sU16 Matrix[KMM_MAXBONE];       // bone matrix index
 
-  sBool IsSame(const GenMinVert &v,sBool uv);
+  bool IsSame(const GenMinVert &v, bool uv);
 };
 
 struct GenMinFace                 // a face
@@ -78,7 +78,7 @@ struct GenMinCluster              // a cluster of faces with same material
     AnimType=anim;
     AnimMatrix=mtx;
   }
-  sBool Equals(const GenMinCluster &cl)
+  bool Equals(const GenMinCluster &cl)
   {
     if(Mtrl!=cl.Mtrl) return 0;
     if(RenderPass!=cl.RenderPass) return 0;
@@ -221,8 +221,8 @@ public:
 
   sInt *CalcMergeVerts() const;
 
-  sBool CalcAdjacencyCore(const sInt *remap); // returns sTRUE iff mesh is closed
-  sBool CalcAdjacency(); // return sTRUE iff mesh is closed
+  bool CalcAdjacencyCore(const sInt *remap); // returns true iff mesh is closed
+  bool CalcAdjacency(); // return true iff mesh is closed
   void VerifyAdjacency();
   void BakeAnimation(sF32 fade,sF32 metamorph);
 

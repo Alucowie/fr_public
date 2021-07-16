@@ -38,7 +38,7 @@ struct sSystem_
   sU8 *LoadFile(const sChar *name,sInt &size);                  // load file entirely, return size
   sU8 *LoadFile(const sChar *name);                             // load file entirely
   sChar *LoadText(const sChar *name);                           // load file entirely and add trailing zero
-  sBool SaveFile(const sChar *name,const sU8 *data,sInt size);  // save file entirely
+  bool SaveFile(const sChar *name, const sU8 *data, sInt size); // save file entirely
 
 // misc
   sInt GetTime();

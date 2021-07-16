@@ -159,13 +159,13 @@ static void MusicPlayerHandler(sS16 *buffer,sInt samples,void *user)
 }
 #endif
 
-extern sBool ConfigDialog(sInt nr,const sChar *title);
+extern bool ConfigDialog(sInt nr, const sChar *title);
 
 extern sInt DebugTextMem;
 
 sInt DebugTexMem = 0;
 
-sBool sAppHandler(sInt code,sDInt value)
+bool sAppHandler(sInt code, sDInt value)
 {
   static const sInt aspectRatios[][2] = { { 4,3 }, { 5,4 }, { 16,9 }, { 16,10 }, { 2,1 } };
 
@@ -427,13 +427,13 @@ sBool sAppHandler(sInt code,sDInt value)
     if(beat>=0 && root->Cache->ClassId==KC_DEMO)
     {
       GenOverlayManager->Reset(Environment);
-      GenOverlayManager->RealPaint = sTRUE;
+      GenOverlayManager->RealPaint = true;
       GenOverlayManager->Game = Game;
 
       sFloatFix();
       root->Exec(Environment);
 
-      GenOverlayManager->RealPaint = sFALSE;
+      GenOverlayManager->RealPaint = false;
       GenOverlayManager->Reset(Environment);
     }
 
@@ -455,9 +455,9 @@ sBool sAppHandler(sInt code,sDInt value)
     break;
 #if !sINTRO
   default:
-    return sFALSE;
+    return false;
 #endif
   }
 
-  return sTRUE;
+  return true;
 }

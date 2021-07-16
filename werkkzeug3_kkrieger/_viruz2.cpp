@@ -787,7 +787,7 @@ CV2MPlayer::~CV2MPlayer()
 
 
 
-sBool CV2MPlayer::InitBase(const void *a_v2m)
+bool CV2MPlayer::InitBase(const void *a_v2m)
 ///////////////////////////////////////
 {
 	const sU8 *d=(const sU8*)a_v2m;
@@ -826,12 +826,12 @@ sBool CV2MPlayer::InitBase(const void *a_v2m)
 		}		
 	}
 	sInt size=*((sU32*)d);
-	if (size>16384 || size<0) return sFALSE;
+	if (size>16384 || size<0) return false;
 	d+=4;
 	m_base.globals=d;
 	d+=size;
 	size=*((sU32*)d);
-	if (size>1048576 || size<0) return sFALSE;
+	if (size>1048576 || size<0) return false;
 	d+=4;
 	m_base.patchmap=d;
 	d+=size;
@@ -855,7 +855,7 @@ sBool CV2MPlayer::InitBase(const void *a_v2m)
 		}
 	}
 #endif
-	return sTRUE;
+	return true;
 }
 
 
@@ -1019,18 +1019,18 @@ void CV2MPlayer::Tick()
 
 
 
-sBool CV2MPlayer::Open(const void *a_v2mptr, sU32 a_samplerate)
+bool CV2MPlayer::Open(const void *a_v2mptr, sU32 a_samplerate)
 ///////////////////////////////////////////////////////////////
 {
 	if (m_base.valid) Close();
 	
 	m_samplerate=a_samplerate;
 
-	if (!InitBase(a_v2mptr)) return sFALSE;
+	if (!InitBase(a_v2mptr)) return false;
 
 	Reset();
 
-	return m_base.valid=sTRUE;
+	return m_base.valid = true;
 }
 
 
@@ -1054,7 +1054,7 @@ void CV2MPlayer::Play(sU32 a_time)
 	Stop();
 	Reset();
 
-	m_base.valid=sFALSE;
+	m_base.valid = false;
 	sU32 destsmpl, cursmpl=0;
 #ifdef __GNUC__
 #if defined(__x86_64__)
@@ -1116,7 +1116,7 @@ void CV2MPlayer::Play(sU32 a_time)
 	m_timeoffset=cursmpl-m_state.cursmpl;
 	m_fadeval=1.0f;
 	m_fadedelta=0.0f;
-	m_base.valid=sTRUE;
+	m_base.valid = true;
 }
 
 
@@ -1180,10 +1180,10 @@ void CV2MPlayer::Stop(sU32 a_fadetime)
 
 
 
-sBool CV2MPlayer::Render(sF32 *a_buffer, sU32 a_len)
+bool CV2MPlayer::Render(sF32 *a_buffer, sU32 a_len)
 ////////////////////////////////////////////////////
 {
-	if (!a_buffer) return sFALSE;
+	if (!a_buffer) return false;
 
 	if (m_base.valid && m_state.state==PlayerState::PLAYING)
 	{
@@ -2136,14 +2136,14 @@ sU8 *sViruz2::ConvertV2M(const sU8 *in,sInt inlen,sInt &outlen)
   return out;
 }
 
-sBool sViruz2::Init(sInt songnr)
+bool sViruz2::Init(sInt songnr)
 {
   Buffer = new sF32[16384];
   Viruz.Open(Stream);
   Viruz.Play(0);
 //  ssInit(Stream,0);
 //  ssPlay();
-  return sTRUE;
+  return true;
 }
 
 sInt sViruz2::Render(sS16 *d,sInt samples)

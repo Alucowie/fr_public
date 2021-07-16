@@ -162,7 +162,7 @@ class sMaterial11 : public sMaterial  // order+size must match material operator
 {
   sInt Tex[4];                    // texture handles
   sInt TexUse[4];                 // maps texture stages to texture numbers
-  sBool HasTexSRT;                // texture srt used?
+  bool HasTexSRT;                 // texture srt used?
   sInt Setup;                     // setup id
 
   void FreeEverything();
@@ -201,10 +201,10 @@ public:
 
   void Reset();
   void CopyFrom(const sMaterial11 *x);
-  void DefaultCombiner(sBool *tex=0); // set combiner to defaults, tex holds an array of bools if the textures are set.
+  void DefaultCombiner(bool *tex = 0); // set combiner to defaults, tex holds an array of bools if the textures are set.
   void SetTex(sInt i,sInt handle);
 
-  sBool Compile();
+  bool Compile();
   void Set(const sMaterialEnv &env);
 
   static void SetShadowStates(sU32 flags);

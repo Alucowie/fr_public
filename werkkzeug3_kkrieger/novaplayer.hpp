@@ -52,7 +52,7 @@ struct KEnvironment2
   void Exit();
   sViewport View;                           // viewport 
   sMaterialEnv Env;                         // camera
-  sBool InScene;                            // BeginViewport() already called
+  bool InScene;                             // BeginViewport() already called
   sInt BeatTime;                            // absolte time
   sInt EffectBeatTime;                      // time relative to effect
   sArray<struct KEvent2 *> Events;          // list of all effects, for globals.

@@ -9,7 +9,7 @@
 namespace FRIED
 {
   // ---- the quantization tables themselves
-  static sBool tablesInitialized = sFALSE;
+  static bool tablesInitialized = false;
   static sInt qdescale[8][16];
   static sInt qrescale[8][16];
 
@@ -105,7 +105,7 @@ namespace FRIED
       }
     }
 
-    tablesInitialized = sTRUE;
+    tablesInitialized = true;
   }
 
   // ---- actual quantization functions

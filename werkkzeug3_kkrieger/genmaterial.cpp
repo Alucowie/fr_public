@@ -385,7 +385,7 @@ GenMaterial * __stdcall Init_Material_Material(KOp *op)
       info->Reset();
       info->Color[0] = 0xffff2020;
       info->Combiner[sMCS_COLOR0] = sMCOA_SET;
-      sBool ok = info->Compile();
+      bool ok = info->Compile();
       sVERIFY(ok);
     }
 #if !sPLAYER

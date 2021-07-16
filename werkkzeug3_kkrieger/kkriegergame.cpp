@@ -249,7 +249,7 @@ void KKriegerGame::Init()
   Switches[KGS_MOUSESPEED] = 5;
   Switches[KGS_BRIGHTNESS] = 5;
   Switches[KGS_SPECULAR] = 1;
-  WasInOptions = sFALSE;
+  WasInOptions = false;
 
   OnOptionsChanged();
 }
@@ -777,7 +777,7 @@ void KKriegerGame::CellConnect()
 
 #pragma lekktor(off)
 
-sBool KKriegerGame::OnKey(sU32 key)
+bool KKriegerGame::OnKey(sU32 key)
 {
   sInt i;
   static sInt CheatOn;
@@ -815,71 +815,71 @@ sBool KKriegerGame::OnKey(sU32 key)
   case 'W':
     AccelForw = AccelForwFactor;
     CheatOn = 0;
-    return sTRUE;
+    return true;
   case 's':
   case 'S':
     AccelForw = -AccelBackFactor;
     CheatOn = 0;
-    return sTRUE;
+    return true;
   case 'd':
   case 'D':
     AccelSide = AccelSideFactor;
     CheatOn = 0;
-    return sTRUE;
+    return true;
   case 'a':
   case 'A':
     AccelSide = -AccelSideFactor;
     CheatOn = 0;
-    return sTRUE;
+    return true;
   case 'w'|sKEYQ_BREAK:
   case 'W'|sKEYQ_BREAK:
   case 's'|sKEYQ_BREAK:
   case 'S'|sKEYQ_BREAK:
     AccelForw = 0;
     CheatOn = 0;
-    return sTRUE;
+    return true;
   case 'd'|sKEYQ_BREAK:
   case 'D'|sKEYQ_BREAK:
   case 'a'|sKEYQ_BREAK:
   case 'A'|sKEYQ_BREAK:
     AccelSide = 0;
     CheatOn = 0;
-    return sTRUE;
+    return true;
 
   case 'y':
   case 'Y':
     FlyMode = !FlyMode;
-    return sTRUE;
+    return true;
 
   case sKEY_SHIFTL:
     Player.UseKey = 1;
-    return sTRUE;
+    return true;
 
   case sKEY_CTRLR:
   case sKEY_MOUSEL:
     Player.FireKey = 1;
-    return sTRUE;
+    return true;
   case sKEY_CTRLR|sKEYQ_BREAK:
   case sKEY_MOUSEL|sKEYQ_BREAK:
     Player.FireKey = 0;
-    return sTRUE;
+    return true;
 
 #if !sPLAYER
   case 'z':
     CamZoomPos = (CamZoomPos+1)%2;
-    return sTRUE;
+    return true;
 #endif
 
   case 'm':
   case 'M':
     CheatOn = 1;
-    return sTRUE;
+    return true;
   case 'n':
   case 'N':
     if(CheatOn)
       sCopyMem(&Player.Life,&Player.LifeMax,16*4);
     CheatOn = 0;
-    return sTRUE;
+    return true;
 
   case '1':
   case '2':
@@ -901,9 +901,9 @@ sBool KKriegerGame::OnKey(sU32 key)
       if(i>=0 && Player.Weapon[i])
         Player.NextWeapon = i;
     }
-    return sTRUE;
+    return true;
   }
-  return sFALSE;
+  return false;
 }
 
 /****************************************************************************/
@@ -966,7 +966,7 @@ void KKriegerGame::AddEvents(KEnvironment *kenv)
 
 /****************************************************************************/
 
-void KKriegerGame::ResetRoot(KEnvironment *env,KOp *root,sBool firsttime)
+void KKriegerGame::ResetRoot(KEnvironment *env, KOp *root, bool firsttime)
 {
   SetPainter(root,env);
   Restart();
@@ -1170,7 +1170,7 @@ void KKriegerGame::OnTick(KEnvironment *kenv,sInt slices)
   sInt i;
   KKriegerMonster *mon;
   sInt sl;
-  sBool inOptions;
+  bool inOptions;
   sF32 f;
   KKriegerCollideInfo ci;
 
@@ -1407,8 +1407,8 @@ void KKriegerGame::OnTick(KEnvironment *kenv,sInt slices)
     // AI
 
     {
-      sBool prev;
-      sBool mach;
+      bool prev;
+      bool mach;
 
       prev = 0;
       mach = 0;
@@ -2194,7 +2194,7 @@ void KKriegerShot::Exit()
   }
 }
 
-sBool KKriegerGame::ShotAI(KKriegerShot *shot)
+bool KKriegerGame::ShotAI(KKriegerShot *shot)
 {
   KKriegerCollideInfo ci;
   sVector newpos,speed;
@@ -2246,7 +2246,7 @@ sBool KKriegerGame::ShotAI(KKriegerShot *shot)
       event->Matrix.InitDir(ci.Plane);
       event->Matrix.l = shot->Matrix.l;
       Environment->AddDynamicEvent(event);
-      return sFALSE;
+      return false;
     }
   }
   shot->DoubleKill = 0;
@@ -2260,18 +2260,19 @@ sBool KKriegerGame::ShotAI(KKriegerShot *shot)
     event->Matrix = shot->Matrix;
     Environment->AddDynamicEvent(event);
 
-    return sFALSE;
+    return false;
   }
   if(ci.DCell && ci.DCell==&Player.HitCell && shot->Who==KCRF_ISMONSTER)
   {
     Player.Hit(WeaponHits[shot->Weapon]);
-    return sFALSE;
+    return false;
   }
-  return sTRUE;
+  return true;
 }
 
 
-void KKriegerGame::MonsterAI(KKriegerMonster *mon,KEnvironment *kenv,sBool machinelife,sBool prevlife)
+void KKriegerGame::MonsterAI(KKriegerMonster *mon, KEnvironment *kenv,
+                             bool machinelife, bool prevlife)
 {
   sF32 dist;
   sVector delta;
@@ -2282,7 +2283,7 @@ void KKriegerGame::MonsterAI(KKriegerMonster *mon,KEnvironment *kenv,sBool machi
 //  KKriegerCellAdd *cell;
   sVector p0,p1;
   sF32 attackdist;
-  sBool spawn;
+  bool spawn;
   KKriegerCollideInfo ci;
 //  sMatrix mat;
 //  sInt i;
@@ -2599,7 +2600,7 @@ void KKriegerGame::Physic(sF32 fade)
 /****************************************************************************/
 
 
-sBool KKriegerGame::CollideRay(
+bool KKriegerGame::CollideRay(
   KKriegerCellAdd *&cadd,         // old / new add-cell
   const sVector &p1,              // move to here
   const sVector &p0,              // move from here
@@ -2667,7 +2668,7 @@ retry:;
         ci.Pos   = ci2.Pos;
       }
     }
-    return sTRUE;
+    return true;
   }
 
   // we are well in add, check subs
@@ -2679,14 +2680,15 @@ retry:;
 // find nearest intersection with subcell.
 // .. add code to check zones here ..
 
-sBool KKriegerGame::CollideRaySub(const sVector &d,const sVector &p1,const sVector &p0,KKriegerCellAdd **list,sInt count,KKriegerCollideInfo &ci)
+bool KKriegerGame::CollideRaySub(const sVector &d, const sVector &p1, const sVector &p0,
+                                 KKriegerCellAdd **list, sInt count, KKriegerCollideInfo &ci)
 {
   sInt i,j;
-  sBool collided;
+  bool collided;
   KKriegerCell *cell;
   KKriegerCellAdd *cadd;
   KKriegerCellDynamic *dcell;
-  sBool hit0,hit1;
+  bool hit0,hit1;
 
   GAMEPERF(CallFindSubIntersect);
 
@@ -2751,11 +2753,12 @@ sBool KKriegerGame::CollideRaySub(const sVector &d,const sVector &p1,const sVect
   return collided;
 }
 
-sBool KKriegerGame::CollideRaySub2(const sVector &d,const sVector &p1,const sVector &p0,KKriegerCell *cell,KKriegerCollideInfo &ci)
+bool KKriegerGame::CollideRaySub2(const sVector &d, const sVector &p1, const sVector &p0,
+                                  KKriegerCell *cell, KKriegerCollideInfo &ci)
 {
   sF32 besti;
   sVector v,planei;
-  sBool collided;
+  bool collided;
   sF32 distresult;
 
   // find any rejection plane
@@ -2801,7 +2804,7 @@ sBool KKriegerGame::CollideRaySub2(const sVector &d,const sVector &p1,const sVec
 
 
 
-sBool KKriegerCell::RejectPlane(const sVector &v0,const sVector &v1)
+bool KKriegerCell::RejectPlane(const sVector &v0, const sVector &v1)
 {
   sInt i;
 
@@ -2809,10 +2812,10 @@ sBool KKriegerCell::RejectPlane(const sVector &v0,const sVector &v1)
   {
     if(Planes[i].x*v0.x+Planes[i].y*v0.y+Planes[i].z*v0.z+Planes[i].w<0)
       if(Planes[i].x*v1.x+Planes[i].y*v1.y+Planes[i].z*v1.z+Planes[i].w<0)
-        return sTRUE;
+        return true;
   }
 
-  return sFALSE;
+  return false;
 }
 
 sInt KKriegerCell::OutsideMask(const sVector &v,sF32 radius)    // normal points inside!
@@ -2835,7 +2838,8 @@ sInt KKriegerCell::OutsideMask(const sVector &v,sF32 radius)    // normal points
 
 // calculate intersection point ray -> cell when casting from inside to outside
 
-sBool KKriegerCell::IntersectOut(const sVector &p,const sVector &d,sVector &plane,sF32 &distresult,sF32 radius)
+bool KKriegerCell::IntersectOut(const sVector &p, const sVector &d, sVector &plane,
+                                sF32 &distresult, sF32 radius)
 {
   sInt bestplane;
   sInt i;
@@ -2857,7 +2861,7 @@ sBool KKriegerCell::IntersectOut(const sVector &p,const sVector &d,sVector &plan
 #if LOGGING
         sDPrintF("KKriegerCell::IntersectOut() Panic\n");
 #endif
-//        return sFALSE;
+//        return false;
       }
       dist = -dist/det;
       if(dist<best)
@@ -2871,14 +2875,15 @@ sBool KKriegerCell::IntersectOut(const sVector &p,const sVector &d,sVector &plan
   {
     plane = Planes[bestplane];
     distresult = best;
-    return sTRUE;
+    return true;
   }
-  return sFALSE;
+  return false;
 }
 
 // calculate intersection point ray -> cell when casting from the outside
 
-sBool KKriegerCell::IntersectIn(const sVector &p,const sVector &d,sVector &plane,sF32 &distresult,sF32 radius)
+bool KKriegerCell::IntersectIn(const sVector &p, const sVector &d, sVector &plane,
+                               sF32 &distresult, sF32 radius)
 {
   sInt bestplane;
   sInt i;
@@ -2913,9 +2918,9 @@ sBool KKriegerCell::IntersectIn(const sVector &p,const sVector &d,sVector &plane
   {
     plane = Planes[bestplane];
     distresult = best;
-    return sTRUE;
+    return true;
   }
-  return sFALSE;
+  return false;
 }
 
 /****************************************************************************/
@@ -2935,7 +2940,7 @@ KKriegerCellAdd *KKriegerGame::FindCell(const sVector &v)
 
 // faked code to check CollideRay
 
-sBool KKriegerGame::MoveColliderX(KKSolidCollider &collider, const sVector &v,sInt who)
+bool KKriegerGame::MoveColliderX(KKSolidCollider &collider, const sVector &v, sInt who)
 {
   KKriegerCollideInfo ci;
   KKriegerCellAdd *cell;
@@ -2964,12 +2969,12 @@ sBool KKriegerGame::MoveColliderX(KKSolidCollider &collider, const sVector &v,sI
     }    
   }
 
-  return sFALSE;
+  return false;
 }
 
 // cool code that does not work
 
-sBool KKriegerGame::MoveCollider(KKSolidCollider &collider, const sVector &v,sInt who)
+bool KKriegerGame::MoveCollider(KKSolidCollider &collider, const sVector &v, sInt who)
 {
   sVector tmp;
   KKriegerCellAdd *cell;
@@ -3018,7 +3023,7 @@ sBool KKriegerGame::MoveCollider(KKSolidCollider &collider, const sVector &v,sIn
       sDPrintF("Collision: Lasting Desaster\n");
     }    
   }
-  return sFALSE;
+  return false;
 }
 
 void KKriegerGame::CollideSoftSphereAdd(sVector &sphere, KKriegerCellAdd **cellList, sInt &count)
@@ -3115,7 +3120,7 @@ void KKriegerGame::CollideSoftSphereFace(sVector &sphere, const sVector *vertice
   }
 }
 
-sBool KKriegerGame::CheckSphereVsFace(const sVector &sphere, const sVector *vertices, int numVertices, sVector &nearestPoint)
+bool KKriegerGame::CheckSphereVsFace(const sVector &sphere, const sVector *vertices, int numVertices, sVector &nearestPoint)
 {
   sVector normal;
   sVector a, b, toSphere;
@@ -3123,7 +3128,7 @@ sBool KKriegerGame::CheckSphereVsFace(const sVector &sphere, const sVector *vert
   sVector sphereCopy;
   sF32 distance;
   sInt i;
-  sBool result, inside;
+  bool result, inside;
 
   a.Sub3(vertices[2], vertices[1]);
   b.Sub3(vertices[0], vertices[1]);
@@ -3136,13 +3141,13 @@ sBool KKriegerGame::CheckSphereVsFace(const sVector &sphere, const sVector *vert
   distance = normal.Dot3(toSphere);
   // early out if sphere to far from plane
   if(sFAbs(distance) > sphere.w)
-    return sFALSE;
+    return false;
 
   // now test for each edge whether this point lies inside the face
   // if it lies outside, check for collision with the edge
   sphereCopy = sphere;
-  result = sFALSE;
-  inside = sTRUE;
+  result = false;
+  inside = true;
   for(i = 0; i < numVertices; i++)
   {
     tmp.Sub3(vertices[(i+1) % numVertices], vertices[i]);
@@ -3150,26 +3155,26 @@ sBool KKriegerGame::CheckSphereVsFace(const sVector &sphere, const sVector *vert
     tmp.Sub3(sphere, vertices[i]);
     if(tmp.Dot3(tmp2) > 0)
     {
-      inside = sFALSE;
+      inside = false;
       // check edge
       if(CheckSphereVsEdge(sphereCopy, vertices[i], vertices[(i+1) % numVertices], nearestPoint))
       {
-        result = sTRUE;
+        result = true;
         sphereCopy.w = sphereCopy.Distance(nearestPoint);
       }
     }
   }
 
-  if(inside == sFALSE)
+  if(inside == false)
     return result;
   
   // just find and return the nearest point on the plane
   nearestPoint.Scale3(normal, -distance);
   nearestPoint.Add3(sphere);
-  return sTRUE;
+  return true;
 }
 
-sBool KKriegerGame::CheckSphereVsEdge(const sVector &sphere, const sVector &v1, const sVector &v2, sVector &nearestPoint)
+bool KKriegerGame::CheckSphereVsEdge(const sVector &sphere, const sVector &v1, const sVector &v2, sVector &nearestPoint)
 {
   sVector unit, toSphere;
   sF32 a, length;
@@ -3185,20 +3190,20 @@ sBool KKriegerGame::CheckSphereVsEdge(const sVector &sphere, const sVector &v1, 
   {
     // test vertice 1
     if(toSphere.Abs3() > sphere.w)
-      return sFALSE;
+      return false;
     nearestPoint = v1;
-    return sTRUE;
+    return true;
   }
   if(a > length)
   // the second vertice is tested as the first one of the next edge if appropriate
-    return sFALSE;
+    return false;
   
   nearestPoint.Scale3(unit, a);
   nearestPoint.Add3(v1);
   toSphere.Sub3(sphere, nearestPoint);
   if(toSphere.Abs3() > sphere.w)
-    return sFALSE;
-  return sTRUE;
+    return false;
+  return true;
 }
 
 #define SPLITHEAPMAX 1024
@@ -3260,17 +3265,17 @@ void KKriegerGame::CreateCollisionFaces(KKriegerCellAdd &add)
   }
 }
 
-sBool KKriegerGame::SplitCollisionFace(const GenSimpleFace &face, const sVector *planes, sInt plane, sInt nPlanes, KKriegerCellAdd &add)
+bool KKriegerGame::SplitCollisionFace(const GenSimpleFace &face, const sVector *planes, sInt plane, sInt nPlanes, KKriegerCellAdd &add)
 {
   GenSimpleFace sides[2];
-  sBool use[2];
+  bool use[2];
   sInt i, j;
   sVector center;
   sVector normal;
   
 //  debug_count_splits++;
   if(nPlanes == 0)
-    return sTRUE;
+    return true;
 
   {
     sVector a, b;
@@ -3294,7 +3299,7 @@ sBool KKriegerGame::SplitCollisionFace(const GenSimpleFace &face, const sVector 
     
     if(use[i] && plane == nPlanes - 1)
     {
-      use[i] = sFALSE;
+      use[i] = false;
       center.Init3();
       for(j = 0; j < sides[i].VertexCount; j++)
         center.Add3(sides[i].Vertices[j]);
@@ -3303,7 +3308,7 @@ sBool KKriegerGame::SplitCollisionFace(const GenSimpleFace &face, const sVector 
       {
         float d = planes[j].Dot3(center) + planes[j].w;
         if(d < 0 || (d < EPSILON*4 && planes[j].Dot3(normal) > 0))
-          use[i] = sTRUE;
+          use[i] = true;
       }
     }
 
@@ -3647,7 +3652,7 @@ struct SplashDamageMem : public KInstanceMem
 void __stdcall Exec_KKrieger_SplashDamage(KOp *op,KEnvironment *kenv,sInt hits,sF32 range,sF32 enable)
 {
   SplashDamageMem *mem;
-  sBool ok;
+  bool ok;
 
   mem = kenv->GetInst<SplashDamageMem>(op);
   
@@ -3668,7 +3673,7 @@ void __stdcall Exec_KKrieger_SplashDamage(KOp *op,KEnvironment *kenv,sInt hits,s
 /***                                                                      ***/
 /****************************************************************************/
 
-static sBool sMakePlane(sVector &p,const sVector &v0,const sVector &v1,const sVector &v2)
+static bool sMakePlane(sVector &p, const sVector &v0, const sVector &v1, const sVector &v2)
 {
   sVector d0,d1,v;
   sF64 e;
@@ -3677,7 +3682,7 @@ static sBool sMakePlane(sVector &p,const sVector &v0,const sVector &v1,const sVe
   d1.Sub3(v1,v2);
   v.Cross3(d0,d1);
 
-  if(v.Dot3(v)<1e-10) return sFALSE;
+  if(v.Dot3(v) < 1e-10) return false;
   
   e = sFSqrt(v.Dot3(v));                    // we need some really normal normals here
   v.x = v.x/e;
@@ -3686,7 +3691,7 @@ static sBool sMakePlane(sVector &p,const sVector &v0,const sVector &v1,const sVe
   v.w = v.Dot3(v1);
 
   p = v;
-  return sTRUE;
+  return true;
 }
 
 void KKriegerCell::Init(const sMatrix &mat,const sVector &scale,sInt mode)
@@ -3710,7 +3715,7 @@ void KKriegerCell::Init(const sVector *va,sInt mode)
   sInt k;
   sF32 d;
   sVector p;
-  sBool ok;
+  bool ok;
   static sInt order[6][4] = 
   {
     { 0,2,3,1 },
@@ -3732,7 +3737,7 @@ void KKriegerCell::Init(const sVector *va,sInt mode)
 
   for(k=0;k<6;k++)
   {
-    ok = sFALSE;
+    ok = false;
     if(!sMakePlane(p,va[order[k][0]],va[order[k][1]],va[order[k][2]]))
     {
       if(!sMakePlane(p,va[order[k][1]],va[order[k][2]],va[order[k][3]]))
@@ -3740,15 +3745,15 @@ void KKriegerCell::Init(const sVector *va,sInt mode)
           if(!sMakePlane(p,va[order[k][3]],va[order[k][0]],va[order[k][1]]))
             ; // no way finding even a single plane, no        
           else
-            ok = sTRUE; // it's just a triange
+            ok = true; // it's just a triange
         else
-          ok = sTRUE; // it's just a triange
+          ok = true; // it's just a triange
       else
-        ok = sTRUE; // it's just a triange
+        ok = true; // it's just a triange
     }
     else  // it's a quad. lets check if it's a plane one!
     {
-      ok = sTRUE;
+      ok = true;
       d = p.Dot3(va[order[k][3]])-p.w;
       if(d<-0.005f)    // it's a bad one, and even inconvex
       {

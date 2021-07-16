@@ -28,9 +28,9 @@ sMAKEZONE(ExecXForm   ,"ExecXForm"  ,0xff593d33);
 #if !sPLAYER
 KOp *ShowPortalOp;
 sVector ShowPortalCube[8];
-sBool ShowPortalOpProcessed;
+bool ShowPortalOpProcessed;
 
-sBool SceneWireframe = sFALSE;
+bool SceneWireframe = false;
 sInt SceneWireFlags = 0;
 sU32 SceneWireMask = 0;
 #endif
@@ -59,7 +59,7 @@ GenScene::GenScene()
   SRT[2] = 1;
   Count = 0;
   Next = 0;
-  IsSector = sFALSE;
+  IsSector = false;
 }
 
 GenScene::~GenScene()
@@ -294,7 +294,7 @@ void ExecSceneInputs(KOp *parent,KEnvironment *kenv,sF32 *srt)
 
 /****************************************************************************/
 
-GenScene * __stdcall Init_Scene_Scene(GenMesh *mesh,sF323 s,sF323 r,sF323 t,sBool lightmap)
+GenScene * __stdcall Init_Scene_Scene(GenMesh *mesh, sF323 s, sF323 r, sF323 t, bool lightmap)
 {
   GenScene *scene;
 
@@ -308,7 +308,7 @@ GenScene * __stdcall Init_Scene_Scene(GenMesh *mesh,sF323 s,sF323 r,sF323 t,sBoo
   return scene;
 }
 
-void __stdcall Exec_Scene_Scene(KOp *op,KEnvironment *kenv,sF323 s,sF323 r,sF323 t,sBool lightmap)
+void __stdcall Exec_Scene_Scene(KOp *op, KEnvironment *kenv, sF323 s, sF323 r, sF323 t, bool lightmap)
 {
   ExecSceneInputs(op,kenv,&s.x);
 }
@@ -418,7 +418,7 @@ void __stdcall Exec_Scene_Light(KOp *op,KEnvironment *kenv,sF323 r,sF323 t,sU32 
   if(ShowPortalOp == op)
   {
     ShowPortalCube[0] = kenv->ExecStack.Top().l;
-    ShowPortalOpProcessed = sTRUE;
+    ShowPortalOpProcessed = true;
   }
 #endif
 
@@ -1321,7 +1321,7 @@ GenScene * __stdcall Init_Scene_Sector(GenScene *scene0)
   scene = new GenScene;
   add = MakeScene(scene0);
   if(add) *scene->Childs.Add() = add;
-  scene->IsSector = sTRUE;
+  scene->IsSector = true;
 
   return scene;
 }
@@ -1342,7 +1342,7 @@ void __stdcall Exec_Scene_Sector(KOp *op,KEnvironment *kenv)
     scene->Next = kenv->ExecSectorList;
     scene->Sector = op->GetInput(0);
     scene->SectorMatrix = kenv->ExecStack.Top();
-    scene->SectorPaintThisFrame = sFALSE;
+    scene->SectorPaintThisFrame = false;
     kenv->ExecSectorList = scene;
   }*/
 }
@@ -1395,7 +1395,7 @@ void __stdcall Exec_Scene_Portal(KOp *op,KEnvironment *kenv,sF322 x,sF322 y,sF32
       p.Init((i&1) ? x.y : x.x,(i&2) ? y.y : y.x,(i&4) ? z.y : z.x,1);
       ShowPortalCube[i].Rotate34(kenv->ExecStack.Top(),p);
     }
-    ShowPortalOpProcessed = sTRUE;
+    ShowPortalOpProcessed = true;
   }
 #endif
 

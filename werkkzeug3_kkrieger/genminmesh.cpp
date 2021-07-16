@@ -47,7 +47,7 @@ sInt GenMinVector::Classify()
 
 /****************************************************************************/
 
-sBool GenMinVert::IsSame(const GenMinVert &v,sBool uv)
+bool GenMinVert::IsSame(const GenMinVert &v, bool uv)
 {
   const sF32 e=0.00001f;
   if(sFAbs(Pos.x-v.Pos.x)>e) return 0;
@@ -531,7 +531,7 @@ void GenMinMesh::Transform(sInt sel,const sMatrix &mat,sInt src,sInt dest)
 {
   sVector v;
   GenMinVert *vp;
-  sBool ok;
+  bool ok;
 
   vp = Vertices.Array;
   src--;
@@ -580,7 +580,7 @@ void GenMinMesh::CalcNormals()
 
   if(NormalsOK)
     return;
-  NormalsOK = sTRUE;
+  NormalsOK = true;
 
   mf = &Faces[0];
   mv = &Vertices[0];
@@ -1004,7 +1004,7 @@ static void ConnectFaces(GenMinFace *faces,const sInt *buf,sInt count)
   }
 }
 
-sBool GenMinMesh::CalcAdjacencyCore(const sInt *remap)
+bool GenMinMesh::CalcAdjacencyCore(const sInt *remap)
 {
   // calculate number of edges we need
   sInt numEdges = 0;
@@ -1036,7 +1036,7 @@ sBool GenMinMesh::CalcAdjacencyCore(const sInt *remap)
 
   // generate adjacency
   sInt last0 = -1, last1 = -1, count = 0, temp[2];
-  sBool closed = sTRUE;
+  bool closed = true;
 
   for(sInt i=0;i<numEdges;i++)
   {
@@ -1054,7 +1054,7 @@ sBool GenMinMesh::CalcAdjacencyCore(const sInt *remap)
     else
     {
       if(count != 0)
-        closed = sFALSE;
+        closed = false;
 
       ConnectFaces(Faces.Array,temp,count);
 
@@ -1067,7 +1067,7 @@ sBool GenMinMesh::CalcAdjacencyCore(const sInt *remap)
   }
 
   if(count != 0)
-    closed = sFALSE;
+    closed = false;
 
   ConnectFaces(Faces.Array,temp,count);
 
@@ -1077,10 +1077,10 @@ sBool GenMinMesh::CalcAdjacencyCore(const sInt *remap)
   return closed;
 }
 
-sBool GenMinMesh::CalcAdjacency()
+bool GenMinMesh::CalcAdjacency()
 {
   sInt *remap = CalcMergeVerts();
-  sBool result = CalcAdjacencyCore(remap);
+  bool result = CalcAdjacencyCore(remap);
   delete[] remap;
 
   return result;
@@ -1088,7 +1088,7 @@ sBool GenMinMesh::CalcAdjacency()
 
 void GenMinMesh::VerifyAdjacency()
 {
-  sBool closed = sTRUE;
+  bool closed = true;
 
   for(sInt i=0;i<Faces.Count;i++)
   {
@@ -1112,7 +1112,7 @@ void GenMinMesh::VerifyAdjacency()
           sVERIFY(Faces[opposite >> 3].Adjacent[opposite & 7] == i*8+j);
         }
         else
-          closed = sFALSE;
+          closed = false;
       }
     }
   }
@@ -1258,7 +1258,7 @@ void GenMinMesh::AutoStitch()
 /****************************************************************************/
 /****************************************************************************/
 
-sBool CheckMinMesh(GenMinMesh *&mesh)
+bool CheckMinMesh(GenMinMesh *&mesh)
 {
   GenMinMesh *oldmesh;
   if(mesh==0)
@@ -1928,7 +1928,7 @@ GenMinMesh * __stdcall MinMesh_SelectAll(GenMinMesh *mesh,sU32 mode)
 
 /****************************************************************************/
 
-sBool SelectLogic(sInt old,sInt sel,sInt mode)
+bool SelectLogic(sInt old, sInt sel, sInt mode)
 {
   switch(mode&3)
   {
@@ -1954,9 +1954,9 @@ GenMinMesh * __stdcall MinMesh_SelectCube(GenMinMesh *mesh,sInt mode,sF323 cente
 
   for(sInt i=0;i<mesh->Vertices.Count;i++)
   {
-    sBool a = sFAbs(mesh->Vertices[i].Pos.x-center.x)<=size.x/2;
-    sBool b = sFAbs(mesh->Vertices[i].Pos.y-center.y)<=size.y/2; 
-    sBool c = sFAbs(mesh->Vertices[i].Pos.z-center.z)<=size.z/2;
+    bool a = sFAbs(mesh->Vertices[i].Pos.x-center.x)<=size.x/2;
+    bool b = sFAbs(mesh->Vertices[i].Pos.y-center.y)<=size.y/2;
+    bool c = sFAbs(mesh->Vertices[i].Pos.z-center.z)<=size.z/2;
     mesh->Vertices[i].TempByte = (a && b && c);
   }
   switch(mode&12)
@@ -1969,7 +1969,7 @@ GenMinMesh * __stdcall MinMesh_SelectCube(GenMinMesh *mesh,sInt mode,sF323 cente
     for(sInt i=0;i<mesh->Faces.Count;i++)
     {
       GenMinFace *face = &mesh->Faces[i];
-      sBool ok = 1;
+      bool ok = true;
       for(sInt j=0;j<face->Count;j++)
         if(!mesh->Vertices[face->Vertices[j]].TempByte)
           ok = 0;
@@ -1980,7 +1980,7 @@ GenMinMesh * __stdcall MinMesh_SelectCube(GenMinMesh *mesh,sInt mode,sF323 cente
     for(sInt i=0;i<mesh->Faces.Count;i++)
     {
       GenMinFace *face = &mesh->Faces[i];
-      sBool ok = 0;
+      bool ok = false;
       for(sInt j=0;j<face->Count;j++)
         if(mesh->Vertices[face->Vertices[j]].TempByte)
           ok = 1;
@@ -3320,8 +3320,8 @@ GenMinMesh *MeshCoder::CloseBoundaries(GenMinMesh *inMesh)
   for(sInt i=0;i<mesh->Vertices.Count;i++)
     remap[i] = i;
 
-  sBool closed = mesh->CalcAdjacencyCore(remap);
-  //sBool closed = mesh->CalcAdjacency();
+  bool closed = mesh->CalcAdjacencyCore(remap);
+  //bool closed = mesh->CalcAdjacency();
   delete[] remap;
 
   // assert everything was ok and return the new mesh
@@ -3538,12 +3538,12 @@ void MeshCoder::AssertLinkedEdge(MeshElement *v)
 
     if(f1 != 0 && f2 != 0)
     {
-      sBool consistent = sFALSE;
+      bool consistent = false;
 
       for(sInt i1=0;i1<f1->Degree;i1++)
         for(sInt i2=0;i2<f2->Degree;i2++)
           if(f1->Adjacent[i1] == f2->Adjacent[i2])
-            consistent = sTRUE;
+            consistent = true;
 
       sVERIFY(consistent);
     }

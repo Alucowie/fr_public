@@ -399,7 +399,7 @@ GenOverlayManagerClass::GenOverlayManagerClass()
       sSetMem(mtrl11->Combiner,0,sizeof(mtrl11->Combiner));
       mtrl11->Combiner[sMCS_VERTEX] = sMCOA_SET;
     }
-    sBool ok = mtrl11->Compile();
+    bool ok = mtrl11->Compile();
 #if sUSE_SHADERS
     if(CurrentShader>sPS_00)
     {
@@ -458,7 +458,7 @@ GenOverlayManagerClass::GenOverlayManagerClass()
   GeoTSpace = sSystem->GeoAdd(sFVF_TSPACE3,sGEO_QUAD);
 
   RefCount = 1;
-  RealPaint = sFALSE;
+  RealPaint = false;
   LastOutput = 0;
   Game = 0;
 
@@ -471,7 +471,7 @@ GenOverlayManagerClass::GenOverlayManagerClass()
 #endif
 
 #ifdef _DOPE
-  EnableIPP = sTRUE;
+  EnableIPP = true;
   DontRender = 0;
   ForceResolution = 3;
 #endif
@@ -928,7 +928,7 @@ GenIPP * __stdcall Init_IPP_JPEG(GenIPP *in,sInt size,sInt dir,sF32 strength,sIn
 
 /****************************************************************************/
 
-extern sBool IntroStereo3D;
+extern bool IntroStereo3D;
 
 void __stdcall Exec_IPP_Viewport(KOp *parent,KEnvironment *kenv,sInt size,sInt flags,sU32 color,sF323 rot,sF323 pos,sF32 farclip,sF32 nearclip,sF32 centerx,sF32 centery,sF32 zoomx,sF32 zoomy,sU32 fogc,sF32 fogend,sF32 fogst,sF32 eyed,sF32 focal,sF32 fx0,sF32 fy0,sF32 fx1,sF32 fy1,sInt ocount)
 {
@@ -1127,7 +1127,7 @@ void __stdcall Exec_IPP_Viewport(KOp *parent,KEnvironment *kenv,sInt size,sInt f
           break;
 
         case 2: // no specular
-          Engine->Paint(kenv,sFALSE);
+          Engine->Paint(kenv, false);
           break;
         }
 

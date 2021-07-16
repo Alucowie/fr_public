@@ -21,7 +21,7 @@ class GenBitmap;
 
 class GenMinMesh;
 
-sBool CheckMesh(class GenMesh *&mesh,sU32 mask=0x80000000);
+bool CheckMesh(class GenMesh *&mesh, sU32 mask = 0x80000000);
 
 // selection mask:  00vvffee --- vert:corn:face:edge
 
@@ -60,7 +60,7 @@ struct GenMeshElem                          // same for all elements of a mesh
   sU8 Used;                                 // unused elements are (supposed to be) removed during cleanup.
 
   void InitElem();
-  void SelElem(sU32 mask,sBool state,sInt mode);
+  void SelElem(sU32 mask, bool state, sInt mode);
   void SelLogic(sU32 smask1,sU32 smask2,sU32 dmask,sInt mode);
 };
 
@@ -75,7 +75,7 @@ struct GenMeshVert : public GenMeshElem     // vertex data. maybe multiple per c
   sU8 Matrix[4];
 
   void Init();
-  void Sel(sU32 mask,sBool state,sInt mode) {SelElem(mask>>16,state,mode);}
+  void Sel(sU32 mask, bool state, sInt mode) { SelElem(mask>>16, state,mode); }
 }; // =32 bytes (player), 36 bytes (editor)
 
 struct GenMeshEdge : public GenMeshElem     // edge of a mesh
@@ -90,7 +90,7 @@ struct GenMeshEdge : public GenMeshElem     // edge of a mesh
   sInt Crease;
 
   void Init();
-  void Sel(sU32 mask,sBool state,sInt mode) {SelElem(mask>>0,state,mode);}
+  void Sel(sU32 mask, bool state, sInt mode) { SelElem(mask>>0, state,mode); }
 }; // =48 bytes
 
 struct GenMeshFace : public GenMeshElem     // face of a mesh
@@ -102,7 +102,7 @@ struct GenMeshFace : public GenMeshElem     // face of a mesh
   sInt Temp3;
 
   void Init();
-  void Sel(sU32 mask,sBool state,sInt mode) {SelElem(mask>>8,state,mode);}
+  void Sel(sU32 mask, bool state, sInt mode) { SelElem(mask>>8, state,mode); }
 }; // =24 bytes
 
 struct GenMeshMtrl                          // material of a face. use Mtrl[Face->Id]
@@ -156,7 +156,7 @@ struct GenSimpleFace
   void AddVertex(const sVector &v); // assumes Vertices[] has enough space!
   
   ClipCode Clip(const sVector &plane,GenSimpleFace *sides) const;
-  sBool Inside(const sVector *planes,sInt nPlanes) const;
+  bool Inside(const sVector *planes, sInt nPlanes) const;
 };
 
 struct GenSimpleFaceList : public GenSimpleFace
@@ -180,8 +180,9 @@ public:
   void AddFace(const GenSimpleFace &face);
   void Cube(const sAABox &box);
 
-  sBool CSGSplitR(const GenSimpleFace &face,const sVector *planes,sInt plane,sInt nPlanes,sBool keepOut);
-  void CSGAgainst(const sVector *planes,sInt nPlanes,sBool keepOut);
+  bool CSGSplitR(const GenSimpleFace &face, const sVector *planes,
+                 sInt plane, sInt nPlanes, bool keepOut);
+  void CSGAgainst(const sVector *planes, sInt nPlanes, bool keepOut);
 };
 
 class GenSimpleBrush
@@ -196,7 +197,7 @@ public:
   ~GenSimpleBrush();
 
   void Cube(const sAABox &box);
-  void CSGAgainst(const GenSimpleBrush &other,sBool keepOut);
+  void CSGAgainst(const GenSimpleBrush &other, bool keepOut);
 };
 
 /****************************************************************************/
@@ -291,7 +292,7 @@ public:
   class EngMesh *PreparedMesh;
 
   sInt Pivot;
-  sBool GotNormals;
+  bool GotNormals;
   sAABox BBox;
 
 #if !sPLAYER
@@ -349,10 +350,10 @@ public:
 #endif
   void ReIndex();
   void CleanupMesh();
-  sBool IsBorderEdge(sU32 i,sInt mode);
+  bool IsBorderEdge(sU32 i, sInt mode);
 
   void Mask2Sel(sU32 mask);
-  void All2Sel(sBool set=1,sInt mask=MAS_EDGE|MAS_FACE|MAS_VERT);
+  void All2Sel(bool set=1, sInt mask=MAS_EDGE|MAS_FACE|MAS_VERT);
   void Id2Mask(sU32 mask,sInt id);
   void Sel2Mask(sU32 dmask,sInt dmode=0);
   void All2Mask(sU32 dmask,sInt dmode=0);
@@ -377,7 +378,7 @@ public:
   void BonesModify(sInt matrix,sF32 phase);
   void FixVertCycle(sInt edge);
   void Crease(sInt selType=0,sU32 dmask=0,sInt dmode=0,sInt what=0xfe);
-  void UnCrease(sBool edge=0,sInt what=0xfe);
+  void UnCrease(bool edge=0, sInt what=0xfe);
 	void CalcNormals(sInt type=0,sInt calcWhat=3);
   void NeedAllNormals();
 	void Triangulate(sInt threshold=5,sU32 dmask=0,sInt dmode=0,sInt type=0); // Triangulates selected polygons
@@ -386,11 +387,12 @@ public:
 	void Displace(GenBitmap *bitmap,sF32 amplx,sF32 amply,sF32 amplz);
 	void Bevel(sF32 elevate,sF32 pullin,sInt mode,sU32 dmask=0,sInt dmode=0);
 	void Perlin(const sMatrix &mat,const sVector &amp);
-	sBool Add(GenMesh *other,sInt keepmaterial=0);
+	bool Add(GenMesh *other, sInt keepmaterial=0);
 	void DeleteFaces();
   void SelectGrow();
 
-  void CubicProjection(const sMatrix &mat,sInt mask=0,sInt dest=sGMI_UV0,sBool real=sFALSE);
+  void CubicProjection(const sMatrix &mat, sInt mask = 0,
+                       sInt dest = sGMI_UV0, bool real = false);
 
 #if sLINK_XSI
   void ImportXSI(sXSILoader *xsi);
@@ -492,7 +494,7 @@ GenMesh * __stdcall Mesh_SmoothAngle(GenMesh *msh,sF32 angle);
 GenMesh * __stdcall Mesh_Color(GenMesh *msh,sF323 pos,sF322 dir,sU32 color,sF32 amplify,sF32 range,sInt op);
 GenMesh * __stdcall Mesh_BendS(GenMesh *msh,sF323 anchor,sF323 rotate,sF32 len,KSpline *spline);
 GenMesh * __stdcall Mesh_LightSlot(sF323 pos,sU32 color,sF32 amplify,sF32 range);
-GenMesh * __stdcall Mesh_ShadowEnable(GenMesh *mesh,sBool enable);
+GenMesh * __stdcall Mesh_ShadowEnable(GenMesh *mesh, bool enable);
 GenMesh * __stdcall Mesh_Multiply2(sInt seed,sInt3 count1,sF323 translate1,sInt3 count2,sF323 translate2,sInt random,sInt3 count3,sF323 translate3,sInt inCount,GenMesh *inMesh,...);
 
 GenSimpleMesh * __stdcall Mesh_BSP(GenMesh *mesh);

@@ -144,7 +144,7 @@ public:
   void Preload();
 
 private:
-  sBool Preloaded;
+  bool Preloaded;
 
   // general helpers
   sInt AddMaterial(GenMaterial *mtrl,sInt pass);
@@ -256,13 +256,13 @@ public:
 
   void ProcessPortals(KEnvironment *kenv,KKriegerCell *observerCell);
 
-  void Paint(KEnvironment *kenv,sBool specular=sTRUE);
+  void Paint(KEnvironment *kenv, bool specular = true);
   void PaintSimple(KEnvironment *kenv);
 
 #if !sINTRO
   void DebugPaintBoundingBoxes(sU32 color);
 
-  void DebugPaintStart(sBool world = sTRUE);
+  void DebugPaintStart(bool world = true);
   void DebugPaintAABox(const sAABox &box,sU32 color);
   void DebugPaintRect(const sFRect &rect,sU32 color);
   void DebugPaintLine(sF32 x0,sF32 y0,sF32 z0,sF32 x1,sF32 y1,sF32 z1,sU32 color);
@@ -281,7 +281,7 @@ private:
   sMatrix ViewProject;
 
   sFrustum Frustum;
-  sBool CurrentSectorPaint;
+  bool CurrentSectorPaint;
 
   EngLight *LightJobs;
   sInt LightJobCount;
@@ -294,7 +294,7 @@ private:
   sArray<PaintJob *> PaintJobs2;
 
   EngMaterialInsert *Inserts[ENG_MAXPASS];
-  sBool NeedCurrentRender[ENG_MAXPASS];
+  bool NeedCurrentRender[ENG_MAXPASS];
   sU32 UsageMask;
 
   MeshJob *MeshJobs;
@@ -303,7 +303,7 @@ private:
   GenScene *SectorJobs;
 
   EngLight WeaponLight;
-  sBool WeaponLightSet;
+  bool WeaponLightSet;
 
   void InsertLightJob(const EngLight &light,sF32 importance,sF32 fade);
   sInt AddMatrix(const sMatrix &matrix);

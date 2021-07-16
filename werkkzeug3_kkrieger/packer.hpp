@@ -158,12 +158,12 @@ class CarryRangeCoder
 
   sU8 *Buffer;
   sU32 Bytes;
-  sBool FirstByte;
+  bool FirstByte;
 
 public:
   void InitEncode(sU8 *buffer);
   void FinishEncode();
-  void EncodeBit(sU32 prob,sBool bit);
+  void EncodeBit(sU32 prob, bool bit);
   void ShiftLow();
 
   sU32 GetBytes()               { return Bytes + FFNum; }
@@ -182,7 +182,7 @@ public:
   void InitEncode(sU8 *buffer);
   void FinishEncode();
 
-  void PutBit(sBool bit);
+  void PutBit(bool bit);
   void PutByte(sU8 value);
 
   sU32 GetBytes()             { return Bytes; }
@@ -195,13 +195,13 @@ class BitModel
   sU32 Prob;
   sInt Move;
   static sF32 Cost[513];
-  static sBool CostInit;
+  static bool CostInit;
 
 public:
   void Init(sInt move);
 
-  sF32 Encode(CarryRangeCoder &coder,sBool bit);
-  sF32 GetBits(sBool bit) const;
+  sF32 Encode(CarryRangeCoder &coder, bool bit);
+  sF32 GetBits(bool bit) const;
 };
 
 /****************************************************************************/
@@ -229,7 +229,7 @@ class CCAPackerBackEnd: public PackerBackEnd
   BitModel PrevMatch;
   BitModel LitBit[256];
 
-  sBool LWM;
+  bool LWM;
 
   sF32 GammaSize[8];
   sF32 CodesSize[2];
@@ -302,7 +302,7 @@ public:
 class APackPackerBackEnd: public PackerBackEnd
 {
   BitBuffer Bit;
-  sBool LWM;
+  bool LWM;
 
   void EncodeGamma(sU32 value);
   sF32 SizeGamma(sU32 value);

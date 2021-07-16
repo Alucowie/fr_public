@@ -110,7 +110,7 @@ class sGuiManager : public sObject
   sU32 GuiStyle;
 
   void PaintR(sGuiWindow *,sRect clip,sInt sx,sInt sy);
-  sBool KeyR(sGuiWindow *win,sU32 key);
+  bool KeyR(sGuiWindow *win, sU32 key);
   void FrameR(sGuiWindow *win);
   void CalcSizeR(sGuiWindow *win);
   void LayoutR(sGuiWindow *win);
@@ -122,10 +122,10 @@ public:
   sU32 GetClass() { return sCID_GUIMANAGER; }
   void Tag();
 
-  void Bevel(sRect &r,sBool down);
+  void Bevel(sRect &r, bool down);
   void RectHL(sRect &r,sInt w,sU32 colh,sU32 coll);
-  void Button(sRect r,sBool down,const sChar *text,sInt align=0,sU32 col=0);
-  void CheckBox(sRect r,sBool checked,sU32 col=0);
+  void Button(sRect r, bool down, const sChar *text, sInt align = 0, sU32 col = 0);
+  void CheckBox(sRect r, bool checked, sU32 col = 0);
   void Group(sRect r,const sChar *label);
 
   void OnPaint();
@@ -133,7 +133,7 @@ public:
   void OnKey(sU32 key);
   void OnFrame();
   void OnTick(sInt value);
-  sBool OnDebugPrint(sChar *);
+  bool OnDebugPrint(sChar *);
 
   void SetRoot(sGuiWindow *root,sInt screen=0);
   sGuiWindow *GetRoot(sInt screen=0);
@@ -141,12 +141,12 @@ public:
   void SetFocus(sGuiWindow *win);
   void SetFocus(sInt mx,sInt my);
 
-  sBool Send(sU32 cmd,sGuiWindow *win);
+  bool Send(sU32 cmd, sGuiWindow *win);
   void Post(sU32 cmd,sGuiWindow *win);
   void RemWindow(sGuiWindow *win);
   void Clip(sRect &r);                      // this is clipping, not clipboard
   void ClearClip();
-  void GarbageCollection() {StartGCFlag = sTRUE; }
+  void GarbageCollection() { StartGCFlag = true; }
   sU32 GetStyle();
   void SetStyle(sU32 mask);
   void GetMouse(sInt &x,sInt &y) { x=MouseX;y=MouseY; }
@@ -237,17 +237,17 @@ public:
   sGuiWindow *GetChild(sInt i);   // get specific child (slow)
   sGuiWindow *SetChild(sInt i,sGuiWindow *);   // set/exchange specific child (slow), returns old one
   sGuiWindow *SetChild(sGuiWindow *old,sGuiWindow *);   // set/exchange specific child (slow), returns old one
-  sBool Send(sU32 cmd);           // send command
+  bool Send(sU32 cmd);            // send command
   void Post(sU32 cmd);            // send command
   void ScrollTo(sRect vis,sInt mode=1); // scroll so that rect gets visible
   void ScrollTo(sInt x,sInt y);         // scroll upper left corner to that position
   void AddTitle(sChar *title,sU32 flags=0,sU32 closecmd=0);  // add sSizeBorder and set title. flags = 1 -> no sizeing
   void AddScrolling(sInt x=1,sInt y=1); // add sScrollBorder and set EnableX/Y
-  sBool MMBScrolling(sDragData &dd,sInt &sx,sInt &sy); // implement left mousebutton scrolling
+  bool MMBScrolling(sDragData &dd, sInt &sx, sInt &sy); // implement left mousebutton scrolling
 //  void WheelScrolling(sU32 key,sInt step=0); // implement mouse-wheel scrolling
   sGuiWindow *FindBorder(sU32 cid);     // find a certain border window
   class sSizeBorder *FindTitle();       // find the border window that contains the titlebar
-  void SetFullsize(sBool);              // recurse to make this window fullscreen (on/off)
+  void SetFullsize(bool);               // recurse to make this window fullscreen (on/off)
 
   virtual void OnCalcSize();            // calculate XSize and YSize
   virtual void OnSubBorder();           // (border only) subtract bordersize from parent
@@ -255,12 +255,12 @@ public:
   virtual void OnPaint();               // paint the window
   virtual void OnPaint3d(sViewport &);  // paint the window
   virtual void OnKey(sU32 key);         // process keyboard input
-  virtual sBool OnShortcut(sU32 key);   // intercept keyboard input 
+  virtual bool OnShortcut(sU32 key);    // intercept keyboard input
   virtual void OnDrag(sDragData &);     // process mouse input
   virtual void OnFrame();               // called each frame. lot's of gui stuff is done here
   virtual void OnTick(sInt ticks);      // called each frame with specified ticks. do this for simulation-timing
-  virtual sBool OnCommand(sU32);        // command processing
-  virtual sBool OnDebugPrint(sChar *);  // sDPrintF processing
+  virtual bool OnCommand(sU32);         // command processing
+  virtual bool OnDebugPrint(sChar *);   // sDPrintF processing
 
   // a whole bunch of new painting routines for increased usability
 
@@ -284,10 +284,10 @@ public:
   sInt PrintFixedWidth(const sChar *text,sInt len=-1);
   sInt PrintFixedHeight();
 
-  void PaintBevel(sRect &r,sBool down);
+  void PaintBevel(sRect &r, bool down);
   void PaintRectHL(sRect &r,sInt w,sU32 colh,sU32 coll);
-  void PaintButton(sRect r,sBool down,const sChar *text,sInt align=0,sU32 col=sGC_BACK);
-  void PaintCheckBox(sRect r,sBool checked,sU32 col=sGC_BACK);
+  void PaintButton(sRect r, bool down, const sChar *text, sInt align = 0, sU32 col = sGC_BACK);
+  void PaintCheckBox(sRect r, bool checked, sU32 col = sGC_BACK);
   void PaintGroup(sRect r,const sChar *label);
 
   // new skinning stuff
@@ -349,7 +349,7 @@ public:
   void OnKey(sU32 key);
   void OnDrag(sDragData &);
   void OnFrame();
-  sBool OnCommand(sU32 cmd);
+  bool OnCommand(sU32 cmd);
 };
 
 /****************************************************************************/
@@ -375,7 +375,7 @@ public:
   void Tag();
   void OnPaint();
   void OnLayout();
-  sBool OnCommand(sU32 cmd);
+  bool OnCommand(sU32 cmd);
   void OnKey(sU32 key);
   void SetFocus();
 
@@ -434,8 +434,8 @@ public:
   void OnLayout();
   void OnPaint();
   void OnKey(sU32 key);
-  sBool OnShortcut(sU32 key);
-  sBool OnCommand(sU32 cmd);
+  bool OnShortcut(sU32 key);
+  bool OnCommand(sU32 cmd);
 
   sGuiWindow *SendTo;
   sU32 ExitKey;                   // additional key for exit, ESCAPE always works.
@@ -586,10 +586,10 @@ public:
   void OnDrag(sDragData &);
 
   sChar *Title;
-  sBool CloseCmd;
+  bool CloseCmd;
   sInt Maximised;
   sInt DontResize;
-  void Maximise(sBool max);
+  void Maximise(bool max);
 };
 
 /****************************************************************************/
@@ -610,7 +610,7 @@ public:
   void OnPaint();
   void OnDrag(sDragData &);
 
-  sBool MenuStyle;
+  bool MenuStyle;
 
   sControl *AddButton(const sChar *name,sU32 cmd);
   sControl *AddMenu(const sChar *name,sU32 cmd);
@@ -633,8 +633,8 @@ class sScrollBorder : public sGuiWindow
   sInt DragStart;
   sInt KnopXSize;
   sInt KnopYSize;
-  sBool EnableKnopX;
-  sBool EnableKnopY;
+  bool EnableKnopX;
+  bool EnableKnopY;
 public:
   sScrollBorder();
   void OnCalcSize();
@@ -642,8 +642,8 @@ public:
   void OnPaint();
   void OnDrag(sDragData &dd);
 
-  sBool EnableX;
-  sBool EnableY;
+  bool EnableX;
+  bool EnableY;
 };
 
 /****************************************************************************/
@@ -752,7 +752,7 @@ public:
   void OnPaint();
   void OnKey(sU32 key);
   void OnDrag(sDragData &);
-  sBool OnCommand(sU32 cmd);
+  bool OnCommand(sU32 cmd);
 
   sChar *GetEditBuffer() { return NumEditBuf; }
 
@@ -926,7 +926,7 @@ public:
   void OnPaint();
   void OnDrag(sDragData &dd);
   void OnKey(sU32 key);
-  sBool OnCommand(sU32 cmd);
+  bool OnCommand(sU32 cmd);
 
   void Set(sInt nr,sChar *name,sInt cmd=-1,sU32 color=0);
   void Add(sChar *name,sInt cmd=-1,sU32 color=0);
@@ -935,11 +935,11 @@ public:
   void SetName(sInt nr,sChar *name);
   sChar *GetName(sInt nr);
   sInt GetCmd(sInt cmd);
-  sBool GetSelect(sInt nr);
+  bool GetSelect(sInt nr);
   sInt GetCount();
   sInt GetSelect();
   void ClearSelect();
-  void SetSelect(sInt nr,sBool Select);
+  void SetSelect(sInt nr, bool Select);
   sInt FindName(sChar *name);
   void ScrollTo(sInt nr);
   void GetTree(sInt nr,sInt &level,sInt &button);
@@ -1070,15 +1070,15 @@ public:
   void OnDrag(sDragData &);
 
   void MakeRect(const sOpInfo &oi,sRect &r);
-  sBool FindOp(sInt x,sInt y,sOpInfo &oi);
-  sBool CheckDest(sInt x,sInt y,sInt w);
-  sBool CheckDest(sBool dup);
+  bool FindOp(sInt x, sInt y, sOpInfo &oi);
+  bool CheckDest(sInt x, sInt y, sInt w);
+  bool CheckDest(bool dup);
   void AddOperatorMenu(sMenuFrame *mf);
 
   virtual sInt GetOpCount();
   virtual void GetOpInfo(sInt i,sOpInfo &);
   virtual void SelectRect(sRect cells,sInt mode);
-  virtual void MoveDest(sBool dup);
+  virtual void MoveDest(bool dup);
 };
 
 #define sOIS_LOAD       0x0001

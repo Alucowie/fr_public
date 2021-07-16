@@ -241,7 +241,7 @@ sInt CoreInstructionSet::Hash(const CoreI &instr)
   return hash & BUCKET_MASK;
 }
 
-bool CoreInstructionSet::CompareInstrs(const CoreI *a,const CoreI *b)
+bool CoreInstructionSet::CompareInstrs(const CoreI *a, const CoreI *b)
 {
   if(a->Freq != b->Freq)
     return a->Freq > b->Freq;
@@ -257,18 +257,18 @@ bool CoreInstructionSet::CompareInstrs(const CoreI *a,const CoreI *b)
 sInt DisFilter::CountInstr(sU8 *instr)
 {
   sInt code,code2,modrm,sib,flags;
-  sBool o16;
+  bool o16;
   CoreI corei;
   
   sU8 *start = instr;
   code = *instr++;
   if(code == 0x66) // operand size prefix
   {
-    o16 = sTRUE;
+    o16 = true;
     code = *instr++;
   }
   else
-    o16 = sFALSE;
+    o16 = false;
 
   if(code == 0x0f) // two-byte opcode
   {
@@ -342,11 +342,11 @@ sInt DisFilter::ProcessInstr(sU8 *instr,sU32 memory,sU32 VA)
   sU8 *start;
   sU8 code,code2,modrm,sib,flags;
   sU32 val,tmp;
-  sBool o16;
+  bool o16;
   sInt i;
   CoreI corei;
 
-  o16 = sFALSE;
+  o16 = false;
   modrm = 0;
   sib = 0;
 
@@ -358,12 +358,12 @@ sInt DisFilter::ProcessInstr(sU8 *instr,sU32 memory,sU32 VA)
     if(++FuncTablePos == 255)
       FuncTablePos = 0;
 
-    NextFunc = sFALSE;
+    NextFunc = false;
   }
 
   if(code == 0x66) // operand size prefix
   {
-    o16 = sTRUE;
+    o16 = true;
     code = *instr++;
   }
 
@@ -376,7 +376,7 @@ sInt DisFilter::ProcessInstr(sU8 *instr,sU32 memory,sU32 VA)
     flags = Table0[code];
 
   if(code == 0xc2 || code == 0xc3 || code == 0xcc) // return/int3
-    NextFunc = sTRUE;
+    NextFunc = true;
 
   if((flags & fMODE) == fMO)
     flags = Tablefx[((*instr & 0x38) >> 3) | ((code & 0x01) << 3) | ((code & 0x08) << 1)];
@@ -537,7 +537,7 @@ void DisFilter::Filter(sU8 *code,sInt size,sU32 VA,DebugInfo *info)
     FuncTable[i] = ~0U;
 
   FuncTablePos = 0;
-  NextFunc = sTRUE;
+  NextFunc = true;
   LastJump = 0;
   Info = info;
   memory = 0;
@@ -599,7 +599,7 @@ void DisUnFilter(sU8 *packed,sU8 *dest,sU32 oldAddr,sU32 newAddr,ReorderBuffer &
   sU8 *buffer[NBUFFERS],*finish,*start,*opacked,*corei;
   sInt i,flags;
   sU8 code,code2,modrm,sib,coreind,corelen;
-  sBool o16,nextFunc;
+  bool o16, nextFunc;
   sU32 val,lastJump,memory;
   sU32 funcTable[256];
   sU8 *instTable[255];
@@ -619,7 +619,7 @@ void DisUnFilter(sU8 *packed,sU8 *dest,sU32 oldAddr,sU32 newAddr,ReorderBuffer &
   funcTablePos = 1;
   lastJump = 0;
   memory = 0;
-  nextFunc = sTRUE;
+  nextFunc = true;
 
   // read instr table
   sInt nInstr = *buffer[0]++;
@@ -660,7 +660,7 @@ void DisUnFilter(sU8 *packed,sU8 *dest,sU32 oldAddr,sU32 newAddr,ReorderBuffer &
       if(++funcTablePos == 256)
         funcTablePos = 1;
 
-      nextFunc = sFALSE;
+      nextFunc = false;
     }
 
     if(code == 0xce) // escape
@@ -672,19 +672,19 @@ void DisUnFilter(sU8 *packed,sU8 *dest,sU32 oldAddr,sU32 newAddr,ReorderBuffer &
     {
       *dest++ = code;
 
-      o16 = sFALSE;
+      o16 = false;
       modrm = sib = 0;
 
       if(code == 0x66) // operand size prefix
       {
-        o16 = sTRUE;
+        o16 = true;
         code = *corei++;
         *dest++ = code;
         corelen++;
       }
 
       if(code == 0xc2 || code == 0xc3 || code == 0xcc) // return/int3
-        nextFunc = sTRUE; // next opcode (probably) starts a new function
+        nextFunc = true; // next opcode (probably) starts a new function
 
       if(code == 0x0f) // two-byte instruction
       {

@@ -15,7 +15,7 @@
 #include <xmmintrin.h>
 
 extern sF32 GlobalFps;
-extern sBool IntroHighTexRes;
+extern bool IntroHighTexRes;
 
 /****************************************************************************/
 /***                                                                      ***/
@@ -29,7 +29,7 @@ GenEffect::GenEffect()
   Material = 0;
   Pass = 0;
   Usage = ENGU_OTHER;
-  NeedCurrentRender = sFALSE;
+  NeedCurrentRender = false;
   EffectData = 0;
   Op = 0;
 }
@@ -325,7 +325,7 @@ void __stdcall Exec_Effect_Print(KOp *op,KEnvironment *kenv,sInt flags,sF32 size
   sInt i;
   sMaterialEnv env;
   sInt centerchar;
-  sBool inf;
+  bool inf;
 
   mat = (GenMaterial *) op->GetLinkCache(0);
   if(!mat)

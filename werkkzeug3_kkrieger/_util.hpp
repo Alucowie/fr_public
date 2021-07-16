@@ -18,7 +18,7 @@ extern class sPerfMon_ *sPerfMon;
 /****************************************************************************/
 
 sBitmap *sLoadBitmap(sChar *filename);  // BMP & PIC
-sBool sSaveBitmap(sChar *filename,sBitmap *bm);     // BMP & TGA
+bool sSaveBitmap(sChar *filename, sBitmap *bm);     // BMP & TGA
 
 /****************************************************************************/
 /***                                                                      ***/
@@ -175,7 +175,7 @@ public:
 
   void Flush();
   void SetClipping(sRect &r);
-  void EnableClipping(sBool clip);
+  void EnableClipping(bool clip);
 };
 
 #define sFA_TOP     1             // alignment for PrintC

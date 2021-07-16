@@ -82,8 +82,8 @@ sGuiManager::sGuiManager()
   PostIndex = 0;
   NewAppPosToggle = 0;
   Viewport.Init();
-  ViewportValid = sFALSE;
-  StartGCFlag = sFALSE;
+  ViewportValid = false;
+  StartGCFlag = false;
   LastGCCount = 0;
   OnWindow = 0;
   CurrentRoot = 0;
@@ -172,7 +172,7 @@ void sGuiManager::Tag()
 /****************************************************************************/
 /****************************************************************************/
 
-sBool sGuiManager::OnDebugPrint(sChar *t)
+bool sGuiManager::OnDebugPrint(sChar *t)
 {
   sGuiWindow *win;
 
@@ -180,11 +180,11 @@ sBool sGuiManager::OnDebugPrint(sChar *t)
   while(win)
   {
     if(win->OnDebugPrint(t))
-      return sTRUE;
+      return true;
     win = win->Parent;
   }
 
-  return sFALSE;
+  return false;
 }
 
 /****************************************************************************/
@@ -213,7 +213,7 @@ void sGuiManager::OnPaint()
     {
       Viewport.Init();
       Viewport.Screen = i;
-      ViewportValid = sFALSE;
+      ViewportValid = false;
 
       sSystem->Clear(sVCF_ALL,Palette[0]);
 
@@ -227,7 +227,7 @@ void sGuiManager::OnPaint()
           sPainter->Paint(CursorMat,MouseX,MouseY,0xffffffff);
           sPainter->Flush();
         }
-        ViewportValid = sFALSE;
+        ViewportValid = false;
       } 
     }
   }
@@ -276,7 +276,7 @@ void sGuiManager::PaintR(sGuiWindow *win,sRect clip,sInt sx,sInt sy)
     if(win->Flags & sGWF_PAINT3D)
     {
       sPainter->Flush();
-      ViewportValid = sFALSE;
+      ViewportValid = false;
 
       view.Init();
       view.Screen = Viewport.Screen;
@@ -295,7 +295,7 @@ void sGuiManager::PaintR(sGuiWindow *win,sRect clip,sInt sx,sInt sy)
       if(!ViewportValid)
       {
         sSystem->SetViewport(Viewport);
-        ViewportValid = sTRUE;
+        ViewportValid = true;
       }
       OnWindow = win;
       win->OnPaint();
@@ -529,7 +529,7 @@ void sGuiManager::OnFrame()
   if(StartGCFlag)
   {
     sBroker->Free();
-    StartGCFlag = sFALSE;
+    StartGCFlag = false;
     sBroker->Stats(oc,rc);
     LastGCCount = oc;
   }
@@ -558,13 +558,13 @@ void sGuiManager::OnTick(sInt ticks)
 
 /****************************************************************************/
 
-sBool sGuiManager::KeyR(sGuiWindow *win,sU32 key)
+bool sGuiManager::KeyR(sGuiWindow *win, sU32 key)
 {
   sInt result;
 
   if(win->Parent)
     if(KeyR(win->Parent,key))
-      return sTRUE;
+      return true;
   OnWindow = win;
   result = win->OnShortcut(key);
   OnWindow = 0;
@@ -822,16 +822,16 @@ void sGuiManager::SetFocus(sInt mx,sInt my)
 
 /****************************************************************************/
 
-sBool sGuiManager::Send(sU32 cmd,sGuiWindow *win)
+bool sGuiManager::Send(sU32 cmd, sGuiWindow *win)
 {
-  if(cmd==0) return sTRUE;
+  if(cmd==0) return true;
   while(win)
   {
     OnWindow = win;
     if(win->OnCommand(cmd))
     {
       OnWindow = 0;
-      return sTRUE;
+      return true;
     }
     win = win->Parent;
   }
@@ -862,13 +862,13 @@ void sGuiManager::Clip(sRect &r)
 {
   r.And(CurrentClip);
   sPainter->SetClipping(r);
-  sPainter->EnableClipping(sTRUE);
+  sPainter->EnableClipping(true);
 }
   
 void sGuiManager::ClearClip()
 {
   sPainter->SetClipping(CurrentClip);
-  sPainter->EnableClipping(sTRUE);
+  sPainter->EnableClipping(true);
 }
 
 sU32 sGuiManager::GetStyle()
@@ -1027,7 +1027,7 @@ sChar *sGuiManager::ClipboardFindText()
 /****************************************************************************/
 /****************************************************************************/
 
-void sGuiManager::Bevel(sRect &r,sBool down)
+void sGuiManager::Bevel(sRect &r, bool down)
 {
   sU32 colh0,colh1;
   sU32 coll0,coll1; 
@@ -1068,7 +1068,7 @@ void sGuiManager::RectHL(sRect &r,sInt w,sU32 colh,sU32 coll)
 
 /****************************************************************************/
 
-void sGuiManager::Button(sRect r,sBool down,const sChar *text,sInt align,sU32 col)
+void sGuiManager::Button(sRect r, bool down, const sChar *text, sInt align, sU32 col)
 {
   if(col==0)
     col = sGui->Palette[sGC_BUTTON];
@@ -1079,7 +1079,7 @@ void sGuiManager::Button(sRect r,sBool down,const sChar *text,sInt align,sU32 co
 }
 
 
-void sGuiManager::CheckBox(sRect r,sBool checked,sU32 col1)
+void sGuiManager::CheckBox(sRect r, bool checked, sU32 col1)
 {
   sU32 col0;
 
@@ -1412,7 +1412,7 @@ sGuiWindow *sGuiWindow::SetChild(sGuiWindow *old,sGuiWindow *win)
 
 /****************************************************************************/
 
-sBool sGuiWindow::Send(sU32 cmd)
+bool sGuiWindow::Send(sU32 cmd)
 {
   return sGui->Send(cmd,this->Parent);
 }
@@ -1520,7 +1520,7 @@ void sGuiWindow::AddScrolling(sInt x,sInt y)
 
 /****************************************************************************/
 
-sBool sGuiWindow::MMBScrolling(sDragData &dd,sInt &sx,sInt &sy)
+bool sGuiWindow::MMBScrolling(sDragData &dd, sInt &sx, sInt &sy)
 {
   static sInt ctrl;
   if(dd.Buttons==4)
@@ -1539,11 +1539,11 @@ sBool sGuiWindow::MMBScrolling(sDragData &dd,sInt &sx,sInt &sy)
     case sDD_STOP:
       break;
     }
-    return sTRUE;
+    return true;
   }
   else
   {
-    return sFALSE;
+    return false;
   }
 }
 /*
@@ -1583,7 +1583,7 @@ sSizeBorder *sGuiWindow::FindTitle()
   return (sSizeBorder *)FindBorder(sCID_SIZEBORDER);
 }
 
-void sGuiWindow::SetFullsize(sBool b)
+void sGuiWindow::SetFullsize(bool b)
 {
   sInt i,j;
   sGuiWindow *w;
@@ -1668,9 +1668,9 @@ void sGuiWindow::OnKey(sU32 key)
 
 /****************************************************************************/
 
-sBool sGuiWindow::OnShortcut(sU32 key)
+bool sGuiWindow::OnShortcut(sU32 key)
 {
-  return sFALSE;
+  return false;
 }
 
 /****************************************************************************/
@@ -1693,16 +1693,16 @@ void sGuiWindow::OnTick(sInt ticks)
 
 /****************************************************************************/
 
-sBool sGuiWindow::OnCommand(sU32 cmd)
+bool sGuiWindow::OnCommand(sU32 cmd)
 {
-  return sFALSE;
+  return false;
 }
 
 /****************************************************************************/
 
-sBool sGuiWindow::OnDebugPrint(sChar *t)
+bool sGuiWindow::OnDebugPrint(sChar *t)
 {
-  return sFALSE;
+  return false;
 }
 
 /****************************************************************************/
@@ -1743,13 +1743,13 @@ sInt sGuiWindow::PrintFixedWidth(const sChar *text,sInt len)
 sInt sGuiWindow::PrintFixedHeight()
 { return sPainter->GetHeight(sGui->FixedFont); }
 
-void sGuiWindow::PaintBevel(sRect &r,sBool down)
+void sGuiWindow::PaintBevel(sRect &r, bool down)
 { sGui->Bevel(r,down); }
 void sGuiWindow::PaintRectHL(sRect &r,sInt w,sU32 colh,sU32 coll)
 { sGui->RectHL(r,w,Pal(colh),Pal(coll)); }
-void sGuiWindow::PaintButton(sRect r,sBool down,const sChar *text,sInt align,sU32 col)
+void sGuiWindow::PaintButton(sRect r, bool down, const sChar *text, sInt align, sU32 col)
 { sGui->Button(r,down,text,align,Pal(col)); }
-void sGuiWindow::PaintCheckBox(sRect r,sBool checked,sU32 col)
+void sGuiWindow::PaintCheckBox(sRect r, bool checked, sU32 col)
 { sGui->CheckBox(r,checked,col); }
 void sGuiWindow::PaintGroup(sRect r,const sChar *label)
 { sGui->Group(r,label); }
@@ -1879,9 +1879,9 @@ void sTestWindow::OnFrame()
 
 /****************************************************************************/
 
-sBool sTestWindow::OnCommand(sU32 cmd)
+bool sTestWindow::OnCommand(sU32 cmd)
 {
-  return sFALSE;
+  return false;
 }
 
 /****************************************************************************/
@@ -1966,7 +1966,7 @@ void sDialogWindow::OnKey(sU32 key)
 
 }
 
-sBool sDialogWindow::OnCommand(sU32 cmd)
+bool sDialogWindow::OnCommand(sU32 cmd)
 {
   switch(cmd)
   {
@@ -2003,7 +2003,7 @@ sBool sDialogWindow::OnCommand(sU32 cmd)
     break;
   }
 
-  return sTRUE;
+  return true;
 }
 
 void sDialogWindow::SetFocus()
@@ -2129,19 +2129,19 @@ void sOverlappedFrame::OnPaint()
 void sOverlappedFrame::OnFrame()
 {
   sGuiWindow **p,*w0,*w1;
-  sBool swap;
+  bool swap;
 
   p = &Childs;
   while(*p && (*p)->Next)
   {
     w0 = *p;
     w1 = (*p)->Next;
-    swap = sFALSE;
+    swap = false;
 
     if((w0->Flags & sGWF_TOPMOST) == (w1->Flags & sGWF_TOPMOST))
     {
       if((w0->Flags & sGWF_CHILDFOCUS) && !(w1->Flags & sGWF_CHILDFOCUS))
-        swap = sTRUE;
+        swap = true;
     }
     else if((w0->Flags & sGWF_TOPMOST) && !(w1->Flags & sGWF_TOPMOST))
     {
@@ -2298,7 +2298,7 @@ void sMenuFrame::OnPaint()
     sGui->Post(1,this);
 }
 
-sBool sMenuFrame::OnCommand(sU32 cmd)
+bool sMenuFrame::OnCommand(sU32 cmd)
 {
   if(cmd)
   {
@@ -2345,7 +2345,7 @@ void sMenuFrame::OnKey(sU32 key)
   }
 }
 
-sBool sMenuFrame::OnShortcut(sU32 key)
+bool sMenuFrame::OnShortcut(sU32 key)
 {
   if(key&sKEYQ_SHIFT) key|= sKEYQ_SHIFT;
   if(key&sKEYQ_CTRL) key|= sKEYQ_CTRL;
@@ -2359,10 +2359,10 @@ sBool sMenuFrame::OnShortcut(sU32 key)
     }
     if(SendTo)
       sGui->SetFocus(SendTo);
-    return sTRUE;
+    return true;
   }
   else
-    return sFALSE;
+    return false;
 }
 
 sControl *sMenuFrame::AddMenu(const sChar *name,sU32 cmd,sU32 shortcut)
@@ -3175,7 +3175,7 @@ void sSizeBorder::OnSubBorder()
 void sSizeBorder::OnPaint()
 {
   sRect r;
-  sBool focus;
+  bool focus;
   sU32 col0,col1;
 
   r = Client;
@@ -3289,7 +3289,7 @@ void sSizeBorder::OnDrag(sDragData &dd)
   }
 }
 
-void sSizeBorder::Maximise(sBool max)
+void sSizeBorder::Maximise(bool max)
 {
   if(!Maximised && max)
   {
@@ -3642,7 +3642,7 @@ void sScrollBorder::OnSubBorder()
 void sScrollBorder::OnPaint()
 {
   sInt max;
-  sBool skin = (sGui->GetStyle()&sGS_SKIN05);
+  bool skin = (sGui->GetStyle() & sGS_SKIN05);
 
   EnableKnopX = 0;
   EnableKnopY = 0;
@@ -4315,7 +4315,7 @@ void sControl::OnCalcSize()
 {
   sChar buffer[64];
 
-  sBool skin = (sGui->GetStyle()&sGS_SKIN05);
+  bool skin = (sGui->GetStyle() & sGS_SKIN05);
   sInt font = sGui->PropFont;
   if(skin && (Style&sCS_FAT)) font = sGui->FatFont;
   if(Type==sCT_HEX) font = sGui->FixedFont;
@@ -4356,7 +4356,7 @@ void sControl::OnCalcSize()
 
 void sControl::OnPaint()
 {
-  sBool select;
+  bool select;
   sInt align;
   sInt val;
   sU32 col0,col1,col;
@@ -4384,7 +4384,7 @@ void sControl::OnPaint()
   str = 0;
   strs = -1;
   labelsize = 0;
-  sBool skin = (sGui->GetStyle()&sGS_SKIN05);
+  bool skin = (sGui->GetStyle() & sGS_SKIN05);
   font = sGui->PropFont;
   if(skin && (Style&sCS_FAT)) font = sGui->FatFont;
   if(Type==sCT_HEX) font = sGui->FixedFont;
@@ -5265,7 +5265,7 @@ void sControl::OnDrag(sDragData &dd)
   }
 }
 
-sBool sControl::OnCommand(sU32 cmd)
+bool sControl::OnCommand(sU32 cmd)
 {
   sMenuFrame *mf;
   const sChar *str;
@@ -5296,15 +5296,15 @@ sBool sControl::OnCommand(sU32 cmd)
         str++;
     }
     sGui->AddPulldown(mf);
-    return sTRUE;
+    return true;
   default:
     if(cmd>=128 && cmd<(sU32)128+CycleSize)
     {
       SetCycle(cmd-128);
       Post(DoneCmd);
-      return sTRUE;
+      return true;
     }
-    return sFALSE;
+    return false;
   }
 }
 
@@ -6100,7 +6100,7 @@ void sListControl::SetRename(sChar *buffer,sInt buffersize)
   Dialog->InitString(buffer,buffersize);
 }
 
-sBool sListControl::OnCommand(sU32 cmd)
+bool sListControl::OnCommand(sU32 cmd)
 {
   sInt i;
 
@@ -6114,14 +6114,14 @@ sBool sListControl::OnCommand(sU32 cmd)
     Send(sLCS_CMD_ADD);
     Send(sLCS_CMD_UPDATE);
     SetSelect(HandleIndex,1);
-    return sTRUE;
+    return true;
   case sCMD_LIST_DELETE:
     if(GetSelect()>=0)
     {
       Dialog = new sDialogWindow;
       Dialog->InitOkCancel(this,"delete","delete scene",sCMD_LIST_DELETE2,sCMD_LIST_CANCEL);
     }
-    return sTRUE;
+    return true;
   case sCMD_LIST_DELETE2:
     HandleIndex = GetSelect();
     if(HandleIndex>=0)
@@ -6133,7 +6133,7 @@ sBool sListControl::OnCommand(sU32 cmd)
       sGui->SetFocus(this);
     }
     Dialog = 0;
-    return sTRUE;
+    return true;
   case sCMD_LIST_RENAME:
     HandleIndex = GetSelect();
     if(HandleIndex>=0)
@@ -6143,11 +6143,11 @@ sBool sListControl::OnCommand(sU32 cmd)
       Dialog->InitOkCancel(this,"rename","enter new name",sCMD_LIST_RENAME2,sCMD_LIST_CANCEL);
     }
     Dialog = 0;
-    return sTRUE;
+    return true;
   case sCMD_LIST_RENAME2:
     Send(sLCS_CMD_UPDATE);
     sGui->SetFocus(this);
-    return sTRUE;
+    return true;
   case sCMD_LIST_MOVEUP:
     i = GetSelect();
     if(i>=1 && i<GetCount())
@@ -6155,12 +6155,12 @@ sBool sListControl::OnCommand(sU32 cmd)
       HandleIndex = i-1;
       Send(sLCS_CMD_SWAP);
       Send(sLCS_CMD_UPDATE);
-      SetSelect(i-1,sTRUE);
+      SetSelect(i-1, true);
       AverageLevel(i-1);
       OpenFolder(i-1);
       Post(LeftCmd);
     }
-    return sTRUE;
+    return true;
   case sCMD_LIST_MOVEDOWN:
     i = GetSelect();
     if(i>=0 && i<GetCount()-1)
@@ -6168,18 +6168,18 @@ sBool sListControl::OnCommand(sU32 cmd)
       HandleIndex = i;
       Send(sLCS_CMD_SWAP);
       Send(sLCS_CMD_UPDATE);
-      SetSelect(i+1,sTRUE);
+      SetSelect(i+1, true);
       AverageLevel(i+1);
       OpenFolder(i+1);
       Post(LeftCmd);
     }
-    return sTRUE;
+    return true;
   case sCMD_LIST_CANCEL:
     Dialog = 0;
     sGui->SetFocus(this);
-    return sTRUE;
+    return true;
   }
-  return sFALSE;
+  return false;
 }
 
 /****************************************************************************/
@@ -6235,7 +6235,7 @@ sInt sListControl::GetCmd(sInt nr)
   return List[nr].Cmd;
 }
 
-sBool sListControl::GetSelect(sInt nr)
+bool sListControl::GetSelect(sInt nr)
 {
   return List[nr].Select;
 }
@@ -6267,9 +6267,9 @@ void sListControl::ClearSelect()
   LastSelected = -1;
 }
 
-void sListControl::SetSelect(sInt nr,sBool sel)
+void sListControl::SetSelect(sInt nr, bool sel)
 {
-  sel = sel ? sTRUE : sFALSE;
+  sel = sel ? true : false;
   if(GetSelect(nr)!=sel)
   {
     if(Style & sLCS_MULTISELECT)
@@ -6382,7 +6382,7 @@ void sListControl::CalcLevel()
 void sListControl::OpenFolder(sInt nr)
 {
   sInt level;
-  sBool change;
+  bool change;
 
   level = List[nr].Level+1;
 
@@ -6465,9 +6465,9 @@ void sListHeader::OnPaint()
     r.x1 = x = sMin(Client.x0 + List->TabStops[i+1],Client.x1);
     r.y1 = Client.y0 + Height;
     if(DragTab == -1 || (i != DragTab -1 && i != DragTab))
-      sGui->Bevel(r,sFALSE);
+      sGui->Bevel(r, false);
     else
-      sGui->Bevel(r,sTRUE);
+      sGui->Bevel(r, true);
 
     sPainter->Paint(sGui->FlatMat,r,sGui->Palette[sGC_BUTTON]);
 
@@ -6633,7 +6633,7 @@ void sOpWindow::OnPaint()
   sInt j,pw;
   sU32 col,colt;
   sRect r,rr;
-  sBool small,sel;
+  bool small, sel;
   sOpInfo oi;
   sInt shadow;
 
@@ -6743,7 +6743,7 @@ void sOpWindow::OnPaint()
 
     sPainter->Flush();
     sPainter->SetClipping(ClientClip);
-    sPainter->EnableClipping(sTRUE);
+    sPainter->EnableClipping(true);
     // paint shadow for dragging
 
   }
@@ -6788,10 +6788,10 @@ void sOpWindow::OnPaint()
 void sOpWindow::OnDrag(sDragData &dd)
 {
   sOpInfo oi;
-  sBool found;
+  bool found;
   sInt max;
   sRect r;
-  sBool pickit;
+  bool pickit;
   sInt mode;
   sU32 keyq;
   sInt cellx,celly;
@@ -7001,16 +7001,16 @@ void sOpWindow::OnDrag(sDragData &dd)
       break;
     case DM_MOVE:
     case DM_WIDTH:
-      if(CheckDest(sFALSE))
+      if(CheckDest(false))
       {
-        MoveDest(sFALSE);
+        MoveDest(false);
         sGui->Post(sOIC_CHANGED,this);
       }
       break;
     case DM_DUPLICATE:
-      if(CheckDest(sTRUE))
+      if(CheckDest(true))
       {
-        MoveDest(sTRUE);
+        MoveDest(true);
         sGui->Post(sOIC_CHANGED,this);
       }
       break;
@@ -7046,7 +7046,7 @@ void sOpWindow::SelectRect(sRect cells,sInt mode)
 {
 }
 
-void sOpWindow::MoveDest(sBool dup)
+void sOpWindow::MoveDest(bool dup)
 {
 }
 
@@ -7060,7 +7060,7 @@ void sOpWindow::MakeRect(const sOpInfo &oi,sRect &r)
   r.y0 = Client.y0 + oi.PosY*PageY;
 }
 
-sBool sOpWindow::FindOp(sInt mousex,sInt mousey,sOpInfo &oi)
+bool sOpWindow::FindOp(sInt mousex, sInt mousey, sOpInfo &oi)
 {
   sInt i,max;
   sRect r;
@@ -7071,13 +7071,13 @@ sBool sOpWindow::FindOp(sInt mousex,sInt mousey,sOpInfo &oi)
     GetOpInfo(i,oi);
     MakeRect(oi,r);
     if(r.Hit(mousex,mousey))
-      return sTRUE;
+      return true;
   }
 
-  return sFALSE;
+  return false;
 }
 
-sBool sOpWindow::CheckDest(sInt x,sInt y,sInt w)
+bool sOpWindow::CheckDest(sInt x, sInt y, sInt w)
 {
   sInt i,max;
   sOpInfo oi;
@@ -7087,12 +7087,12 @@ sBool sOpWindow::CheckDest(sInt x,sInt y,sInt w)
   {
     GetOpInfo(i,oi);
     if(oi.PosY==y && oi.PosX<x+w && oi.PosX+oi.Width>x)
-      return sFALSE;
+      return false;
   }
-  return sTRUE;
+  return true;
 }
 
-sBool sOpWindow::CheckDest(sBool dup)
+bool sOpWindow::CheckDest(bool dup)
 {
   sInt i,max,j;
   sInt x,y,w;
@@ -7118,7 +7118,7 @@ sBool sOpWindow::CheckDest(sBool dup)
           if(map[y*PageMaxX+x+j])
           {
             delete[] map;
-            return sFALSE;
+            return false;
           }
           map[y*PageMaxX+x+j] = 1;
         }
@@ -7132,14 +7132,14 @@ sBool sOpWindow::CheckDest(sBool dup)
       if(map[y*PageMaxX+x+j])
       {
         delete[] map;
-        return sFALSE;
+        return false;
       }
       map[y*PageMaxX+x+j] = 1;
     }
   }
 
   delete[] map;
-  return sTRUE;
+  return true;
 }
 
 /****************************************************************************/
@@ -7975,7 +7975,7 @@ void sTextControl::Log(sChar *s)
   Cursor = tl+sl;
   ScrollToCursor();
   Static = stat;
-  RecalcSize = sTRUE;
+  RecalcSize = true;
 }
 
 /****************************************************************************/

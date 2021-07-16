@@ -12,7 +12,7 @@
 #define FRIED_CHROMASUBSAMPLE 0x0004 // not implemented yet
 
 // Loading/saving
-sBool LoadFRIED(const sU8 *data,sInt size,sInt &xout,sInt &yout,sU8 *&dataout);
+bool LoadFRIED(const sU8 *data, sInt size, sInt &xout, sInt &yout, sU8 *&dataout);
 sU8 *SaveFRIED(const sU8 *image,sInt xsize,sInt ysize,sInt flags,sInt quality,sInt &outsize);
 
 #endif

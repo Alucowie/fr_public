@@ -113,16 +113,16 @@ sInt IntroScreenX=sPLAYER_SCREENX;
 sInt IntroScreenY=sPLAYER_SCREENY;
 sInt IntroFlags = sPLAYER_FULLSCREEN ? sSF_FULLSCREEN : 0;
 sInt IntroTargetAspect = 0;
-sBool IntroHighTexRes = sTRUE;
+bool IntroHighTexRes = true;
 #else
 const sInt IntroScreenX=sPLAYER_SCREENX;
 const sInt IntroScreenY=sPLAYER_SCREENY;
 const sInt IntroFlags = sPLAYER_FULLSCREEN ? sSF_FULLSCREEN : 0;
 sInt IntroTargetAspect = 0;
-sBool IntroHighTexRes = sTRUE;
+bool IntroHighTexRes = true;
 #endif
 sInt IntroLoop;
-sBool IntroStereo3D = sTRUE;
+bool IntroStereo3D = true;
 
 /****************************************************************************/
 
@@ -137,7 +137,7 @@ BITMAPINFO FontBMI;
 HBITMAP FontHBM;
 HFONT FontHandle;
 
-sBool InitGDI();
+bool InitGDI();
 void ExitGDI();
 
 /****************************************************************************/
@@ -467,11 +467,11 @@ BOOL CALLBACK sDialogProc(HWND win,UINT msg,WPARAM wparam,LPARAM lparam)
 #endif
     CheckDlgButton(win,IDC_VSYNC,BST_CHECKED);
 //    CheckDlgButton(win,IDC_STEREO3D,BST_CHECKED);
-    return sTRUE;
+    return true;
 
   case WM_CLOSE:
     EndDialog(win,102);
-    return sTRUE;
+    return true;
 
   case WM_COMMAND:
     switch(wparam&0xffff)
@@ -499,7 +499,7 @@ BOOL CALLBACK sDialogProc(HWND win,UINT msg,WPARAM wparam,LPARAM lparam)
 #endif
 
         IntroTargetAspect = SendDlgItemMessage(win,IDC_ASPECT,CB_GETCURSEL,0,0);
-        IntroHighTexRes = IsDlgButtonChecked(win,IDC_HIGHTEXRES) == BST_CHECKED ? sTRUE : sFALSE;
+        IntroHighTexRes = IsDlgButtonChecked(win,IDC_HIGHTEXRES) == BST_CHECKED ? true : false;
 
         IntroLoop = (IsDlgButtonChecked(win,IDC_LOOP)==BST_CHECKED);
         IntroStereo3D = (IsDlgButtonChecked(win,IDC_STEREO3D) == BST_CHECKED);
@@ -511,16 +511,16 @@ BOOL CALLBACK sDialogProc(HWND win,UINT msg,WPARAM wparam,LPARAM lparam)
       EndDialog(win,wparam);
       break;
     }
-    return sTRUE;
+    return true;
   }
-  return sFALSE;
+  return false;
 }
 
 // please note that the resource-file is excluded from build
 // you have to compile the resource manually, and then this
 // code is used to extract the dialog from the resource file.
 
-sBool ConfigDialog(sInt nr,const sChar *title)
+bool ConfigDialog(sInt nr, const sChar *title)
 {
   if(title)
     sWindowTitle = title;
@@ -530,15 +530,15 @@ sBool ConfigDialog(sInt nr,const sChar *title)
 }
 #endif
 
-static sBool MessagePump()
+static bool MessagePump()
 {
   MSG msg;
-  sBool ok = sTRUE;
+  bool ok = true;
 
   while(PeekMessage(&msg,0,0,0,PM_NOREMOVE))
   {
     if(!GetMessage(&msg,0,0,0))
-      ok = sFALSE;
+      ok = false;
 
     TranslateMessage(&msg);
     DispatchMessage(&msg);
@@ -759,10 +759,10 @@ BOOL CALLBACK MonitorEnumProc(HMONITOR handle,HDC hdc,LPRECT rect,LPARAM user)
     sSystem->WScreenCount++;
 
     if(sSystem->ConfigFlags & sSF_MULTISCREEN)
-      return sTRUE;
+      return true;
   }
 
-  return sFALSE;
+  return false;
 }
 
 /****************************************************************************/
@@ -771,7 +771,7 @@ void sSystem_::InitX()
 {
   WNDCLASS wc;
   MSG msg;
-  sBool gotmsg;
+  bool gotmsg;
   sInt i;
 
 // set up memory checking
@@ -840,9 +840,9 @@ void sSystem_::InitX()
   WWindowedStyle = 0;
   WMinimized = 0;
   WMaximized = 0;
-  WAborting = sFALSE;
+  WAborting = false;
   WResponse = 0;
-  WConstantUpdate = sTRUE;
+  WConstantUpdate = true;
   WAbortKeyFlag = 0;
   WFocus = 1;
 
@@ -1302,7 +1302,7 @@ void sSystem_::InitScreens()
 
     WINZERO(d3dpp[nr]);
     d3dpp[nr].BackBufferFormat = (D3DFORMAT) Screen[nr].SFormat;
-    d3dpp[nr].EnableAutoDepthStencil = sFALSE;
+    d3dpp[nr].EnableAutoDepthStencil = false;
     d3dpp[nr].SwapEffect = D3DSWAPEFFECT_DISCARD;
     if((ConfigFlags & (sSF_FULLSCREEN | sSF_WAITVSYNC)) == (sSF_FULLSCREEN | sSF_WAITVSYNC))
       d3dpp[nr].BackBufferCount = 2;
@@ -1321,7 +1321,7 @@ void sSystem_::InitScreens()
       d3dpp[nr].BackBufferHeight = ConfigY;
       Screen[nr].XSize = ConfigX;
       Screen[nr].YSize = ConfigY;
-      WFullscreen = sTRUE;
+      WFullscreen = true;
       SetWindowLong((HWND)Screen[nr].Window,GWL_STYLE,WS_POPUP|WS_VISIBLE);
     }
     else
@@ -1330,7 +1330,7 @@ void sSystem_::InitScreens()
       GetClientRect((HWND) Screen[nr].Window,&r);
       Screen[nr].XSize = r.right-r.left;
       Screen[nr].YSize = r.bottom-r.top;
-      WFullscreen = sFALSE;
+      WFullscreen = false;
       SetWindowLong((HWND)Screen[nr].Window,GWL_STYLE,WWindowedStyle);
     }
   }
@@ -1509,7 +1509,7 @@ dxdevfailed:;
   LastVB = -1;
   LastVSize = 0;
   LastIB = -1;
-  MtrlReset = sTRUE;
+  MtrlReset = true;
   MtrlClearCaches();
 
   CurrentTarget = -1;
@@ -1761,7 +1761,7 @@ void sSystem_::InitX()
 {
   WNDCLASS wc;
   MSG msg;
-  sBool quitmsg;
+  bool quitmsg;
   sInt i;
 
 // init system
@@ -1819,7 +1819,7 @@ void sSystem_::InitX()
 
 //  WActiveMsg = 1;
 //  WContinuous = 1;
-//  WConstantUpdate = sTRUE;
+//  WConstantUpdate = true;
 //  WFocus = 1;
 
   sU32 windowstyle;
@@ -1945,7 +1945,7 @@ void sSystem_::InitScreens()
 
   WINZERO(d3dpp);
   d3dpp.BackBufferFormat = (D3DFORMAT) Screen[0].SFormat;
-  d3dpp.EnableAutoDepthStencil = sFALSE;
+  d3dpp.EnableAutoDepthStencil = false;
   d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
   if(IntroFlags & sSF_WAITVSYNC)
   {
@@ -2106,7 +2106,7 @@ void sSystem_::InitScreens()
   LastVB = -1;
   LastVSize = 0;
   LastIB = -1;
-  MtrlReset = sTRUE;
+  MtrlReset = true;
 
   CurrentTarget = -1;
 }
@@ -2155,7 +2155,7 @@ void sSystem_::Tag()
   ExitProcess(0);
 #else
   if (this)
-    WAborting = sTRUE;
+    WAborting = true;
   if(this && DXD)
     DXD->Release();
   _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)&~(_CRTDBG_LEAK_CHECK_DF|_CRTDBG_ALLOC_MEM_DF));
@@ -2548,7 +2548,7 @@ void sSystem_::SetViewport(const sViewport &vp)
   DXDev->SetViewport(&d3dvp);
 }
 
-void sSystem_::GrabScreen(sInt sourceRT,const sRect &win,sInt tex,sBool stretch)
+void sSystem_::GrabScreen(sInt sourceRT, const sRect &win, sInt tex, bool stretch)
 {
   IDirect3DSurface9 *backbuffer;
   IDirect3DSwapChain9 *swapchain;
@@ -2940,7 +2940,7 @@ void sSystem_::MakeAttenuationVolume()
 
 /****************************************************************************/
 
-sBool sSystem_::StreamTextureStart(sInt handle,sInt level,sBitmapLock &lock)
+bool sSystem_::StreamTextureStart(sInt handle, sInt level, sBitmapLock &lock)
 {
   sHardTex *tex;
   IDirect3DTexture9 *mst;
@@ -2954,7 +2954,7 @@ sBool sSystem_::StreamTextureStart(sInt handle,sInt level,sBitmapLock &lock)
   DXStreamLevel = level;
 
   if(FAILED(mst->LockRect(level,&dxlock,0,0)))
-    return sFALSE;
+    return false;
 
   lock.Data = (sU8 *)dxlock.pBits;
   lock.XSize = tex->XSize>>level;
@@ -2962,7 +2962,7 @@ sBool sSystem_::StreamTextureStart(sInt handle,sInt level,sBitmapLock &lock)
   lock.Kind = tex->Format;
   lock.BPR = dxlock.Pitch;
 
-  return sTRUE;
+  return true;
 }
 
 /****************************************************************************/
@@ -3250,7 +3250,7 @@ sInt sSystem_::GeoDraw(sInt &handle)
     LastIB = 3;
     DXDev->SetIndices(GeoBuffer[3].IB);
     DXDev->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,gh->Vertex.Start,0,gh->Vertex.Count,0,count/4*2);
-    return sFALSE;
+    return false;
   default:
     sVERIFYFALSE;
   }
@@ -3260,13 +3260,13 @@ sInt sSystem_::GeoDraw(sInt &handle)
   else if(count)
     DXDev->DrawPrimitive(mode,gh->Vertex.Start,count);
 
-  return sFALSE;
+  return false;
 }
 
-void sSystem_::AllocBufferInternal(sGeoBufferRef &ref,sInt size,sBool stat,sInt index,void **ptr)
+void sSystem_::AllocBufferInternal(sGeoBufferRef &ref, sInt size, bool stat, sInt index, void **ptr)
 {
   sInt i,lockf;
-  sBool ok;
+  bool ok;
 
   if(stat) // static buffer
   {
@@ -3363,7 +3363,7 @@ void sSystem_::GeoBegin(sInt handle,sInt vc,sInt ic,sF32 **fp,void **ip,sInt upd
 
     if(ic)
     {
-      sBool is32b = (gh->Mode & sGEO_IND32B);
+      bool is32b = (gh->Mode & sGEO_IND32B);
 
       AllocBufferInternal(gh->Index,is32b ? 4 : 2,gh->Mode & sGEO_STATIB,is32b ? 2 : 1,(void **)ip);
       gh->Locked |= sGEO_INDEX;
@@ -3374,7 +3374,7 @@ void sSystem_::GeoBegin(sInt handle,sInt vc,sInt ic,sF32 **fp,void **ip,sInt upd
 void sSystem_::GeoEnd(sInt handle,sInt vc,sInt ic)
 {
   sGeoHandle *gh;
-//  sBool load;
+//  bool load;
 
   sVERIFY(handle>=1 && handle<MAX_GEOHANDLE);
   sVERIFY(GeoHandle[handle].Mode!=0);
@@ -3403,7 +3403,7 @@ void sSystem_::GeoEnd(sInt handle,sInt vc,sInt ic)
 /****************************************************************************/
 
 #if !sINTRO
-sBool sSystem_::GetScreenInfo(sInt i,sScreenInfo &info)
+bool sSystem_::GetScreenInfo(sInt i, sScreenInfo &info)
 {
   if(i<0||i>=WScreenCount)
   {
@@ -3413,7 +3413,7 @@ sBool sSystem_::GetScreenInfo(sInt i,sScreenInfo &info)
     info.ShaderLevel = sPS_00;
     info.LowQuality = 0;
     info.PixelRatio = 1;
-    return sFALSE;
+    return false;
   }
   else
   {
@@ -3423,7 +3423,7 @@ sBool sSystem_::GetScreenInfo(sInt i,sScreenInfo &info)
     info.ShaderLevel = CmdShaderLevel;
     info.LowQuality = CmdLowQuality;
     info.PixelRatio = 1.0f*Screen[i].XSize/Screen[i].YSize;
-    return sTRUE;
+    return true;
   }
 }
 
@@ -3432,7 +3432,7 @@ sInt sSystem_::GetScreenCount()
   return WScreenCount;
 }
 
-sBool sSystem_::GetFullscreen()
+bool sSystem_::GetFullscreen()
 {
   return WFullscreen;
 }
@@ -3831,7 +3831,7 @@ static sU32 KeyRepeatDelay;
 static sU32 KeyRepeatRate;
 static sU32 KeyStickyMouseX;
 static sU32 KeyStickyMouseY;
-static sBool KeySticky;
+static bool KeySticky;
 static sInt KeyStickyTime;
 static sU32 MouseX;
 static sU32 MouseY;
@@ -3876,7 +3876,7 @@ void sSystem_::AddAKey(sU32 *Scans,sInt ascii)
 
 /****************************************************************************/
 
-sBool sSystem_::InitDI()
+bool sSystem_::InitDI()
 {
   HRESULT hr;
   DIPROPDWORD  prop; 
@@ -3935,18 +3935,18 @@ sBool sSystem_::InitDI()
 
 
   hr = (*DirectInput8CreateP)(WInst,DIRECTINPUT_VERSION,IID_IDirectInput8,(void**)&DXI,0);
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 
 // set up keyboard
 
   hr = DXI->CreateDevice(GUID_SysKeyboard,&DXIKey,0);
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 
   hr = DXIKey->SetDataFormat(&c_dfDIKeyboard); 
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 
   hr = DXIKey->SetCooperativeLevel((HWND)Screen[0].Window,DISCL_FOREGROUND|DISCL_NONEXCLUSIVE);
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 
   prop.diph.dwSize = sizeof(DIPROPDWORD); 
   prop.diph.dwHeaderSize = sizeof(DIPROPHEADER); 
@@ -3954,7 +3954,7 @@ sBool sSystem_::InitDI()
   prop.diph.dwHow = DIPH_DEVICE; 
   prop.dwData = MAX_KEYQUEUE; 
   hr = DXIKey->SetProperty(DIPROP_BUFFERSIZE,&prop.diph); 
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 
 // load keyboard mapping
 
@@ -3989,18 +3989,18 @@ sBool sSystem_::InitDI()
 
   hr = DXIKey->Acquire();
   DXIKeyFocus = 1;
-//  if(FAILED(hr)) return sFALSE;
+//  if(FAILED(hr)) return false;
 
 // create mouse 
 
   hr = DXI->CreateDevice(GUID_SysMouse,&DXIMouse,0);
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 
   hr = DXIMouse->SetDataFormat(&c_dfDIMouse); 
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 
   hr = DXIMouse->SetCooperativeLevel((HWND)Screen[0].Window,DISCL_FOREGROUND|DISCL_NONEXCLUSIVE);
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 
   prop.diph.dwSize = sizeof(DIPROPDWORD); 
   prop.diph.dwHeaderSize = sizeof(DIPROPHEADER); 
@@ -4008,7 +4008,7 @@ sBool sSystem_::InitDI()
   prop.diph.dwHow = DIPH_DEVICE; 
   prop.dwData = MAX_MOUSEQUEUE; 
   hr = DXIMouse->SetProperty(DIPROP_BUFFERSIZE,&prop.diph); 
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 
 // init mouse tables
 
@@ -4022,7 +4022,7 @@ sBool sSystem_::InitDI()
 
   hr = DXIMouse->Acquire(); 
   DXIMouseFocus = 1;
-//  if(FAILED(hr)) return sFALSE;
+//  if(FAILED(hr)) return false;
 
   return TRUE; 
 }
@@ -4176,7 +4176,7 @@ void sSystem_::PollDI()
           KeyStickyMouseX = MouseX;
           KeyStickyMouseY = MouseY;
           KeyStickyTime = sSystem->GetTime();
-          KeySticky = sTRUE;
+          KeySticky = true;
 
           if(KeyDownIndex<MAX_KEYQUEUE)
             KeyDown[KeyDownIndex++] = key;
@@ -4189,7 +4189,7 @@ void sSystem_::PollDI()
     }
   }
   if(sAbs(KeyStickyMouseX-MouseX)+sAbs(KeyStickyMouseY-MouseY)>4)
-    KeySticky = sFALSE;
+    KeySticky = false;
 
   if(KeyRepeat!=0 && time>=(sInt)KeyRepeatTimer && KeyIndex<MAX_KEYBUFFER)
   {
@@ -4276,7 +4276,7 @@ void sSystem_::PollDI()
 
 #if !sPLAYER
 
-sBool sSystem_::FileRequester(sChar *buffer,sInt size,sU32 flags)
+bool sSystem_::FileRequester(sChar *buffer, sInt size, sU32 flags)
 {
   sChar oldpath[2048];
   OPENFILENAME ofn;
@@ -4449,7 +4449,7 @@ void sSystem_::GetKeyName(sChar *buffer,sInt size,sU32 key)
 
 /****************************************************************************/
 
-sBool sSystem_::GetAbortKey()
+bool sSystem_::GetAbortKey()
 {
 #pragma lekktor(off)
   if(GetAsyncKeyState(VK_PAUSE)&1)
@@ -4576,20 +4576,20 @@ void sSystem_::GetPerf(sPerfInfo &info,sInt mode)
 
 /****************************************************************************/
 
-sBool sSystem_::GetWinMouse(sInt &x,sInt &y)
+bool sSystem_::GetWinMouse(sInt &x, sInt &y)
 {
   x = WMouseX;
   y = WMouseY;
-  return sTRUE;
+  return true;
 }
 
-sBool sSystem_::GetWinMouseAbs(sInt &x,sInt &y)
+bool sSystem_::GetWinMouseAbs(sInt &x, sInt &y)
 {
   POINT pt;
   GetCursorPos(&pt);
   x = pt.x;
   y = pt.y;
-  return sTRUE;
+  return true;
 }
 
 void sSystem_::SetWinMouse(sInt x,sInt y)
@@ -4637,7 +4637,7 @@ sInt sSystem_::GetWinMode()
   return 0;
 }
 
-void sSystem_::HideWinMouse(sBool hide)
+void sSystem_::HideWinMouse(bool hide)
 {
   if(hide)
     while(ShowCursor(0)>0);
@@ -4668,7 +4668,7 @@ static WAVEFORMATEX soundFormat = {
   0
 };
 
-sBool sSystem_::InitDS()
+bool sSystem_::InitDS()
 {
   DWORD count1,count2;
   void *pos1,*pos2;
@@ -4679,10 +4679,10 @@ sBool sSystem_::InitDS()
   timeBeginPeriod(1);
 
   hr = (*DirectSoundCreate8P)(0,&DXS,0);
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 
   hr = DXS->SetCooperativeLevel((HWND)Screen[0].Window,DSSCL_PRIORITY);
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 
 #if !sINTRO
   WINSET(dsbd);
@@ -4690,17 +4690,17 @@ sBool sSystem_::InitDS()
   dsbd.dwBufferBytes = 0;
   dsbd.lpwfxFormat = 0;
   hr = DXS->CreateSoundBuffer(&dsbd,&DXSPrimary,0);
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 
   hr = DXSPrimary->QueryInterface(IID_IDirectSound3DListener,(void **)&Listener);
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 #else // no dsound3d support
   WINSET(dsbd);
   dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER;
   dsbd.dwBufferBytes = 0;
   dsbd.lpwfxFormat = 0;
   hr = DXS->CreateSoundBuffer(&dsbd,&DXSPrimary,0);
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 #endif
 
   DXSPrimary->SetFormat(&soundFormat);
@@ -4712,10 +4712,10 @@ sBool sSystem_::InitDS()
   dsbd.lpwfxFormat = &soundFormat;
 
   hr = DXS->CreateSoundBuffer(&dsbd,&sbuffer,0);
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
   hr = sbuffer->QueryInterface(IID_IDirectSoundBuffer8,(void**)&DXSBuffer);
   sbuffer->Release();
-  if(FAILED(hr)) return sFALSE;
+  if(FAILED(hr)) return false;
 
   hr = DXSBuffer->Lock(0,DXSSAMPLES*4,&pos1,&count1,&pos2,&count2,0);
   if(!FAILED(hr))
@@ -4727,7 +4727,7 @@ sBool sSystem_::InitDS()
 
   DXSEvent = CreateEvent(0,0,0,0);
   if(!DXSEvent)
-    return sFALSE;
+    return false;
 
   InitializeCriticalSection(&DXSLock);
 
@@ -4736,12 +4736,12 @@ sBool sSystem_::InitDS()
   DXSRun = 0;
   DXSThread = CreateThread(0,16384,ThreadCode,0,0,&DXSThreadId);
   if(!DXSThread)
-    return sFALSE;
+    return false;
 
   SoundTime = 1;
   DXSTime = timeGetTime();
 
-  return sTRUE;
+  return true;
 }
 
 #pragma lekktor(on)
@@ -4869,7 +4869,7 @@ unsigned long __stdcall ThreadCode(void *)
     }
     LeaveCriticalSection(&DXSLock);
   }
-  DXSRun = sFALSE;
+  DXSRun = false;
   return 0;
 }
 
@@ -4954,7 +4954,7 @@ sInt sSystem_::GetCurrentSample()
 
 #if sLINK_KKRIEGER
 
-sInt sSystem_::SampleAdd(sS16 *data,sInt size,sInt buffers,sInt handle,sBool is3d)
+sInt sSystem_::SampleAdd(sS16 *data, sInt size, sInt buffers, sInt handle, bool is3d)
 {
   sInt i;
   IDirectSoundBuffer *dsb;
@@ -5225,7 +5225,7 @@ sU8 *sSystem_::LoadFile(const sChar *name,sInt &size)
   sU8 *mem;
    
   mem = 0;
-  result = sFALSE;
+  result = false;
   handle = CreateFile(name,GENERIC_READ,FILE_SHARE_READ,0,OPEN_EXISTING,0,0);
   if(handle != INVALID_HANDLE_VALUE)
   {
@@ -5234,9 +5234,9 @@ sU8 *sSystem_::LoadFile(const sChar *name,sInt &size)
     {
       mem = new sU8[size];
       if(ReadFile(handle,mem,size,&test,0))
-        result = sTRUE;
+        result = true;
       if(size!=(sInt)test)
-        result = sFALSE;
+        result = false;
     }
     CloseHandle(handle);
   }
@@ -5290,7 +5290,7 @@ sChar *sSystem_::LoadText(const sChar *name)
   sInt size;
    
   mem = 0;
-  result = sFALSE;
+  result = false;
   handle = CreateFile(name,GENERIC_READ,FILE_SHARE_READ,0,OPEN_EXISTING,0,0);
   if(handle != INVALID_HANDLE_VALUE)
   {
@@ -5299,9 +5299,9 @@ sChar *sSystem_::LoadText(const sChar *name)
     {
       mem = new sU8[size+1];
       if(ReadFile(handle,mem,size,&test,0))
-        result = sTRUE;
+        result = true;
       if(size!=(sInt)test)
-        result = sFALSE;
+        result = false;
       mem[size]=0;
     }
     CloseHandle(handle);
@@ -5317,22 +5317,22 @@ sChar *sSystem_::LoadText(const sChar *name)
 
 /****************************************************************************/
 
-sBool sSystem_::SaveFile(const sChar *name,const sU8 *data,sInt size)
+bool sSystem_::SaveFile(const sChar *name, const sU8 *data, sInt size)
 {
   sInt result;
   HANDLE handle;
   DWORD test;
 
-  result = sFALSE;
+  result = false;
   handle = CreateFile(name,GENERIC_WRITE,FILE_SHARE_WRITE,0,CREATE_NEW,0,0);  
   if(handle == INVALID_HANDLE_VALUE)
     handle = CreateFile(name,GENERIC_WRITE,FILE_SHARE_WRITE,0,TRUNCATE_EXISTING,0,0);  
   if(handle != INVALID_HANDLE_VALUE)
   {
     if(WriteFile(handle,data,size,&test,0))
-      result = sTRUE;
+      result = true;
     if(size!=(sInt)test)
-      result = sFALSE;
+      result = false;
     CloseHandle(handle);
   }
 
@@ -5428,16 +5428,16 @@ sDirEntry *sSystem_::LoadDir(const sChar *name)
 
 /****************************************************************************/
 
-sBool sSystem_::MakeDir(const sChar *name)
+bool sSystem_::MakeDir(const sChar *name)
 {
   return CreateDirectory(name,0) != 0;
 }
 
 /****************************************************************************/
 
-sBool sSystem_::CheckDir(const sChar *name)
+bool sSystem_::CheckDir(const sChar *name)
 {
-  sBool result;
+  bool result;
   static sChar buffer[sMAX_PATHNAME];
   HANDLE handle;
   sInt len;
@@ -5456,7 +5456,7 @@ sBool sSystem_::CheckDir(const sChar *name)
   return result;
 }
 
-sBool sSystem_::CheckFile(const sChar *name)
+bool sSystem_::CheckFile(const sChar *name)
 {
   HANDLE handle;
 
@@ -5464,20 +5464,20 @@ sBool sSystem_::CheckFile(const sChar *name)
   if(handle != INVALID_HANDLE_VALUE)
   {
     CloseHandle(handle);
-    return sTRUE;
+    return true;
   }
-  return sFALSE;
+  return false;
 }
 
 #undef sMAX_PATHNAME
 
 /****************************************************************************/
 
-sBool sSystem_::RenameFile(const sChar *oldname,const sChar *newname)
+bool sSystem_::RenameFile(const sChar *oldname, const sChar *newname)
 {
-  sBool result;
+  bool result;
 
-  result = sFALSE;
+  result = false;
 //  if(CheckFileName(name))
   {
     result = MoveFile(oldname,newname);
@@ -5488,7 +5488,7 @@ sBool sSystem_::RenameFile(const sChar *oldname,const sChar *newname)
 
 /****************************************************************************/
 
-sBool sSystem_::DeleteFile(const sChar *name)
+bool sSystem_::DeleteFile(const sChar *name)
 {
   return ::DeleteFileA(name);
 }
@@ -5556,7 +5556,7 @@ sBitmap *sSystem_::LoadBitmap(const sU8 *data,sInt size)
   }
 }
 
-sBool sSystem_::LoadBitmapCore(const sU8 *data,sInt size,sInt &xout,sInt &yout,sU8 *&dataout)
+bool sSystem_::LoadBitmapCore(const sU8 *data, sInt size, sInt &xout, sInt &yout, sU8 *&dataout)
 {
   HDC screendc;
   HDC hdc;
@@ -5582,7 +5582,7 @@ sBool sSystem_::LoadBitmapCore(const sU8 *data,sInt size,sInt &xout,sInt &yout,s
 
 #if sLINK_PNG
   if(LoadPNG(data,size,xout,yout,dataout))
-    return sTRUE;
+    return true;
 #endif
 
   screendc = GetDC(0);
@@ -5773,22 +5773,22 @@ void sGeoBuffer::Init()
   UserCount = 0;
 }
 
-sBool sGeoBuffer::Alloc(sInt count,sInt size,sInt &firstp,sInt type)
+bool sGeoBuffer::Alloc(sInt count, sInt size, sInt &firstp, sInt type)
 {
   sInt pos,first;
 
   if(Type!=type)
-    return sFALSE;
+    return false;
 
   first = (Used+size-1)/size;
   pos = (first+count)*size;
   if(pos>Size)
-    return sFALSE;
+    return false;
 
   Used = pos;
   firstp = first;
   UserCount++;
-  return sTRUE;
+  return true;
 }
 
 void sGeoBuffer::Free()
@@ -6083,14 +6083,14 @@ struct sHostFontPrivate
 
 /****************************************************************************/
 
-sBool InitGDI()
+bool InitGDI()
 {
   GDIScreenDC = GetDC(0);
   GDIDC = CreateCompatibleDC(GDIScreenDC);
   GDIHBM = CreateCompatibleBitmap(GDIScreenDC,16,16);
   SelectObject(GDIDC,GDIHBM);
 
-  return sTRUE;
+  return true;
 }
 
 /****************************************************************************/
@@ -6234,14 +6234,14 @@ void sHostFont::Print(sBitmap *bm,sChar *text,sInt x,sInt y,sU32 color,sInt len)
 
 /****************************************************************************/
 
-sBool sHostFont::Prepare(sBitmap *bm,sChar *letters,sHostFontLetter *met)
+bool sHostFont::Prepare(sBitmap *bm, sChar *letters, sHostFontLetter *met)
 {
   sInt letter;
   sInt border;
   sInt x,y,xs,ys,h,w,a;
   SIZE size;
   sChar buffer[2];
-  sBool result;
+  bool result;
   ABC abc;
 
   Begin(bm);
@@ -6254,7 +6254,7 @@ sBool sHostFont::Prepare(sBitmap *bm,sChar *letters,sHostFontLetter *met)
   ys = bm->YSize;
   sSetMem(met,0,sizeof(sHostFontLetter)*256);
 
-  result = sTRUE;
+  result = true;
   while(*letters)
   {
     letter = (*letters++)&0xff;
@@ -6284,7 +6284,7 @@ sBool sHostFont::Prepare(sBitmap *bm,sChar *letters,sHostFontLetter *met)
       x=border;
       if(y+h>ys-border)
       {
-        result = sFALSE;
+        result = false;
         break;
       }
     }
@@ -6308,14 +6308,14 @@ sBool sHostFont::Prepare(sBitmap *bm,sChar *letters,sHostFontLetter *met)
 
 /****************************************************************************/
 
-sBool sHostFont::PrepareCheck(sInt xs,sInt ys,sChar *letters)
+bool sHostFont::PrepareCheck(sInt xs, sInt ys, sChar *letters)
 {
   sInt letter;
   sInt border;
   sInt x,y,h,w;
   SIZE size;
   sChar buffer[2];
-  sBool result;
+  bool result;
 
 
   h = Height;
@@ -6323,7 +6323,7 @@ sBool sHostFont::PrepareCheck(sInt xs,sInt ys,sChar *letters)
   x = border;
   y = border;
 
-  result = sTRUE;
+  result = true;
   while(*letters)
   {
     letter = (*letters++)&0xff;
@@ -6338,7 +6338,7 @@ sBool sHostFont::PrepareCheck(sInt xs,sInt ys,sChar *letters)
       x=border;
       if(y+h>ys-border)
       {
-        result = sFALSE;
+        result = false;
         break;
       }
     }
@@ -6537,7 +6537,7 @@ void sSystem_::PrintShader(const sU32 *data)
   sU32 val;
   sInt komma;
   sInt line;
-  sBool end = sFALSE;
+  bool end = false;
 
   line = 1;
   while(!end)
@@ -6558,7 +6558,7 @@ void sSystem_::PrintShader(const sU32 *data)
       break;
     }
     if(val == 0xffff)
-      end = sTRUE;
+      end = true;
     in = out = def = dcl = label = komma = 0;
     switch(outin[code]&0xf0)
     {
@@ -6663,7 +6663,7 @@ void sSystem_::PrintShader(const sU32 *data)
 /****************************************************************************/
 
 // Compare two state lists.
-static sBool checkStatesEqual(const sU32 *st1,const sU32 *st2)
+static bool checkStatesEqual(const sU32 *st1, const sU32 *st2)
 {
   sInt i;
   for(i=0;st1[i] == st2[i] && ((i&1) || st1[i] != ~0U);i++);
@@ -6942,14 +6942,14 @@ static sInt aviTarget = sINVALID;
 static sU8 *aviBuffer = 0;
 static sInt aviFrameCount;
 
-sBool sSystem_::VideoStart(sChar *filename,sF32 fpsrate,sInt xRes,sInt yRes)
+bool sSystem_::VideoStart(sChar *filename, sF32 fpsrate, sInt xRes, sInt yRes)
 {
   AVISTREAMINFO asi;
   AVICOMPRESSOPTIONS aco;
   AVICOMPRESSOPTIONS FAR *optlist[1];
   BITMAPINFOHEADER bmi;
-  sBool gotOptions = sFALSE;
-  sBool error = sTRUE;
+  bool gotOptions = false;
+  bool error = true;
 
   VideoEnd();
 
@@ -6995,7 +6995,7 @@ sBool sSystem_::VideoStart(sChar *filename,sF32 fpsrate,sInt xRes,sInt yRes)
   WINZERO(aco);
   optlist[0] = &aco;
 
-  gotOptions = sTRUE;
+  gotOptions = true;
   if(!AVISaveOptions((HWND) Screen[0].Window,0,1,&aviVid,optlist))
   {
     sDPrintF("AVISaveOptions failed\n");
@@ -7032,7 +7032,7 @@ sBool sSystem_::VideoStart(sChar *filename,sF32 fpsrate,sInt xRes,sInt yRes)
     goto cleanup;
   }
 
-  error = sFALSE;
+  error = false;
   sDPrintF("Video recording started.\n");
   aviXRes = xRes;
   aviYRes = yRes;
@@ -7059,7 +7059,7 @@ sInt sSystem_::VideoWriteFrame(sF32 &u1,sF32 &v1)
 {
   D3DLOCKED_RECT lr;
   IDirect3DSurface9 *surface = 0;
-  sBool error = sTRUE;
+  bool error = true;
 
   if(aviTarget == sINVALID)
     return sINVALID;
@@ -7107,7 +7107,7 @@ sInt sSystem_::VideoWriteFrame(sF32 &u1,sF32 &v1)
   aviSurface->UnlockRect();
   AVIStreamWrite(aviVidC,aviFrameCount,1,aviBuffer,3*aviXRes*aviYRes,0,0,0);
 
-  error = sFALSE;
+  error = false;
   aviFrameCount++;
 
   u1 = aviXRes / 1024.0f;

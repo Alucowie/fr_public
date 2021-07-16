@@ -20,7 +20,7 @@ public:
   class GenMaterial *Material;
   sInt Pass;
   sInt Usage;
-  sBool NeedCurrentRender;
+  bool NeedCurrentRender;
   void *EffectData;
   KOp *Op;
 };

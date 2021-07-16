@@ -33,7 +33,7 @@ void GenMeshElem::InitElem()
   Used = 1;
 }
 
-void GenMeshElem::SelElem(sU32 mask,sBool state,sInt mode)
+void GenMeshElem::SelElem(sU32 mask, bool state, sInt mode)
 {
   switch(mode)
   {
@@ -46,7 +46,7 @@ void GenMeshElem::SelElem(sU32 mask,sBool state,sInt mode)
 
 void GenMeshElem::SelLogic(sU32 smask1,sU32 smask2,sU32 dmask,sInt mode)
 {
-  sBool s1,s2;
+  bool s1, s2;
 
   s1 = (Mask & smask1) ? 1 : 0;
   s2 = (Mask & smask2) ? 1 : 0;
@@ -149,7 +149,7 @@ ClipCode GenSimpleFace::Clip(const sVector &plane,GenSimpleFace *faces) const
   sInt lasti,i;
   sInt cross;
   sVector v;
-  sBool allOn = sTRUE;
+  bool allOn = true;
 
 //  faces[0].Init(VertexCount + 2);
 //  faces[1].Init(VertexCount + 2);
@@ -189,11 +189,11 @@ ClipCode GenSimpleFace::Clip(const sVector &plane,GenSimpleFace *faces) const
       // add out point to out side
       faces[side].AddVertex(Vertices[i]);
 
-      cross = sTRUE;
+      cross = true;
     }
 
     if(side != 2)
-      allOn = sFALSE;
+      allOn = false;
 
     lastside = side;
     lasti = i;
@@ -202,16 +202,16 @@ ClipCode GenSimpleFace::Clip(const sVector &plane,GenSimpleFace *faces) const
   return allOn ? CC_ALL_ON_PLANE : cross ? CC_CROSSED : CC_NOT_CROSSED;
 }
 
-sBool GenSimpleFace::Inside(const sVector *planes,sInt nPlanes) const
+bool GenSimpleFace::Inside(const sVector *planes, sInt nPlanes) const
 {
   sInt i,j;
 
   for(i=0;i<nPlanes;i++)
     for(j=0;j<VertexCount;j++)
       if(ClassifyVert(Vertices[j],planes[i]) == 0) // out?
-        return sFALSE;
+        return false;
 
-  return sTRUE;
+  return true;
 }
 
 /****************************************************************************/
@@ -305,13 +305,14 @@ void GenSimpleMesh::Cube(const sAABox &box)
   AddQuad(Verts[5],Verts[4],Verts[0],Verts[1]); // bottom
 }
 
-sBool GenSimpleMesh::CSGSplitR(const GenSimpleFace &face,const sVector *planes,sInt plane,sInt nPlanes,sBool keepOut)
+bool GenSimpleMesh::CSGSplitR(const GenSimpleFace &face, const sVector *planes,
+                              sInt plane, sInt nPlanes, bool keepOut)
 {
   GenSimpleFace sides[2];
   sVector sidev[2][64];
-  sBool split[2];
+  bool split[2];
   sInt i;
-  sBool ret;
+  bool ret;
 
   sFatal("dierk hat hier das allokationschema geändert und nicht getestet...");
 
@@ -325,7 +326,7 @@ sBool GenSimpleMesh::CSGSplitR(const GenSimpleFace &face,const sVector *planes,s
   for(i=0;i<2;i++)
   {
     if(sides[i].VertexCount < 3) // degenerate faces can't be split
-      split[i] = sFALSE;
+      split[i] = false;
     else
     {
       if(plane == nPlanes - 1) // leaf, check whether face inside volume
@@ -341,21 +342,21 @@ sBool GenSimpleMesh::CSGSplitR(const GenSimpleFace &face,const sVector *planes,s
       if(sides[i].VertexCount >= 3 && !split[i])
         AddFace(sides[i]);
 
-    ret = sTRUE;
+    ret = true;
   }
   else
-    ret = sFALSE;
+    ret = false;
 
 //  sides[0].Exit();
 //  sides[1].Exit();
   return ret;
 }
 
-void GenSimpleMesh::CSGAgainst(const sVector *planes,sInt nPlanes,sBool keepOut)
+void GenSimpleMesh::CSGAgainst(const sVector *planes, sInt nPlanes, bool keepOut)
 {
   sInt i,inFaceCount;
   GenSimpleFace *faces;
-  sBool split;
+  bool split;
 
   inFaceCount = Faces.Count;
   faces = Faces.Array;
@@ -411,10 +412,10 @@ void GenSimpleBrush::Cube(const sAABox &box)
   BBox = box;
 }
 
-void GenSimpleBrush::CSGAgainst(const GenSimpleBrush &other,sBool keepOut)
+void GenSimpleBrush::CSGAgainst(const GenSimpleBrush &other, bool keepOut)
 {
   if(BBox.Intersects(other.BBox))
-    Mesh->CSGAgainst(other.Planes,other.PlaneCount,sTRUE);
+    Mesh->CSGAgainst(other.Planes, other.PlaneCount, true);
 }
 
 /****************************************************************************/
@@ -454,7 +455,7 @@ GenMesh::GenMesh()
   PreparedMesh = 0;
 
   Pivot = -1;
-  GotNormals = sFALSE;
+  GotNormals = false;
 
   Mtrl.Count = 2;                 // null-material
   Mtrl[0].Material = 0;
@@ -1130,9 +1131,9 @@ void GenMesh::ReIndex()
     Vert[i].ReIndex = i;
 }
 
-sBool GenMesh::IsBorderEdge(sU32 i,sInt mode)
+bool GenMesh::IsBorderEdge(sU32 i, sInt mode)
 {
-  sBool s0,s1;
+  bool s0,s1;
 
   s0 = GetFace(i)->Select;
   s1 = GetFaceI(i)->Select;
@@ -1160,7 +1161,7 @@ void GenMesh::Mask2Sel(sU32 mask)
       Edge[i].Select = ((Edge[i].Mask & (mask    ))!=0);
 }
 
-void GenMesh::All2Sel(sBool sel,sInt mask)
+void GenMesh::All2Sel(bool sel, sInt mask)
 {
   sInt i;
 
@@ -1257,7 +1258,7 @@ void GenMesh::Edge2Vert(sInt uvs)
 void GenMesh::Vert2FaceEdge()
 {
   sInt i,e,ee;
-  sBool all;
+  bool all;
 
   for(i=0;i<Edge.Count;i++)
     Edge[i].Select = GetVert(i*2+0)->Select && GetVert(i*2+1)->Select;
@@ -1267,7 +1268,7 @@ void GenMesh::Vert2FaceEdge()
 		if(!Face[i].Material)
 			continue;
     e = ee = Face[i].Edge;
-    all = sTRUE;
+    all = true;
     do
     {
       if(!GetVert(e)->Select)
@@ -2021,7 +2022,7 @@ void GenMesh::FixVertCycle(sInt i)
 void GenMesh::Crease(sInt selType,sU32 dmask,sInt dmode,sInt what)
 {
   sInt i,j,k,e,got,v0,v,vf;
-  sBool sel;
+  bool sel;
 
   sVERIFY(!(what & 1));
 
@@ -2077,10 +2078,10 @@ void GenMesh::Crease(sInt selType,sU32 dmask,sInt dmode,sInt what)
   }
 }
 
-void GenMesh::UnCrease(sBool edge,sInt what)
+void GenMesh::UnCrease(bool edge, sInt what)
 {
 	sInt i;
-	sBool sel;
+	bool sel;
 
 	sVERIFY(!(what & 1));
 
@@ -2103,7 +2104,7 @@ void GenMesh::UnCrease(sBool edge,sInt what)
 void GenMesh::CalcNormals(sInt type,sInt calcWhat)
 {
 	sInt i,e,ee,component;
-	sBool ok;
+	bool ok;
 
 	sInt msk = type ? 0 : sGMF_NORMAL;
 
@@ -2143,13 +2144,13 @@ void GenMesh::CalcNormals(sInt type,sInt calcWhat)
         while(e!=ee);
         
         ee = e;
-        ok = (calcWhat & 4 || GetFace(e)->Select) ? sTRUE : sFALSE;
+        ok = (calcWhat & 4 || GetFace(e)->Select) ? true : false;
 
         // accumulate on this side of the crease
         // (the loop construction is absolutely awful, fix that somehow)
         sVector accu,t,t1,t2,*v0,*v1,*v2;
         sF32 t1l,t2l;
-        sBool wasExit,exit=sFALSE;
+        bool wasExit, exit = false;
 
         v0 = VertBuf + GetVertId(e) * vs;
         v2 = VertBuf + GetVertId(NextFaceEdge(e)) * vs;
@@ -2164,7 +2165,7 @@ void GenMesh::CalcNormals(sInt type,sInt calcWhat)
 
           // go to next vert, cycle variables
           if(GetFace(e)->Select)
-            ok = sTRUE;
+            ok = true;
 
           t1 = t2;
           t1l = t2l;
@@ -2236,7 +2237,7 @@ void GenMesh::NeedAllNormals()
   if(!GotNormals)
   {
     CalcNormals(0,7);
-    GotNormals = sTRUE;
+    GotNormals = true;
   }
 }
 
@@ -2330,7 +2331,7 @@ void GenMesh::Cut(const sVector &plane,sInt mode)
 {
 	sInt i,j,va0,va1,vb0,vb1,ec,va,vb,e,ee,pe,noe,noet;
 	sF32 t0,t1;
-	sBool force;
+	bool force;
 
 	// classify vertices
 	for(i=0;i<Vert.Count;i++)
@@ -2391,14 +2392,14 @@ void GenMesh::Cut(const sVector &plane,sInt mode)
 
 		do
 		{
-			force = sFALSE;
+			force = false;
 
 			if(GetEdge(e)->Temp[0]) // edge is on right side of plane?
 			{
 				if(pe==-1)
 				{
 					ee = e;
-					force = sTRUE;
+					force = true;
 				}
 				else if(pe!=PrevFaceEdge(e)) // need to add new edge
 				{
@@ -2797,7 +2798,7 @@ void GenMesh::Perlin(const sMatrix &mat,const sVector &amp)
 
 /****************************************************************************/
 
-sBool GenMesh::Add(GenMesh *other,sInt not_useD_anymore)
+bool GenMesh::Add(GenMesh *other, sInt not_useD_anymore)
 {
 	sInt i,j,v,e,f,m,c,l,p;
 	GenMeshVert *vp;
@@ -2807,7 +2808,7 @@ sBool GenMesh::Add(GenMesh *other,sInt not_useD_anymore)
   GenMeshColl *cp;
 
 	if(VertMask()!=other->VertMask())
-		return sFALSE;
+		return false;
 
 	// make space for data
 
@@ -2905,7 +2906,7 @@ sBool GenMesh::Add(GenMesh *other,sInt not_useD_anymore)
   Pivot = -1;
   UnPrepare();
  
-	return sTRUE;
+  return true;
 }
 
 /****************************************************************************/
@@ -2950,7 +2951,7 @@ void GenMesh::SelectGrow()
 
 /****************************************************************************/
 
-void GenMesh::CubicProjection(const sMatrix &mat,sInt mask,sInt dest,sBool real)
+void GenMesh::CubicProjection(const sMatrix &mat, sInt mask, sInt dest, bool real)
 {
   sInt i,j,bm,axis;
   sF32 max;
@@ -3066,7 +3067,7 @@ void GenMesh::UnPrepareWire()
 /***                                                                      ***/
 /****************************************************************************/
 
-sBool CheckMesh(GenMesh *&mesh,sU32 mask)
+bool CheckMesh(GenMesh *&mesh, sU32 mask)
 {
   GenMesh *oldmesh;
   if(mesh==0)
@@ -3105,7 +3106,7 @@ GenMesh * __stdcall Mesh_Cube(sInt tx,sInt ty,sInt tz,sInt flags,sFSRT srt)
   mesh->Init(sGMF_DEFAULT,1024);
   mesh->Ring(4,0,1.4142135623730950488016887242097f/2,sPI2F/8);
 
-  mesh->Face[0].Select = sTRUE;
+  mesh->Face[0].Select = true;
   mesh->Extrude(0x00010000);
   mat.Init();
   mat.l.z = 1;
@@ -3268,7 +3269,7 @@ GenMesh * __stdcall Mesh_Subdivide(KOp *upd,GenMesh *mesh,sInt mask,sF32 alpha,s
 	while(count--)
 		mesh->Subdivide(alpha);
 
-  mesh->GotNormals = sFALSE;
+  mesh->GotNormals = false;
 
 	return mesh;
 }
@@ -3498,7 +3499,7 @@ GenMesh * __stdcall Mesh_Extrude(KOp *upd,GenMesh *mesh,sInt smask,sInt dmask,sI
     mesh->Mask2Sel((dmask & 0xff)<<8);
   mesh->Face2Vert();
   mesh->Sel2Mask((dmask & 0xff00)<<8);
-  mesh->GotNormals = sFALSE;
+  mesh->GotNormals = false;
 
   return mesh;
 }
@@ -3516,7 +3517,7 @@ GenMesh * __stdcall Mesh_Transform(KOp *upd,GenMesh *mesh,sInt mask,sFSRT srt)
     mat.PivotTransform(mesh->VertBuf[mesh->Pivot*mesh->VertSize()]);
 #endif
 	mesh->TransVert(mat);
-  mesh->GotNormals = sFALSE;
+  mesh->GotNormals = false;
 
 	return mesh;
 }
@@ -3540,7 +3541,7 @@ GenMesh * __stdcall Mesh_TransformEx(KOp *upd,GenMesh *mesh,sInt mask,sFSRT srt,
 #endif
 	mesh->TransVert(mat,sj,dj);
   if(dj == sGMI_POS || dj == sGMI_NORMAL || dj == sGMI_TANGENT)
-    mesh->GotNormals = sFALSE;
+    mesh->GotNormals = false;
 
 	return mesh;
 }
@@ -3567,7 +3568,7 @@ GenMesh * __stdcall Mesh_Cylinder(sInt tx,sInt ty,sInt mode,sInt tz,sInt arc)
   matuv.Init();
   matuv.l.y = 1.0f/ty;
 
-  mesh->Face[0].Select = sTRUE;
+  mesh->Face[0].Select = true;
   for(i=0;i<ty;i++)
   {
 		e=mesh->Edge.Count;
@@ -3680,7 +3681,7 @@ GenMesh * __stdcall Mesh_Crease(GenMesh *mesh,sInt mask,sInt what,sInt selType)
   mesh->Face2Vert();
   mesh->Sel2Mask(mask<<16,MSM_SET);
   if(what & (sGMF_NORMAL | sGMF_TANGENT))
-    mesh->GotNormals = sFALSE;
+    mesh->GotNormals = false;
 
 	return mesh;
 }
@@ -3714,7 +3715,7 @@ GenMesh * __stdcall Mesh_Torus(sInt tx,sInt ty,sF32 ro,sF32 ri,sF32 phase,sF32 a
 {
 	sInt i,n,e,f,t;
 	sInt sj;
-	sBool closed;
+	bool closed;
 	sMatrix mat,matuv;
   GenMesh *mesh;
 
@@ -3734,7 +3735,7 @@ GenMesh * __stdcall Mesh_Torus(sInt tx,sInt ty,sF32 ro,sF32 ri,sF32 phase,sF32 a
 
 	mat.Init();
 	mat.l.x = -ro;
-	mesh->Face[0].Select = sTRUE;
+	mesh->Face[0].Select = true;
 
 	mesh->Face2Vert();
 	mesh->TransVert(mat);
@@ -3757,7 +3758,7 @@ GenMesh * __stdcall Mesh_Torus(sInt tx,sInt ty,sF32 ro,sF32 ri,sF32 phase,sF32 a
 	if(closed)
 	{
 		// delete the start/end faces
-		mesh->Face[1].Select = sTRUE;
+		mesh->Face[1].Select = true;
 		mesh->DeleteFaces();
 
 		e = mesh->Edge.Count;
@@ -3842,7 +3843,7 @@ GenMesh * __stdcall Mesh_Sphere(sInt tx,sInt ty)
 	matuv.l.y = 1.0f / ty;
 
 	mesh->Ring(tx,0,0.5f,0.0f);
-	mesh->Face[mesh->Face.Count-1].Select = sTRUE;
+	mesh->Face[mesh->Face.Count-1].Select = true;
 	for(i=0;i<ty;i++)
 	{
 		mesh->Extrude(0);
@@ -3927,7 +3928,7 @@ GenMesh * __stdcall Mesh_Triangulate(GenMesh *mesh,sInt mask,sInt thres,sInt typ
   if(CheckMesh(mesh,mask<<8)) return 0;
 
 	mesh->Triangulate(thres,0,0,type);
-  mesh->GotNormals = sFALSE;
+  mesh->GotNormals = false;
 	return mesh;
 }
 
@@ -3944,7 +3945,7 @@ GenMesh * __stdcall Mesh_Cut(GenMesh *mesh,sF322 dir,sF32 offs,sInt mode)
 	plane.Init4(mat.i.x,mat.j.x,mat.k.x,offs);
   mesh->All2Sel();
 	mesh->Cut(plane,mode);
-  mesh->GotNormals = sFALSE;
+  mesh->GotNormals = false;
 
   return mesh;
 }
@@ -3957,7 +3958,7 @@ GenMesh * __stdcall Mesh_ExtrudeNormal(KOp *upd,GenMesh *mesh,sInt mask,sF32 dis
 
   mesh->NeedAllNormals();
 	mesh->ExtrudeNormal(distance);
-  mesh->GotNormals = sFALSE;
+  mesh->GotNormals = false;
 	return mesh;
 }
 
@@ -3971,7 +3972,7 @@ GenMesh * __stdcall Mesh_Displace(KOp *upd,GenMesh *mesh,GenBitmap *bmp,sInt mas
   mesh->NeedAllNormals();
   mesh->Displace(bmp,ampli.x,ampli.y,ampli.z);
   bmp->Release();
-  mesh->GotNormals = sFALSE;
+  mesh->GotNormals = false;
 	return mesh;
 }
 
@@ -3983,7 +3984,7 @@ GenMesh * __stdcall Mesh_Bevel(KOp *upd,GenMesh *mesh,sInt mask,sF32 elev,sF32 p
 
   mesh->NeedAllNormals();
 	mesh->Bevel(elev,pull,mode,0,mask<<8);
-  mesh->GotNormals = sFALSE;
+  mesh->GotNormals = false;
   //mesh->Sel2Mask(dmask<<16,0);
 
 	return mesh;
@@ -4019,7 +4020,7 @@ GenMesh * __stdcall Mesh_Add(sInt count,GenMesh *mesh,...)
       other->Release();
     }
   }
-  mesh->GotNormals = sFALSE;
+  mesh->GotNormals = false;
  
   return mesh;
 }
@@ -4127,7 +4128,7 @@ GenMesh * __stdcall Mesh_Multiply(KOp *kop,GenMesh *mesh,sFSRT srt,sInt count,sI
 	}
 
   mesh->Release();
-  out->GotNormals = sFALSE;
+  out->GotNormals = false;
 
 	return out;
 }
@@ -4486,7 +4487,7 @@ GenMesh * __stdcall Mesh_SelectLogic(GenMesh *msh,sU32 smask1,sU32 smask2,sU32 d
 {
   sInt i;
   sU32 smask;
-//  sBool s1,s2;
+//  bool s1,s2;
 
   if(CheckMesh(msh)) return 0;
 
@@ -4560,7 +4561,7 @@ GenMesh * __stdcall Mesh_Invert(GenMesh *msh)
     edg->Vert[1] = edg->Temp[1];
   }
 
-  msh->GotNormals = sFALSE;
+  msh->GotNormals = false;
   return msh;
 }
 
@@ -4818,7 +4819,7 @@ GenMesh * __stdcall Mesh_Bend2(GenMesh *mesh,sF323 center,sF323 rotate,sF32 len,
 
     vp[0].Rotate34(mb,vt);
   }
-  mesh->GotNormals = sFALSE;
+  mesh->GotNormals = false;
 
   return mesh;
 }
@@ -4841,7 +4842,7 @@ GenMesh * __stdcall Mesh_SmoothAngle(GenMesh *mesh,sF32 angle)
     mesh->Edge[i].Select = sFAbs(n1.Dot3(n2)) < angle;
   }
   mesh->Crease(1,0,0,sGMF_NORMAL|sGMF_TANGENT);
-  mesh->GotNormals = sFALSE;
+  mesh->GotNormals = false;
 
   return mesh;
 }
@@ -4970,7 +4971,7 @@ GenMesh * __stdcall Mesh_BendS(GenMesh *mesh,sF323 anchor,sF323 rotate,sF32 len,
     v1.Rotate34(mat[it+1],vt);
     vp[0].Lin3(v0,v1,t);
   }
-  mesh->GotNormals = sFALSE;
+  mesh->GotNormals = false;
 
   return mesh;
 }
@@ -4996,7 +4997,7 @@ GenMesh * __stdcall Mesh_LightSlot(sF323 pos,sU32 color,sF32 amplify,sF32 range)
 
 /****************************************************************************/
 
-GenMesh * __stdcall Mesh_ShadowEnable(GenMesh *mesh,sBool enable)
+GenMesh * __stdcall Mesh_ShadowEnable(GenMesh *mesh, bool enable)
 {
   sInt i;
 
@@ -5083,7 +5084,7 @@ GenMesh * __stdcall Mesh_Multiply2(sInt seed,sInt3 count1,sF323 translate1,sInt3
   for(sInt i=0;i<inCount;i++)
     (&inMesh)[i]->Release();
 
-  mesh->GotNormals = sFALSE;
+  mesh->GotNormals = false;
   return mesh;
 }
 
@@ -5105,8 +5106,8 @@ GenSimpleMesh * __stdcall Mesh_BSP(GenMesh *mesh)
   box.Max.Init( 3.0f, 1.0f, 1.0f,1.0f);
   bb.Cube(box);
 
-  ba.CSGAgainst(bb,sTRUE);
-  bb.CSGAgainst(ba,sTRUE);
+  ba.CSGAgainst(bb, true);
+  bb.CSGAgainst(ba, true);
 
   GenSimpleMesh *result = new GenSimpleMesh;
   result->Add(ba.Mesh);

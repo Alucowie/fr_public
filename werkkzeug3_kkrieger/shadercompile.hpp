@@ -30,8 +30,8 @@ class sShaderCompiler
   void ExpectEndOfWord();
   void ExpectEndOfWordAndLine();
   
-  sBool ExpectWord(const sChar *word);
-  sBool ExpectSubWord(const sChar *subWord);
+  bool ExpectWord(const sChar *word);
+  bool ExpectSubWord(const sChar *subWord);
   void VerifyToken(sInt token);
 
   // error messages
@@ -40,7 +40,7 @@ class sShaderCompiler
   sInt ErrorLine;
   sInt ErrorLineNum;
   sInt Line;
-  sBool IsNewLine;
+  bool IsNewLine;
   const sChar *FileName;
 
   void Error(const sChar *error,...);
@@ -74,7 +74,7 @@ class sShaderCompiler
   void PushControl(sInt type,sInt param);
   void PopControl(sInt type);
   Control *TopControl();
-  void ElseControl(sBool set);
+  void ElseControl(bool set);
 
   // output
   sArray<sU32> Output;
@@ -101,10 +101,10 @@ class sShaderCompiler
   sInt ParseWriteMask();
   sU32 ParseSwizzle();
   sU32 ParseRegNum();
-  sU32 ParseFlagIdentifier(sBool expectIt);
+  sU32 ParseFlagIdentifier(bool expectIt);
 
   // word-level parsing routines
-  sU32 ParseDestReg(sBool writeMask);
+  sU32 ParseDestReg(bool writeMask);
   sU32 ParseSourceReg();
   sInt ParseIndexReg();
   void ParseRange(sInt &start,sInt &end);
@@ -118,7 +118,7 @@ class sShaderCompiler
   void ParseAlias();
   void ParseFor();
   void ParseArith();
-  sBool ParseIndexInstr();
+  bool ParseIndexInstr();
   void ParseVMov();
 
   // block-level parsing routines
@@ -130,7 +130,7 @@ public:
   ~sShaderCompiler();
 
   // frontend
-  sBool Compile(const sChar *source,const sChar *fileName,sText *errors);
+  bool Compile(const sChar *source, const sChar *fileName, sText *errors);
   
   const sU32 *GetShader() const;
   sU32 *GetShaderCopy() const;

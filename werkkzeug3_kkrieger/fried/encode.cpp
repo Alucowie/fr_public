@@ -216,7 +216,7 @@ namespace FRIED
     return bytes - byteStart;
   }
 
-  static void hlbt_group1(sInt swidth,sInt so,sInt ib,sInt **srp,sBool ftop)
+  static void hlbt_group1(sInt swidth,sInt so,sInt ib,sInt **srp,bool ftop)
   {
     sInt *pa,*pb,*p0,*p1,*p2,*p3;
     sInt col;
@@ -243,7 +243,7 @@ namespace FRIED
     ndct42D(pa+col,pb+col,p0+col,p1+col);
   }
 
-  static void hlbt_group2(sInt swidth,sInt so,sInt **srp,sBool ftop)
+  static void hlbt_group2(sInt swidth,sInt so,sInt **srp,bool ftop)
   {
     // macroblocks only
     sInt *pa,*pb,*p0,*p1;
@@ -333,7 +333,7 @@ namespace FRIED
 
       if(k == 4)
       {
-        sBool top = row == 5;
+        bool top = row == 5;
         for(sInt ch=0;ch<chans;ch++)
           hlbt_group1(cols,ctx.Chans[ch].StripeOffset,ib,srp,top);
 
@@ -342,7 +342,7 @@ namespace FRIED
 
       if(ib == 31)
       {
-        sBool top = row == 31;
+        bool top = row == 31;
         for(sInt ch=0;ch<chans;ch++)
           hlbt_group2(cols,ctx.Chans[ch].StripeOffset,srp,top);
 

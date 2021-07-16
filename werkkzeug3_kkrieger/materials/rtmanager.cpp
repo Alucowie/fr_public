@@ -167,7 +167,7 @@ void RenderTargetManager_::GrabToTarget(sU32 targetId,const sRect *window) const
       sInt useXRes,useYRes;
       GetRealResolution(tgt,useXRes,useYRes);
 
-      sBool stretch = useXRes > tgt->TexXRes || useYRes > tgt->TexYRes;
+      bool stretch = useXRes > tgt->TexXRes || useYRes > tgt->TexYRes;
       sSystem->GrabScreen(MasterVP.RenderTarget,*window,tgt->Handle,stretch);
 
       break;

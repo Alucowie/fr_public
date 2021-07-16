@@ -188,7 +188,7 @@ void GoodPackerFrontEnd::DoPack(PackerCallback cb)
 {
   sU32 lookAhead,testAhead;
   Match tm; // tempmatch
-  sBool betterMatch;
+  bool betterMatch;
   sF32 sizec,sizet;
   sU8 tick;
 
@@ -211,7 +211,7 @@ void GoodPackerFrontEnd::DoPack(PackerCallback cb)
 
     if(CM.Len>=2)
     {
-      betterMatch = sFALSE;
+      betterMatch = false;
       sizec = BackEnd->MatchLen(CM.Offs,CM.Len);
 
       // try to find a better match
@@ -223,11 +223,11 @@ void GoodPackerFrontEnd::DoPack(PackerCallback cb)
           sizet = BackEnd->MatchLen(tm.Offs,tm.Len);
           if(sizet<1e+20f && CM.Len < tm.Len+(sizec-sizet)*BackEnd->InvAvgMatchLen
             || Ahead && tm.Len >= CM.Len && sizet<sizec)
-            betterMatch = sTRUE;
+            betterMatch = true;
         }
 
         if(testAhead==2 && !Ahead && tm.Len<CM.Len && BackEnd->LiteralLen(SourcePtr,1)+sizet>sizec)
-          betterMatch = sFALSE;
+          betterMatch = false;
       }
 
       if(!betterMatch)
@@ -649,7 +649,7 @@ void CarryRangeCoder::InitEncode(sU8 *buffer)
   Range = ~0;
   FFNum = 0;
   Cache = 0;
-  FirstByte = sTRUE;
+  FirstByte = true;
 }
 
 void CarryRangeCoder::FinishEncode()
@@ -660,7 +660,7 @@ void CarryRangeCoder::FinishEncode()
     ShiftLow();
 }
 
-void CarryRangeCoder::EncodeBit(sU32 prob,sBool bit)
+void CarryRangeCoder::EncodeBit(sU32 prob, bool bit)
 {
   sU32 newBound = (Range >> 11) * prob;
 
@@ -688,7 +688,7 @@ void CarryRangeCoder::ShiftLow()
     if(!FirstByte)
       Buffer[Bytes++] = Cache + Carry;
     else
-      FirstByte = sFALSE;
+      FirstByte = false;
 
     while(FFNum)
     {
@@ -720,7 +720,7 @@ void BitBuffer::FinishEncode()
     *Tag <<= (7 - BitPos);
 }
 
-void BitBuffer::PutBit(sBool bit)
+void BitBuffer::PutBit(bool bit)
 {
   if(++BitPos == 8)
   {
@@ -743,7 +743,7 @@ void BitBuffer::PutByte(sU8 value)
 /****************************************************************************/
 
 sF32 BitModel::Cost[513];
-sBool BitModel::CostInit = sFALSE;
+bool BitModel::CostInit = false;
 
 void BitModel::Init(sInt move)
 {
@@ -761,7 +761,7 @@ void BitModel::Init(sInt move)
   }
 }
 
-sF32 BitModel::Encode(CarryRangeCoder &coder,sBool bit)
+sF32 BitModel::Encode(CarryRangeCoder &coder, bool bit)
 {
   sF32 cost;
 
@@ -776,7 +776,7 @@ sF32 BitModel::Encode(CarryRangeCoder &coder,sBool bit)
   return cost;
 }
 
-sF32 BitModel::GetBits(sBool bit) const
+sF32 BitModel::GetBits(bool bit) const
 {
   sInt pi,ik;
   sF32 t;
@@ -969,7 +969,7 @@ sU32 CCAPackerBackEnd::EncodeStart(sU8 *dest,const sU8 *src,sF32 *profile)
   PrevMatch.Init(5);
   
   Source = src;
-  LWM = sFALSE;
+  LWM = false;
 
   PrevOffset = 0;
 
@@ -1089,7 +1089,7 @@ void CCAPackerBackEnd::EncodeMatch(sU32 pos,sU32 len)
   AccMatchCount++;
 
   PrevOffset = pos;
-  LWM = sTRUE;
+  LWM = true;
 }
 
 void CCAPackerBackEnd::EncodeLiteral(sU32 pos,sU32 len)
@@ -1111,7 +1111,7 @@ void CCAPackerBackEnd::EncodeLiteral(sU32 pos,sU32 len)
 
     pos++;
     AccLiteralCount++;
-    LWM = sFALSE;
+    LWM = false;
   }
 }
 
@@ -1303,7 +1303,7 @@ sU32 NRVPackerBackEnd::EncodeStart(sU8 *dest,const sU8 *src,sF32 *profile)
 
 void NRVPackerBackEnd::EncodeEnd(sF32 *outProfile)
 {
-  Bit.PutBit(sFALSE);
+  Bit.PutBit(false);
   switch(Variant)
   {
   case 0: EncodePrefix11(0x1000000);  break;
@@ -1318,7 +1318,7 @@ void NRVPackerBackEnd::EncodeMatch(sU32 offs,sU32 len)
 {
   sU32 low;
 
-  Bit.PutBit(sFALSE);
+  Bit.PutBit(false);
   len -= 1 + (offs > (Variant ? 0x500U : 0xd00U));
 
   switch(Variant)
@@ -1326,8 +1326,8 @@ void NRVPackerBackEnd::EncodeMatch(sU32 offs,sU32 len)
   case 0: // NRV2B
     if(offs==PrevOffset)
     {
-      Bit.PutBit(sFALSE);
-      Bit.PutBit(sTRUE);
+      Bit.PutBit(false);
+      Bit.PutBit(true);
     }
     else
     {
@@ -1338,8 +1338,8 @@ void NRVPackerBackEnd::EncodeMatch(sU32 offs,sU32 len)
 
     if(len>=4)
     {
-      Bit.PutBit(sFALSE);
-      Bit.PutBit(sFALSE);
+      Bit.PutBit(false);
+      Bit.PutBit(false);
       EncodePrefix11(len-4);
     }
     else
@@ -1353,8 +1353,8 @@ void NRVPackerBackEnd::EncodeMatch(sU32 offs,sU32 len)
     low = len >= 4 ? 0 : len;
     if(offs==PrevOffset)
     {
-      Bit.PutBit(sFALSE);
-      Bit.PutBit(sTRUE);
+      Bit.PutBit(false);
+      Bit.PutBit(true);
       Bit.PutBit(low & 2);
       Bit.PutBit(low & 1);
     }
@@ -1374,8 +1374,8 @@ void NRVPackerBackEnd::EncodeMatch(sU32 offs,sU32 len)
     low = len <= 2;
     if(offs==PrevOffset)
     {
-      Bit.PutBit(sFALSE);
-      Bit.PutBit(sTRUE);
+      Bit.PutBit(false);
+      Bit.PutBit(true);
       Bit.PutBit(low);
     }
     else
@@ -1389,12 +1389,12 @@ void NRVPackerBackEnd::EncodeMatch(sU32 offs,sU32 len)
       Bit.PutBit(len-1);
     else if(len<=4)
     {
-      Bit.PutBit(sTRUE);
+      Bit.PutBit(true);
       Bit.PutBit(len-3);
     }
     else
     {
-      Bit.PutBit(sFALSE);
+      Bit.PutBit(false);
       EncodePrefix11(len-5);
     }
     break;
@@ -1407,7 +1407,7 @@ void NRVPackerBackEnd::EncodeLiteral(sU32 pos,sU32 len)
 {
   while(len--)
   {
-    Bit.PutBit(sTRUE);
+    Bit.PutBit(true);
     Bit.PutByte(Source[pos++]);
   }
 }
@@ -1435,12 +1435,12 @@ void APackPackerBackEnd::EncodeGamma(sU32 value)
   while(--invertlen)
   {
     Bit.PutBit(invert & 1);
-    Bit.PutBit(sTRUE);
+    Bit.PutBit(true);
     invert >>= 1;
   }
 
   Bit.PutBit(invert & 1);
-  Bit.PutBit(sFALSE);
+  Bit.PutBit(false);
 }
 
 sF32 APackPackerBackEnd::SizeGamma(sU32 value)
@@ -1530,25 +1530,25 @@ sU32 APackPackerBackEnd::EncodeStart(sU8 *dest,const sU8 *src,sF32 *profile)
 
 void APackPackerBackEnd::EncodeEnd(sF32 *outProfile)
 {
-  Bit.PutBit(sTRUE);
-  Bit.PutBit(sTRUE);
-  Bit.PutBit(sFALSE);
+  Bit.PutBit(true);
+  Bit.PutBit(true);
+  Bit.PutBit(false);
   Bit.PutByte(0);
   Bit.FinishEncode();
 }
 
 void APackPackerBackEnd::EncodeMatch(sU32 offs,sU32 len)
 {
-  Bit.PutBit(sTRUE);
+  Bit.PutBit(true);
   if(offs<128 && len<4 && (offs!=PrevOffset || LWM))
   {
-    Bit.PutBit(sTRUE);
-    Bit.PutBit(sFALSE);
+    Bit.PutBit(true);
+    Bit.PutBit(false);
     Bit.PutByte((offs << 1) | (len & 1));
   }
   else
   {
-    Bit.PutBit(sFALSE);
+    Bit.PutBit(false);
 
     if(offs!=PrevOffset || LWM)
     {
@@ -1561,15 +1561,15 @@ void APackPackerBackEnd::EncodeMatch(sU32 offs,sU32 len)
     }
     else
     {
-      Bit.PutBit(sFALSE);
-      Bit.PutBit(sFALSE);
+      Bit.PutBit(false);
+      Bit.PutBit(false);
     }
 
     EncodeGamma(len);
   }
 
   PrevOffset = offs;
-  LWM = sTRUE;
+  LWM = true;
 }
 
 void APackPackerBackEnd::EncodeLiteral(sU32 pos,sU32 len)
@@ -1591,21 +1591,21 @@ void APackPackerBackEnd::EncodeLiteral(sU32 pos,sU32 len)
     if(o!=~0U)
     {
       for(i=0;i<3;i++)
-        Bit.PutBit(sTRUE);
+        Bit.PutBit(true);
 
       for(i=8;i;i>>=1)
         Bit.PutBit(o&i);
     }
     else
     {
-      Bit.PutBit(sFALSE);
+      Bit.PutBit(false);
       Bit.PutByte(Source[pos]);
     }
 
     pos++;
   }
 
-  LWM = sFALSE;
+  LWM = false;
 }
 
 sU32 APackPackerBackEnd::GetCurrentSize()

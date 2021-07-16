@@ -79,7 +79,7 @@ public:
   void StartAnalyze(sU32 startAddress,class ReorderBuffer *reorder=0);
   static void TokenizeCallback(void *user,sInt uncompSize,sF32 compSize);
   void FinishAnalyze();
-  sBool FindSymbol(sU32 VA,DISymbol **sym);
+  bool FindSymbol(sU32 VA, DISymbol **sym);
 
   sChar *WriteReport();
 };
@@ -87,7 +87,7 @@ public:
 class DebugInfoReader
 {
 public:
-  virtual sBool ReadDebugInfo(sChar *fileName,DebugInfo &to) = 0;
+  virtual bool ReadDebugInfo(sChar *fileName, DebugInfo &to) = 0;
 };
 
 struct ReorderItem
@@ -106,7 +106,7 @@ public:
 
   void Add(sU32 newVA,sU32 newSize,sU32 oldVA,sU32 oldSize);
   void Finish();
-  sBool Find(sU32 addr,ReorderItem **reord);
+  bool Find(sU32 addr, ReorderItem **reord);
 };
 
 /****************************************************************************/

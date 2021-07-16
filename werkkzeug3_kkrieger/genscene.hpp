@@ -34,8 +34,8 @@ public:
 //  struct KKriegerMonster *Monster;// monster info
 
   // sector
-  sBool IsSector;                 // is sector yes/no.
-  sBool SectorPaint;              // paint/don't paint this sector
+  bool IsSector;                  // is sector yes/no.
+  bool SectorPaint;               // paint/don't paint this sector
   sInt SectorVisited;             // for portal traversal
   sFRect PortalBox;               // portalbox for this sector
   GenScene *Next;                 // linked list (sector painting)
@@ -48,7 +48,7 @@ public:
 
 /****************************************************************************/
 
-GenScene * __stdcall Init_Scene_Scene(GenMesh *mesh,sF323 s,sF323 r,sF323 t,sBool lightmap);
+GenScene * __stdcall Init_Scene_Scene(GenMesh *mesh, sF323 s, sF323 r, sF323 t, bool lightmap);
 GenScene * __stdcall Init_Scene_Add(sInt count,GenScene *s0,...);
 GenScene * __stdcall Init_Scene_Multiply(GenScene *scene,sF323 s,sF323 r,sF323 t,sInt count);
 GenScene * __stdcall Init_Scene_Transform(GenScene *scene,sF323 s,sF323 r,sF323 t);
@@ -76,7 +76,7 @@ GenScene * __stdcall Init_Scene_Marker(GenScene *add,sInt marker);
 GenScene * __stdcall Init_Scene_LOD(GenScene *high,GenScene *low,sF32 lod);
 GenScene * __stdcall Init_Scene_Ambient(sU32 color);
 
-void __stdcall Exec_Scene_Scene(KOp *op,KEnvironment *kenv,sF323 s,sF323 r,sF323 t,sBool lightmap);
+void __stdcall Exec_Scene_Scene(KOp *op, KEnvironment *kenv, sF323 s, sF323 r, sF323 t, bool lightmap);
 void __stdcall Exec_Scene_Add(KOp *op,KEnvironment *kenv);
 void __stdcall Exec_Scene_Multiply(KOp *op,KEnvironment *kenv,sF323 s,sF323 r,sF323 t,sInt count);
 void __stdcall Exec_Scene_Transform(KOp *op,KEnvironment *kenv,sF323 s,sF323 r,sF323 t);
@@ -113,9 +113,9 @@ GenScene * MakeScene(KObject *in);
 #if !sPLAYER
 extern KOp *ShowPortalOp;
 extern sVector ShowPortalCube[8];
-extern sBool ShowPortalOpProcessed;
+extern bool ShowPortalOpProcessed;
 
-extern sBool SceneWireframe;
+extern bool SceneWireframe;
 extern sInt SceneWireFlags;
 extern sU32 SceneWireMask;
 #endif

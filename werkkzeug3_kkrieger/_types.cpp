@@ -187,7 +187,8 @@ sU32 sDec3(sF32 x,sF32 y,sF32 z)
 /****************************************************************************/
 
 #if !sMOBILE
-void sHermite(sF32 *d,sF32 *p0,sF32 *p1,sF32 *p2,sF32 *p3,sInt count,sF32 fade,sF32 t,sF32 c,sF32 b,sBool ignoretime)
+void sHermite(sF32 *d, sF32 *p0, sF32 *p1, sF32 *p2, sF32 *p3, sInt count,
+              sF32 fade, sF32 t, sF32 c, sF32 b, bool ignoretime)
 {
   sF32 f1,f2,f3,f4;
   sF32 t0,t1,t2,t3;
@@ -254,7 +255,8 @@ void sHermite(sF32 *d,sF32 *p0,sF32 *p1,sF32 *p2,sF32 *p3,sInt count,sF32 fade,s
 }
 
 
-void sHermiteD(sF32 *d,sF32 *dd,sF32 *p0,sF32 *p1,sF32 *p2,sF32 *p3,sInt count,sF32 fade,sF32 t,sF32 c,sF32 b,sBool ignoretime)
+void sHermiteD(sF32 *d, sF32 *dd, sF32 *p0, sF32 *p1, sF32 *p2, sF32 *p3,
+               sInt count, sF32 fade, sF32 t, sF32 c, sF32 b, bool ignoretime)
 {
   sF32 f1,f2,f3,f4;
   sF32 t0,t1,t2,t3;
@@ -721,7 +723,7 @@ sInt sQuadraticRoots(const sF32 *coeffs,sF32 *roots)
   }
 }
 
-sBool sNormalFloat(sF32 value)
+bool sNormalFloat(sF32 value)
 {
   const sU32 binval = (sU32 &) value;
   sInt exp = ((binval >> 23) & 0xff) - 127;
@@ -1289,7 +1291,7 @@ sF32 sScanFloat(const sChar *&scan)
 
 /****************************************************************************/
 
-sBool sScanString(const sChar *&scan,sChar *buffer,sInt size)
+bool sScanString(const sChar *&scan, sChar *buffer, sInt size)
 {
   if(*scan!='"')
     return sFALSE;
@@ -1311,7 +1313,7 @@ sBool sScanString(const sChar *&scan,sChar *buffer,sInt size)
 
 /****************************************************************************/
 
-sBool sScanName(const sChar *&scan,sChar *buffer,sInt size)
+bool sScanName(const sChar *&scan, sChar *buffer, sInt size)
 {
   if(!((*scan>='a' && *scan<='z') || 
        (*scan>='A' && *scan<='Z') || *scan=='_' )) 
@@ -1347,7 +1349,7 @@ void sScanSpace(const sChar *&scan)
 
 /****************************************************************************/
 
-sBool sScanCycle(const sChar *s,sInt index,sInt &start,sInt &len)
+bool sScanCycle(const sChar *s, sInt index, sInt &start, sInt &len)
 {
   start = 0;
   len = 0;
@@ -1376,7 +1378,7 @@ extern "C" char * __cdecl _fcvt( double value, int count, int *dec, int *sign );
 extern "C" char * __cdecl _ecvt( double value, int count, int *dec, int *sign );
 #endif
 
-sBool sFormatString(sChar *d,sInt left,const sChar *s,const sChar **fp)
+bool sFormatString(sChar *d, sInt left, const sChar *s, const sChar **fp)
 {
   sInt c;
   sInt field0;
@@ -2128,7 +2130,7 @@ void sWriteString(sU32 *&data,sChar *str)
   data+=(size+3)/4;
 }
 
-sBool sReadString(sU32 *&data,sChar *str,sInt max)
+bool sReadString(sU32 *&data, sChar *str, sInt max)
 {
   sInt size;
 
@@ -2174,7 +2176,7 @@ sInt sReadBegin(sU32 *&data,sU32 cid)
   return version;
 }
 
-sBool sReadEnd(sU32 *&data)
+bool sReadEnd(sU32 *&data)
 {
   if(*data++!=sMAGIC_END) return 0;
   return sTRUE;
@@ -2337,12 +2339,12 @@ void sRect::Init(const struct sFRect &r)
 }
 #endif
 
-sBool sRect::Hit(sInt x,sInt y)
+bool sRect::Hit(sInt x, sInt y)
 {
   return x>=x0 && x<x1 && y>=y0 && y<y1;
 }
 
-sBool sRect::Hit(const sRect &rin)
+bool sRect::Hit(const sRect &rin)
 {
   sRect r;
   r = *this;
@@ -2350,7 +2352,7 @@ sBool sRect::Hit(const sRect &rin)
   return r.x0<r.x1 && r.y0<r.y1;
 }
 
-sBool sRect::Inside(const sRect &r)
+bool sRect::Inside(const sRect &r)
 {
   if(x0  < r.x0) return sFALSE;
   if(y0  < r.y0) return sFALSE;
@@ -2402,12 +2404,12 @@ void sFRect::Init(const struct sRect &r)
   y1=r.y1;
 }
 
-sBool sFRect::Hit(sF32 x,sF32 y)
+bool sFRect::Hit(sF32 x, sF32 y)
 {
   return x>=x0 && x<x1 && y>=y0 && y<y1;
 }
 
-sBool sFRect::Hit(const sFRect &rin)
+bool sFRect::Hit(const sFRect &rin)
 {
   sFRect r;
   r = *this;
@@ -3380,14 +3382,14 @@ void sAABox::And(const sAABox &b)
   Max.z = sMin(Max.z,b.Max.z);
 }
 
-sBool sAABox::Intersects(const sAABox &b)
+bool sAABox::Intersects(const sAABox &b)
 {
   return sMax(Min.x,b.Min.x) < sMin(Max.x,b.Max.x)
     && sMax(Min.y,b.Min.y) < sMin(Max.y,b.Max.y)
     && sMax(Min.z,b.Min.z) < sMin(Max.z,b.Max.z);
 }
 
-sBool sAABox::IntersectsSphere(const sVector &center,sF32 radius)
+bool sAABox::IntersectsSphere(const sVector &center, sF32 radius)
 {
   sF32 d = 0.0f, dt;
 
@@ -3445,7 +3447,7 @@ sF32 sCullPlane::Distance(const sVector &x) const
   return Plane.Dot3(x) + Plane.w;
 }
 
-sBool sCullBBox(const sAABox &box,const sCullPlane *planes,sInt planeCount)
+bool sCullBBox(const sAABox &box, const sCullPlane *planes, sInt planeCount)
 {
   sVector v;
   sInt i,vi;
@@ -3721,17 +3723,17 @@ void sObject::Tag()
 {
 }
 
-sBool sObject::Write(sU32 *&)
+bool sObject::Write(sU32 *&)
 {
   return sFALSE;
 }
 
-sBool sObject::Read(sU32 *&)
+bool sObject::Read(sU32 *&)
 {
   return sFALSE;
 }
 
-sBool sObject::Merge(sU32 *&)
+bool sObject::Merge(sU32 *&)
 {
   return sFALSE;
 }
@@ -3873,7 +3875,7 @@ void sBitmap::Copy(sObject *o)
 
 /****************************************************************************/
 
-sBool sBitmap::Write(sU32 *&p)
+bool sBitmap::Write(sU32 *&p)
 {
   *p++ = 1;
   *p++ = XSize;
@@ -3885,7 +3887,7 @@ sBool sBitmap::Write(sU32 *&p)
 
 /****************************************************************************/
 
-sBool sBitmap::Read(sU32 *&p)
+bool sBitmap::Read(sU32 *&p)
 {
   sInt version;
   version = *p++;
@@ -3952,7 +3954,7 @@ void sText::Init(const sChar *text,sInt len)
   Used = len;
 }
 
-sBool sText::Realloc(sInt size)
+bool sText::Realloc(sInt size)
 {
   sChar *s;
   FixUsed();
@@ -3971,7 +3973,7 @@ sBool sText::Realloc(sInt size)
   }
 }
 
-sBool sText::Grow(sInt size)
+bool sText::Grow(sInt size)
 {
   if(size>Alloc)
   {
@@ -3986,7 +3988,7 @@ sBool sText::Grow(sInt size)
 
 /****************************************************************************/
 
-sBool sText::Write(sU32 *&data)
+bool sText::Write(sU32 *&data)
 {
   sInt size;
 
@@ -4001,7 +4003,7 @@ sBool sText::Write(sU32 *&data)
 }
 
 
-sBool sText::Read(sU32 *&data)
+bool sText::Read(sU32 *&data)
 {
   sInt size;
 
@@ -4083,7 +4085,7 @@ sMusicPlayer::~sMusicPlayer()
     delete[] RewindBuffer;
 }
 
-sBool sMusicPlayer::Load(sChar *name)
+bool sMusicPlayer::Load(sChar *name)
 {
   sInt size;
   sU8 *data;
@@ -4101,7 +4103,7 @@ sBool sMusicPlayer::Load(sChar *name)
   }
 }
 
-sBool sMusicPlayer::Load(sU8 *data,sInt size,sBool ownMem)
+bool sMusicPlayer::Load(sU8 *data, sInt size, bool ownMem)
 {
   if(StreamDelete)
     delete[] Stream;
@@ -4112,7 +4114,7 @@ sBool sMusicPlayer::Load(sU8 *data,sInt size,sBool ownMem)
   return sTRUE;
 }
 
-sBool sMusicPlayer::LoadCache(sChar *name)
+bool sMusicPlayer::LoadCache(sChar *name)
 {
   sInt size;
   sU8 *mem;
@@ -4131,7 +4133,7 @@ sBool sMusicPlayer::LoadCache(sChar *name)
     return sFALSE;
 }
 
-sBool sMusicPlayer::LoadAndCache(sChar *name)
+bool sMusicPlayer::LoadAndCache(sChar *name)
 {
   static sChar buffer[4096];
   sInt size;
@@ -4161,7 +4163,7 @@ sBool sMusicPlayer::LoadAndCache(sChar *name)
   return sTRUE;
 }
 
-sBool sMusicPlayer::LoadAndCache(sChar *name,sU8 *data,sInt size,sBool ownMem)
+bool sMusicPlayer::LoadAndCache(sChar *name, sU8 *data, sInt size, bool ownMem)
 {
   static sChar buffer[4096];
   sU8 *mem;
@@ -4197,7 +4199,7 @@ void sMusicPlayer::AllocRewind(sInt bytes)
   RewindPos = 0;
 }
 
-sBool sMusicPlayer::Start(sInt songnr)
+bool sMusicPlayer::Start(sInt songnr)
 {
   if(Status==1)
   {
@@ -4215,7 +4217,7 @@ void sMusicPlayer::Stop()
     Status = 1;
 }
 
-sBool sMusicPlayer::Handler(sS16 *buffer,sInt samples,sInt vol)
+bool sMusicPlayer::Handler(sS16 *buffer, sInt samples, sInt vol)
 {
   sInt diff,size;
   sInt result;

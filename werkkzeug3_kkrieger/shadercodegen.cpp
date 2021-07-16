@@ -8,8 +8,8 @@
 // Control structure state
 struct sShaderCodeGen::Control
 {
-  sBool Exec;       // execute instrs yes/no
-  sBool Free;       // no if in a chain yet taken?
+  bool Exec;        // execute instrs yes/no
+  bool Free;        // no if in a chain yet taken?
   const sU32 *Loop; // loop point
   sU32 Condition;   // while condition
 };
@@ -33,7 +33,7 @@ sU32 sShaderCodeGen::GetFlagWord(sU32 addr)
     return DataArea[wordOffs];
 }
 
-sBool sShaderCodeGen::EvalCond(sU32 condition)
+bool sShaderCodeGen::EvalCond(sU32 condition)
 {
   // get the input value
   sU32 fieldStart = condition & 0x1f;
@@ -42,7 +42,7 @@ sBool sShaderCodeGen::EvalCond(sU32 condition)
 
   // perform the comparision
   sU32 ref = (condition >> 8) & 0xff;
-  sBool result;
+  bool result;
 
   switch((condition >> 29) & 3)
   {
@@ -60,7 +60,7 @@ sBool sShaderCodeGen::EvalCond(sU32 condition)
 }
 
 // Phase 1 reads in the shader, evaluates if statements, and resolves aliases
-sBool sShaderCodeGen::Phase1(const sU32 *input)
+bool sShaderCodeGen::Phase1(const sU32 *input)
 {
   sU32 aliasTable[MAXTEMP];
   sU32 remapUp[MAXTEMP];
@@ -101,7 +101,7 @@ sBool sShaderCodeGen::Phase1(const sU32 *input)
     sInt nOperands = (opcode >> 24) & 0xf;
     const sU32 *opNext = input + nOperands;
 
-    sBool exec = ctrl->Exec, taken;
+    bool exec = ctrl->Exec, taken;
 
     switch(opcode)
     {
@@ -273,7 +273,7 @@ sBool sShaderCodeGen::Phase1(const sU32 *input)
 }
 
 // Phase 2 performs register allocation
-sBool sShaderCodeGen::Phase2()
+bool sShaderCodeGen::Phase2()
 {
   sInt logReg[MAXTEMP2];
   sInt physReg[MAXPHYSREG+1];

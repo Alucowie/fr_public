@@ -242,7 +242,7 @@ static const sChar *compareops[] =
 
 /****************************************************************************/
 
-static sBool IsSeperator(const sChar *scan)
+static bool IsSeperator(const sChar *scan)
 {
   return (*scan == 0 || 
     *scan == ' ' || *scan == '\n' || *scan == '\t' || *scan == '\r' ||
@@ -454,7 +454,7 @@ void sShaderCompiler::Error(const sChar *name,...)
   ErrorLine++;
 }
 
-sBool sShaderCompiler::ExpectWord(const sChar *word)
+bool sShaderCompiler::ExpectWord(const sChar *word)
 {
   if(sCmpString(Word,word))
   {
@@ -467,7 +467,7 @@ sBool sShaderCompiler::ExpectWord(const sChar *word)
   return sTRUE;
 }
 
-sBool sShaderCompiler::ExpectSubWord(const sChar *subWord)
+bool sShaderCompiler::ExpectSubWord(const sChar *subWord)
 {
   if(sCmpString(TokValue,subWord))
   {
@@ -700,7 +700,7 @@ sShaderCompiler::Control *sShaderCompiler::TopControl()
     return &ControlStack[ControlStack.Count-1];
 }
 
-void sShaderCompiler::ElseControl(sBool set)
+void sShaderCompiler::ElseControl(bool set)
 {
   if(!ControlStack.Count)
     Error("else without if");
@@ -985,7 +985,7 @@ sU32 sShaderCompiler::ParseRegNum()
   return regNum;
 }
 
-sU32 sShaderCompiler::ParseFlagIdentifier(sBool expectIt)
+sU32 sShaderCompiler::ParseFlagIdentifier(bool expectIt)
 {
   sU32 code;
 
@@ -1042,7 +1042,7 @@ sU32 sShaderCompiler::ParseFlagIdentifier(sBool expectIt)
 
 /****************************************************************************/
 
-sU32 sShaderCompiler::ParseDestReg(sBool writeMask)
+sU32 sShaderCompiler::ParseDestReg(bool writeMask)
 {
   sU32 out = 0;
   sInt mask = 0xf;
@@ -1169,7 +1169,7 @@ void sShaderCompiler::ParseRange(sInt &start,sInt &end)
 
 sU32 sShaderCompiler::ParseIfCondition()
 {
-  sBool negate = sFALSE;
+  bool negate = sFALSE;
   sU32 code;
 
   // remove all negate prefixes
@@ -1375,7 +1375,7 @@ void sShaderCompiler::ParseTemp()
   VerifyToken(TOK_TEMP);
   ExpectEndOfWord();
 
-  sBool first = sTRUE;
+  bool first = sTRUE;
   
   // read variable definitions till end of line
   while(!IsNewLine)
@@ -1405,7 +1405,7 @@ void sShaderCompiler::ParseAlias()
   VerifyToken(TOK_ALIAS);
   ExpectEndOfWord();
 
-  sBool first = sTRUE;
+  bool first = sTRUE;
 
   // read alias definitions till end of line
   while(!IsNewLine)
@@ -1480,7 +1480,7 @@ void sShaderCompiler::ParseFor()
     Error("Index register expected");
 }
 
-static sBool HasReplicateSwizzle(sU32 reg)
+static bool HasReplicateSwizzle(sU32 reg)
 {
   reg &= 0x00ff0000; // use swizzle only
   return reg == XS_X || reg == XS_Y || reg == XS_Z || reg == XS_W;
@@ -1608,7 +1608,7 @@ void sShaderCompiler::ParseArith()
     Error("'%s' doesn't allow last parameter to have swizzle",instr->name);
 }
 
-sBool sShaderCompiler::ParseIndexInstr()
+bool sShaderCompiler::ParseIndexInstr()
 {
   if(!sCmpString(TokValue,"imov"))
   {
@@ -1939,7 +1939,7 @@ sShaderCompiler::~sShaderCompiler()
   Output.Exit();
 }
 
-sBool sShaderCompiler::Compile(const sChar *source,const sChar *fileName,sText *errors)
+bool sShaderCompiler::Compile(const sChar *source, const sChar *fileName, sText *errors)
 {
   if(!source)
     source = "";

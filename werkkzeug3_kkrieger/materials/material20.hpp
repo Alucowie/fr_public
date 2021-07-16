@@ -50,12 +50,12 @@ protected:
   sInt TexCount;
 
   sMaterial20Para Para;
-  sBool UseSRT;
+  bool UseSRT;
 
   sMaterial20Base(const sMaterial20Para &para);
   ~sMaterial20Base();
 
-  void DefaultStates(sU32 *&states,sBool alphaTest,sBool zFill,sBool stencilTest,sInt alphaBlend);
+  void DefaultStates(sU32 *&states, bool alphaTest, bool zFill, bool stencilTest, sInt alphaBlend);
   void AddSampler(sU32 *&states,sInt handle,sU32 flags);
   void UseTex(sU32 *&states,sInt index,sInt *handles);
   void Compile(const sU32 *states,const sU32 *vs,const sU32 *ps);

@@ -18,8 +18,8 @@ struct sShaderCodeGen
 
   const sU32 *DataArea;
   sU8 Index[MAXINDEX];
-  sBool IsV1Shader;
-  sBool IsPS11;
+  bool IsV1Shader;
+  bool IsPS11;
 
   sU32 CodeLen;     // in words
   sU32 *FirstInstr; // pointer to first actual instruction in code stream
@@ -27,9 +27,9 @@ struct sShaderCodeGen
   sU32 Code[MAXCODEWORDS];
 
   sU32 GetFlagWord(sU32 addr);
-  sBool EvalCond(sU32 condition);
-  sBool Phase1(const sU32 *input);
-  sBool Phase2();
+  bool EvalCond(sU32 condition);
+  bool Phase1(const sU32 *input);
+  bool Phase2();
   void RemoveOpcodeLengths();
 
 public:

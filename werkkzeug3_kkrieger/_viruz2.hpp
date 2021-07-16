@@ -32,7 +32,7 @@ public:
 
 	// returns  : flag if succeeded
 	//
-	sBool Open (const void *a_v2mptr, sU32 a_samplerate=44100);
+	bool Open (const void *a_v2mptr, sU32 a_samplerate = 44100);
 
 
 	// closes player
@@ -63,7 +63,7 @@ public:
 	// 
 	// returns  : flag if playing
 	//
-  sBool Render (sF32 *a_buffer, sU32 a_len);
+    bool Render (sF32 *a_buffer, sU32 a_len);
 
 
 
@@ -123,7 +123,7 @@ private:
 	// General info from V2M file
 	struct V2MBase
 	{
-		sBool valid;
+		bool valid;
 		const sU8   *patchmap;
 		const sU8   *globals;
 		sU32	timediv;
@@ -207,7 +207,7 @@ private:
 
 	// internal methods
 
-	sBool InitBase(const void *a_v2m);  // inits base struct from v2m
+	bool InitBase(const void *a_v2m);   // inits base struct from v2m
 	void  Reset();                      // resets player, inits synth
 	void  Tick();                       // one midi player tick
 };
@@ -228,7 +228,7 @@ public:
 
   static sU8 *ConvertV2M(const sU8 *in,sInt inlen,sInt &outlen);
 
-  sBool Init(sInt songnr);
+  bool Init(sInt songnr);
   sInt Render(sS16 *stream,sInt samples);
   sInt GetTuneLength();
 };

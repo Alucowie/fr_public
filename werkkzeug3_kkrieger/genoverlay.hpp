@@ -126,7 +126,7 @@ public:
   sMaterial11 *Mtrl[GENOVER_MAXMAT];
   sMaterialDirect *HSCBMaterial;
   class GenMaterial *DefaultMat;
-  sBool RealPaint;
+  bool RealPaint;
 #if !sPLAYER
   sInt SoundEnable;            
   sInt LinkEdit;

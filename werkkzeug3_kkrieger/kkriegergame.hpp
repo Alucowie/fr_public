@@ -138,10 +138,10 @@ struct KKriegerCell
 
   // interface
 
-  sBool RejectPlane(const sVector &v1,const sVector &v2); // tries to find a plane v1 and v2 are on the same side of
+  bool RejectPlane(const sVector &v1, const sVector &v2); // tries to find a plane v1 and v2 are on the same side of
   sInt OutsideMask(const sVector &v,sF32 radius=0);   // bitmask for each plane if v is outside
-  sBool IntersectOut(const sVector &p,const sVector &d,sVector &plane,sF32 &dist,sF32 radius=0); 
-  sBool IntersectIn (const sVector &p,const sVector &d,sVector &plane,sF32 &dist,sF32 radius=0); 
+  bool IntersectOut(const sVector &p, const sVector &d, sVector &plane, sF32 &dist, sF32 radius = 0);
+  bool IntersectIn (const sVector &p, const sVector &d, sVector &plane, sF32 &dist, sF32 radius = 0);
 
   sF32 approxDistance(const sVector &p); // negative for inside, positive for outside
 
@@ -448,8 +448,8 @@ struct KKriegerGame
   sF32 AccelForw;
   sF32 AccelSide;
   sInt FlyMode;                             // toggle "fly" mode with 'y'
-  sBool OnGround;
-  sBool ResetByOp;
+  bool OnGround;
+  bool ResetByOp;
   sInt JumpTimer;
   sU32 LastCancel;
   sInt LastTime;
@@ -475,7 +475,7 @@ struct KKriegerGame
   sF32 DampPlayerCam;
 
   // Stuff
-  sBool WasInOptions;                       // some switches are checked after leaving options
+  bool WasInOptions;                        // some switches are checked after leaving options
 
   KEvent WeaponEvent;                       // event for displaying weapon
   sF32 WeaponTimer;                         // time for weapon animation
@@ -525,14 +525,14 @@ struct KKriegerGame
   void CellSiftDown(sInt n,sInt k);
   void CellConnect();
 
-  sBool OnKey(sU32 key);
+  bool OnKey(sU32 key);
   void OnTick(KEnvironment *kenv,sInt slices);
   void AddEvents(KEnvironment *kenv);
   void OnPaint(sMaterialEnv *env);
   void OnOptionsChanged();
 
   void Panic();
-  void ResetRoot(KEnvironment *kenv,KOp *root,sBool firsttime);
+  void ResetRoot(KEnvironment *kenv, KOp *root, bool firsttime);
   sInt GetNewRoot();
   void Restart();
   void Continue();
@@ -546,9 +546,9 @@ struct KKriegerGame
   // game
 
   void ActivateMonster(KKriegerMonster *mon,sInt active);
-  void MonsterAI(KKriegerMonster *mon,KEnvironment *kenv,sBool machinelife,sBool prevlife);
+  void MonsterAI(KKriegerMonster *mon, KEnvironment *kenv, bool machinelife, bool prevlife);
   void MonsterMagnetAI();
-  sBool ShotAI(KKriegerShot *shot);
+  bool ShotAI(KKriegerShot *shot);
   void Zones(KEnvironment *kenv);
   void RespawnAt(sInt i);
   void FireShot(KEnvironment *kenv,sInt weapon,KKriegerMonster *monster,const sVector *monsterfiredir);
@@ -562,35 +562,35 @@ struct KKriegerGame
 
   // particles (intern)
 
-//  sBool MoveParticle(KKriegerParticle *part,sBool onlyoldcoll);
+//  bool MoveParticle(KKriegerParticle *part, bool onlyoldcoll);
   void Physic(sF32 fade);
 //  void PhysicCons(KKriegerConstraint *cons);
 //  void PhysicPart(KKriegerParticle *p);
 //  void PhysicDCell(KKriegerCellDynamic *cell);
   KKriegerCellAdd *FindCell(const sVector &v);
 
-//  sBool FindFirstIntersect(const sVector &p0,sVector &p1,KKriegerCellAdd *&cadd,sVector *plane=0);
-//  sBool FindFirstIntersect(const sVector &d,const sVector &p1,const sVector &p0,KKriegerCellAdd *&cadd,sVector &plane,sF32 &dist);
-//  sBool FindSubIntersect(const sVector &d,const sVector &p1,const sVector &p0,KKriegerCellAdd **list,sInt count,sVector &plane,sF32 &dist);
-//  sBool FindSubIntersect2(const sVector &d,const sVector &p1,const sVector &p0,KKriegerCell *cell,sVector &plane,sF32 &distresult);
-//  sBool IsFreeSpace(sVector &p,KKriegerCellAdd *cell);
+//  bool FindFirstIntersect(const sVector &p0, sVector &p1, KKriegerCellAdd *&cadd, sVector *plane=0);
+//  bool FindFirstIntersect(const sVector &d, const sVector &p1, const sVector &p0, KKriegerCellAdd *&cadd, sVector &plane, sF32 &dist);
+//  bool FindSubIntersect(const sVector &d, const sVector &p1, const sVector &p0, KKriegerCellAdd **list, sInt count, sVector &plane, sF32 &dist);
+//  bool FindSubIntersect2(const sVector &d, const sVector &p1, const sVector &p0, KKriegerCell *cell, sVector &plane, sF32 &distresult);
+//  bool IsFreeSpace(sVector &p, KKriegerCellAdd *cell);
 //  void CheckZones(sVector &p0,KKriegerCellAdd *c0,sVector &p1,KKriegerCellAdd *c1);
 
   // new collision by exot
 
-  sBool CollideRay(KKriegerCellAdd *&cadd,const sVector &p1,const sVector &p0,KKriegerCollideInfo &ci);
-  sBool CollideRaySub(const sVector &d,const sVector &p1,const sVector &p0,KKriegerCellAdd **list,sInt count,KKriegerCollideInfo &ci);
-  sBool CollideRaySub2(const sVector &d,const sVector &p1,const sVector &p0,KKriegerCell *cell,KKriegerCollideInfo &ci);
+  bool CollideRay(KKriegerCellAdd *&cadd, const sVector &p1, const sVector &p0, KKriegerCollideInfo &ci);
+  bool CollideRaySub(const sVector &d, const sVector &p1, const sVector &p0, KKriegerCellAdd **list, sInt count, KKriegerCollideInfo &ci);
+  bool CollideRaySub2(const sVector &d, const sVector &p1, const sVector &p0, KKriegerCell *cell, KKriegerCollideInfo &ci);
 
-  sBool MoveCollider(KKSolidCollider &collider, const sVector &v,sInt who);
-  sBool MoveColliderX(KKSolidCollider &collider, const sVector &v,sInt who);
+  bool MoveCollider(KKSolidCollider &collider, const sVector &v, sInt who);
+  bool MoveColliderX(KKSolidCollider &collider, const sVector &v, sInt who);
   void CollideSoftSphereAdd(sVector &sphere, KKriegerCellAdd **cellList, sInt &count);
   void CollideSoftSphereSub(sVector &sphere, KKriegerCell *cell);
   void CollideSoftSphereFace(sVector &sphere, const sVector *vertices, int numVertices);
-  sBool CheckSphereVsFace(const sVector &sphere, const sVector *vertices, int numVertices, sVector &nearestPoint);
-  sBool CheckSphereVsEdge(const sVector &sphere, const sVector &v1, const sVector &v2, sVector &nearestPoint);
+  bool CheckSphereVsFace(const sVector &sphere, const sVector *vertices, int numVertices, sVector &nearestPoint);
+  bool CheckSphereVsEdge(const sVector &sphere, const sVector &v1, const sVector &v2, sVector &nearestPoint);
   void CreateCollisionFaces(KKriegerCellAdd &add);
-  sBool SplitCollisionFace(const struct GenSimpleFace &face, const sVector *planes, sInt plane, sInt nPlanes, KKriegerCellAdd &add);
+  bool SplitCollisionFace(const struct GenSimpleFace &face, const sVector *planes, sInt plane, sInt nPlanes, KKriegerCellAdd &add);
 };
 
 /****************************************************************************/

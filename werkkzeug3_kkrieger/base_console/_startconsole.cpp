@@ -273,11 +273,11 @@ sU8 *sSystem_::LoadFile(const sChar *name)
 
 sChar *sSystem_::LoadText(const sChar *name)
 {
-  sInt result;
+  bool result;
   sU8 *mem;
 
   mem = 0;
-  result = sFALSE;
+  result = false;
 #ifdef __linux__
   int fd;
   ssize_t size;
@@ -290,9 +290,9 @@ sChar *sSystem_::LoadText(const sChar *name)
       mem = new sU8[size+1];
       lseek(fd, 0, SEEK_SET);
       if ((test = read(fd, mem, size)))
-        result = sTRUE;
+        result = true;
       if (size != (sInt)test)
-        result = sFALSE;
+        result = false;
       mem[size] = 0;
     }
     close(fd);
@@ -310,9 +310,9 @@ sChar *sSystem_::LoadText(const sChar *name)
     {
       mem = new sU8[size+1];
       if(ReadFile(handle,mem,size,&test,0))
-        result = sTRUE;
+        result = true;
       if(size!=(sInt)test)
-        result = sFALSE;
+        result = false;
       mem[size]=0;
     }
     CloseHandle(handle);
@@ -329,7 +329,7 @@ sChar *sSystem_::LoadText(const sChar *name)
 
 /****************************************************************************/
 
-sBool sSystem_::SaveFile(const sChar *name,const sU8 *data,sInt size)
+bool sSystem_::SaveFile(const sChar *name, const sU8 *data, sInt size)
 {
   sInt result;
 

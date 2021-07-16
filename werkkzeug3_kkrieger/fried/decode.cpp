@@ -309,7 +309,7 @@ namespace FRIED
     p1[swidth-1] <<= 2;
   }
 
-  static void ihlbt_group2(sInt swidth,sInt so,sS16 **srp,sBool fbot)
+  static void ihlbt_group2(sInt swidth, sInt so, sS16 **srp, bool fbot)
   {
     // macroblocks only
     sS16 *pa,*pb,*p0,*p1,*p2,*p3;
@@ -326,7 +326,7 @@ namespace FRIED
       indct42D_MB(p0+col,p1+col,p2+col,p3+col);
   }
 
-  static void ihlbt_group3(sInt swidth,sInt so,sInt ib,sS16 **srp,sBool fbot)
+  static void ihlbt_group3(sInt swidth, sInt so, sInt ib, sS16 **srp, bool fbot)
   {
     // normal rows only
     sS16 *pa,*pb,*p0,*p1,*p2,*p3;
@@ -422,7 +422,7 @@ namespace FRIED
 
         if(row != rows - 16)
         {
-          sBool bot = (row == rows - 32);
+          bool bot = (row == rows - 32);
           sInt sizeStripe = decodeStripe(ctx,cols,chans,bits,bitsEnd - bits,srp);
           if(sizeStripe < 0)
             return -1;
@@ -436,7 +436,7 @@ namespace FRIED
 
       if(k == 4 && row != rows - 2)
       {
-        sBool bot = (row == rows - 6);
+        bool bot = (row == rows - 6);
 
         for(sInt ch=0;ch<chans;ch++)
           ihlbt_group3(cols,ctx.Chans[ch].StripeOffset,ib,srp,bot);
@@ -453,18 +453,18 @@ namespace FRIED
 
 using namespace FRIED;
 
-sBool LoadFRIED(const sU8 *data,sInt size,sInt &xout,sInt &yout,sU8 *&dataout)
+bool LoadFRIED(const sU8 *data, sInt size, sInt &xout, sInt &yout, sU8 *&dataout)
 {
   DecodeContext ctx;
   const sU8 *dataEnd = data + size;
 
   // check file format
   if(size < sizeof(FileHeader))
-    return sFALSE;
+    return false;
 
   // check signature
   if(sCmpMem(data,"FRIED001",8))
-    return sFALSE;
+    return false;
 
   // copy header over
   sCopyMem(&ctx.FH,data,sizeof(FileHeader));
@@ -472,7 +472,7 @@ sBool LoadFRIED(const sU8 *data,sInt size,sInt &xout,sInt &yout,sU8 *&dataout)
 
   // check number of channels and copy channel headers over
   if(ctx.FH.Channels > 16)
-    return sFALSE;
+    return false;
 
   sCopyMem(ctx.Chans,data,ctx.FH.Channels * sizeof(ChannelHeader));
   data += ctx.FH.Channels * sizeof(ChannelHeader);
@@ -491,7 +491,7 @@ sBool LoadFRIED(const sU8 *data,sInt size,sInt &xout,sInt &yout,sU8 *&dataout)
 
   // determine channel setup (rather faked at the moment)
   if(chans <= 1 || ctx.Chans[0].Type != CHANNEL_Y)
-    return sFALSE;
+    return false;
 
   if(chans == 1)
     ctx.ChannelSetup = 0; // gray w/out alpha
@@ -504,10 +504,10 @@ sBool LoadFRIED(const sU8 *data,sInt size,sInt &xout,sInt &yout,sU8 *&dataout)
     else if(chans == 4 && ctx.Chans[3].Type == CHANNEL_ALPHA)
       ctx.ChannelSetup = 3; // color w/ alpha
     else
-      return sFALSE;
+      return false;
   }
   else
-    return sFALSE;
+    return false;
 
   // allocate image
   ctx.Image = new sU8[ctx.FH.XRes * ctx.FH.YRes * (ctx.ChannelSetup >= 2 ? 4 : 2)];

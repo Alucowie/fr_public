@@ -40,14 +40,14 @@ sScriptVM::~sScriptVM()
   sDeleteArray(OutBuffer);
 }
 
-sBool sScriptVM::Extern(sInt id,sInt offset,sInt type,sF32 *p,sBool store)
+bool sScriptVM::Extern(sInt id, sInt offset, sInt type, sF32 *p, bool store)
 {
-  return sTRUE;
+  return true;
 }
 
-sBool sScriptVM::UseObject(sInt id,void *object)
+bool sScriptVM::UseObject(sInt id, void *object)
 {
-  return sTRUE;
+  return true;
 }
 
 /****************************************************************************/
@@ -78,7 +78,7 @@ void sScriptVM::Print(const sChar *buffer)
 
 /****************************************************************************/
 
-sBool sScriptVM::Execute(sScript *Script,sInt startip)
+bool sScriptVM::Execute(sScript *Script, sInt startip)
 {
   static const sInt typesizes[4] = { 1,4,16,1 };
   sInt opcode;
@@ -681,7 +681,7 @@ sU32 getoffset(sU8 *&code)
   return val;
 }
 
-sBool sScriptCompiler::Disassemble(sScript *script,sText *out,sBool verbose)
+bool sScriptCompiler::Disassemble(sScript *script, sText *out, bool verbose)
 {
   sU8 *codeend;
   sU8 *code;
@@ -1106,7 +1106,7 @@ void sScriptCompiler::Error(const sChar *name,...)
   ErrorLine++;
 }
 
-sBool sScriptCompiler::Match(sInt token)
+bool sScriptCompiler::Match(sInt token)
 {
   if(token!=Token)
   {
@@ -1232,12 +1232,12 @@ sScriptCompiler::~sScriptCompiler()
   sDeleteArray(Code);
 }
 
-sBool sScriptCompiler::ExternSymbol(sChar *group,sChar *name,sU32 &groupid,sU32 &offset)
+bool sScriptCompiler::ExternSymbol(sChar *group, sChar *name, sU32 &groupid, sU32 &offset)
 {
-  return sFALSE;
+  return false;
 }
 
-sBool sScriptCompiler::Compiler(sScript *Script,const sChar *source,sText *errors)
+bool sScriptCompiler::Compiler(sScript *Script, const sChar *source, sText *errors)
 {
   sScriptNode *node;
 
