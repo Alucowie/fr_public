@@ -444,11 +444,14 @@ void sShaderCompiler::ExpectEndOfWordAndLine()
 
 void sShaderCompiler::Error(const sChar *name,...)
 {
+  va_list args;
   if(ErrorLine==0)
   {
     ErrorCount++;
     Errors->PrintF("%s(%d): ",FileName,ErrorLineNum);
-    Errors->PrintArg(name,&name);
+    va_start(args, name);
+    Errors->PrintArg(name, args);
+    va_end(args);
     Errors->Print("\n");
   }
   ErrorLine++;

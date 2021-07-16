@@ -37,6 +37,7 @@
 #define sPLATFORM     sPLAT_PC
 #endif
 
+#include <stdarg.h>
 #ifdef __linux__
 #include <cstddef>
 #endif
@@ -805,7 +806,7 @@ bool sScanCycle(const sChar *cycle, sInt index, sInt &start, sInt &len);
 
 void sCopyString(sChar *d,const sChar *s,sInt size);
 sInt sCmpString(const sChar *a,const sChar *b);
-bool sFormatString(sChar *buffer, sInt size, const sChar *format, const sChar **fp); // return sFALSE if text is truncated!
+bool sFormatString(sChar *buffer, sInt size, const sChar *format, va_list ap); // return sFALSE if text is truncated!
 
 /****************************************************************************/
 /***                                                                      ***/
@@ -2030,7 +2031,7 @@ public:
   void FixUsed();
   void Print(const sChar *);                 // these require correct Used-counter!
   void PrintF(const sChar *format,...);
-  void PrintArg(const sChar *format,const sChar **fp);
+  void PrintArg(const sChar *format, va_list args);
 };
 
 #endif

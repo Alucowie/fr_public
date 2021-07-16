@@ -188,8 +188,11 @@ void sSystem_::Tag()
 void sSystem_::PrintF(const sChar *format,...)
 {
   sChar buffer[2048];
+  va_list args;
 
-  sFormatString(buffer,2048,format,&format);
+  va_start(args, format);
+  sFormatString(buffer, 2048, format, args);
+  va_end(args);
 #ifdef __linux__
   puts(buffer);
 #else
