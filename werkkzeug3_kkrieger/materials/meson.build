@@ -1,3 +1,21 @@
+parentinc = include_directories('..')
+
+material11ps_hpp = custom_target(
+  'material11ps.hpp',
+  output : 'material11ps.hpp',
+  input : 'material11.psh',
+  command : [shadercompile, '@INPUT@', '--out-header', '@OUTPUT@'],
+  )
+
+material11vs_hpp = custom_target(
+  'material11vs.hpp',
+  output : 'material11vs.hpp',
+  input : 'material11.vsh',
+  command : [shadercompile, '@INPUT@', '--out-header', '@OUTPUT@'],
+  )
+
+material11 = ['material11.cpp', material11ps_hpp, material11vs_hpp]
+
 material20_envips_hpp = custom_target(
   'material20_envips.hpp',
   output : 'material20_envips.hpp',
@@ -81,3 +99,21 @@ material20_zfillvs_hpp = custom_target(
   input : 'material20_zfill.vsh',
   command : [shadercompile, '@INPUT@', '--out-header', '@OUTPUT@'],
   )
+
+material20 = ['material20.cpp',
+              material20_envips_hpp,
+              material20_envivs_hpp,
+              material20_fatps_hpp,
+              material20_fatvs_hpp,
+              material20_lightps_hpp,
+              material20_lightvs_hpp,
+              material20_texps_hpp,
+              material20_texvs_hpp,
+              material20_vcolorps_hpp,
+              material20_vcolorvs_hpp,
+              material20_zfillps_hpp,
+              material20_zfillvs_hpp]
+
+materiallib_src = material11 + material20 + ['materialdirect.cpp', 'rtmanager.cpp']
+
+materiallib = static_library('materials', materiallib_src, include_directories : parentinc, cpp_args : '-D_LIB')

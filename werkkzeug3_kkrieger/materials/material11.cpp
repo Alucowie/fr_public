@@ -325,10 +325,12 @@ bool sMaterial11::Compile()
 
 // modify material
 
+#if !sPLAYER
+  sInt ps00_combine = sMCOA_NOP;
+#endif
   switch(ShaderLevel)
   {
 #if !sPLAYER
-  sInt ps00_combine = sMCOA_NOP;
   case sPS_00:
     if(SpecialFlags & sMSF_BUMPDETAIL)
     {
