@@ -25,7 +25,19 @@ materials = [
   '../materials/material20.cpp',
   '../materials/materialdirect.cpp',
   '../materials/rtmanager.cpp',
-  '../shadercodegen.cpp']
+  '../shadercodegen.cpp',
+  material20_envips_hpp,
+  material20_envivs_hpp,
+  material20_fatps_hpp,
+  material20_fatvs_hpp,
+  material20_lightps_hpp,
+  material20_lightvs_hpp,
+  material20_texps_hpp,
+  material20_texvs_hpp,
+  material20_vcolorps_hpp,
+  material20_vcolorvs_hpp,
+  material20_zfillps_hpp,
+  material20_zfillvs_hpp]
 
 music = [
   '../_viruz2.cpp',

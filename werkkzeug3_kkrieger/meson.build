@@ -35,4 +35,6 @@ effect_jpegvs_hpp = custom_target(
   command : [shadercompile, '@INPUT@', '--out-header', '@OUTPUT@'],
   )
 
+subdir('materials')
+
 subdir('player_intro')
