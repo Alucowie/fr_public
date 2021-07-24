@@ -39,6 +39,7 @@ namespace FRIED
     dr = c; // !
   }
 
+#if 0
   // new 1d idct
   static void indct4(sS16 &ar,sS16 &br,sS16 &cr,sS16 &dr)
   {
@@ -68,6 +69,7 @@ namespace FRIED
     cr = c;
     dr = d;
   }
+#endif
 
   // 1d wht (lifting-based)
   static void wht4(sInt &ar,sInt &br,sInt &cr,sInt &dr)
@@ -96,6 +98,7 @@ namespace FRIED
     dr = c; // !
   }
 
+#if 0
   // 1d iwht
   static void iwht4(sInt &ar,sInt &br,sInt &cr,sInt &dr)
   {
@@ -122,6 +125,7 @@ namespace FRIED
     cr = c;
     dr = d;
   }
+#endif
 
   // several dct variants. ndcts generate permuted output,
   // indcts expect permuted input. all permutation handling
@@ -160,6 +164,182 @@ namespace FRIED
   void indct42D(sS16 *x0,sS16 *x1,sS16 *x2,sS16 *x3)
   {
   #if 1
+#ifdef __GNUC__
+#if defined(__x86_64__)
+    asm (
+      "mov       %0, %%rax\n\t"
+      "mov       %1, %%rbx\n\t"
+      "mov       %2, %%rcx\n\t"
+      "mov       %3, %%rdx\n\t"
+
+      // load (ok, this is going to be somewhat confusing)
+      "movq      (%%rax), %%mm0\n\t" // mm0=a
+      "movq      (%%rcx), %%mm1\n\t" // mm1=c
+      "movq      (%%rdx), %%mm2\n\t" // mm2=d
+      "movq      (%%rbx), %%mm3\n\t" // mm3=b
+
+      // vertical pass
+      "movq      %%mm2, %%mm4\n\t"
+      "movq      %%mm2, %%mm5\n\t"
+      "psraw     $1, %%mm4\n\t"
+      "psraw     $3, %%mm5\n\t"
+      "psubw     %%mm4, %%mm3\n\t"
+      "paddw     %%mm5, %%mm3\n\t"
+      "psubw     %%mm1, %%mm0\n\t"
+      "pxor      %%mm6, %%mm6\n\t"
+      "movq      %%mm3, %%mm4\n\t"
+      "movq      %%mm3, %%mm5\n\t"
+      "psraw     $1, %%mm4\n\t"
+      "psraw     $3, %%mm5\n\t"
+      "paddw     %%mm0, %%mm3\n\t"
+      "psubw     %%mm0, %%mm6\n\t"
+      "paddw     %%mm4, %%mm2\n\t"
+      "psraw     $1, %%mm3\n\t"
+      "psubw     %%mm5, %%mm2\n\t"
+      "psubw     %%mm3, %%mm0\n\t"
+      "paddw     %%mm2, %%mm6\n\t"
+      "psraw     $1, %%mm6\n\t"
+      "psubw     %%mm6, %%mm1\n\t"
+      "paddw     %%mm1, %%mm2\n\t"
+
+      // transpose (afterwards value from mm4 now in mm2)
+      "movq      %%mm0, %%mm4\n\t"
+      "movq      %%mm2, %%mm5\n\t"
+      "punpcklwd %%mm1, %%mm0\n\t"
+      "punpckhwd %%mm1, %%mm4\n\t"
+      "punpcklwd %%mm3, %%mm2\n\t"
+      "punpckhwd %%mm3, %%mm5\n\t"
+
+      "movq      %%mm0, %%mm1\n\t"
+      "movq      %%mm4, %%mm3\n\t"
+      "punpckldq %%mm2, %%mm0\n\t"
+      "punpckhdq %%mm2, %%mm1\n\t"
+      "punpckldq %%mm5, %%mm4\n\t"
+      "punpckhdq %%mm5, %%mm3\n\t"
+
+      // translation: mm1 => mm4, mm2 => mm3, mm3 => mm1, mm4 => mm2
+      // horizontal pass
+      "movq      %%mm3, %%mm2\n\t"
+      "movq      %%mm3, %%mm5\n\t"
+      "psraw     $1, %%mm2\n\t"
+      "psraw     $3, %%mm5\n\t"
+      "psubw     %%mm2, %%mm1\n\t"
+      "paddw     %%mm5, %%mm1\n\t"
+      "psubw     %%mm4, %%mm0\n\t"
+      "pxor      %%mm6, %%mm6\n\t"
+      "movq      %%mm1, %%mm2\n\t"
+      "movq      %%mm1, %%mm5\n\t"
+      "psraw     $1, %%mm2\n\t"
+      "psraw     $3, %%mm5\n\t"
+      "paddw     %%mm0, %%mm1\n\t"
+      "psubw     %%mm0, %%mm6\n\t"
+      "paddw     %%mm2, %%mm3\n\t"
+      "psraw     $1, %%mm1\n\t"
+      "psubw     %%mm5, %%mm3\n\t"
+      "psubw     %%mm1, %%mm0\n\t"
+      "paddw     %%mm3, %%mm6\n\t"
+      "psraw     $1, %%mm6\n\t"
+      "psubw     %%mm6, %%mm4\n\t"
+      "paddw     %%mm4, %%mm3\n\t"
+
+      "movq      %%mm0, (%%rax)\n\t"
+      "movq      %%mm4, (%%rbx)\n\t"
+      "movq      %%mm3, (%%rcx)\n\t"
+      "movq      %%mm1, (%%rdx)\n\t"
+
+      "emms\n\t"
+      :
+      : "r" (x0), "r" (x1), "r" (x2), "r" (x3)
+    );
+#endif
+#if defined(__i386__)
+    asm (
+      "mov       %0, %%eax\n\t"
+      "mov       %1, %%ebx\n\t"
+      "mov       %2, %%ecx\n\t"
+      "mov       %3, %%edx\n\t"
+
+      // load (ok, this is going to be somewhat confusing)
+      "movq      (%%eax), %%mm0\n\t" // mm0=a
+      "movq      (%%ecx), %%mm1\n\t" // mm1=c
+      "movq      (%%edx), %%mm2\n\t" // mm2=d
+      "movq      (%%ebx), %%mm3\n\t" // mm3=b
+
+      // vertical pass
+      "movq      %%mm2, %%mm4\n\t"
+      "movq      %%mm2, %%mm5\n\t"
+      "psraw     $1, %%mm4\n\t"
+      "psraw     $3, %%mm5\n\t"
+      "psubw     %%mm4, %%mm3\n\t"
+      "paddw     %%mm5, %%mm3\n\t"
+      "psubw     %%mm1, %%mm0\n\t"
+      "pxor      %%mm6, %%mm6\n\t"
+      "movq      %%mm3, %%mm4\n\t"
+      "movq      %%mm3, %%mm5\n\t"
+      "psraw     $1, %%mm4\n\t"
+      "psraw     $3, %%mm5\n\t"
+      "paddw     %%mm0, %%mm3\n\t"
+      "psubw     %%mm0, %%mm6\n\t"
+      "paddw     %%mm4, %%mm2\n\t"
+      "psraw     $1, %%mm3\n\t"
+      "psubw     %%mm5, %%mm2\n\t"
+      "psubw     %%mm3, %%mm0\n\t"
+      "paddw     %%mm2, %%mm6\n\t"
+      "psraw     $1, %%mm6\n\t"
+      "psubw     %%mm6, %%mm1\n\t"
+      "paddw     %%mm1, %%mm2\n\t"
+
+      // transpose (afterwards value from mm4 now in mm2)
+      "movq      %%mm0, %%mm4\n\t"
+      "movq      %%mm2, %%mm5\n\t"
+      "punpcklwd %%mm1, %%mm0\n\t"
+      "punpckhwd %%mm1, %%mm4\n\t"
+      "punpcklwd %%mm3, %%mm2\n\t"
+      "punpckhwd %%mm3, %%mm5\n\t"
+
+      "movq      %%mm0, %%mm1\n\t"
+      "movq      %%mm4, %%mm3\n\t"
+      "punpckldq %%mm2, %%mm0\n\t"
+      "punpckhdq %%mm2, %%mm1\n\t"
+      "punpckldq %%mm5, %%mm4\n\t"
+      "punpckhdq %%mm5, %%mm3\n\t"
+
+      // translation: mm1 => mm4, mm2 => mm3, mm3 => mm1, mm4 => mm2
+      // horizontal pass
+      "movq      %%mm3, %%mm2\n\t"
+      "movq      %%mm3, %%mm5\n\t"
+      "psraw     $1, %%mm2\n\t"
+      "psraw     $3, %%mm5\n\t"
+      "psubw     %%mm2, %%mm1\n\t"
+      "paddw     %%mm5, %%mm1\n\t"
+      "psubw     %%mm4, %%mm0\n\t"
+      "pxor      %%mm6, %%mm6\n\t"
+      "movq      %%mm1, %%mm2\n\t"
+      "movq      %%mm1, %%mm5\n\t"
+      "psraw     $1, %%mm2\n\t"
+      "psraw     $3, %%mm5\n\t"
+      "paddw     %%mm0, %%mm1\n\t"
+      "psubw     %%mm0, %%mm6\n\t"
+      "paddw     %%mm2, %%mm3\n\t"
+      "psraw     $1, %%mm1\n\t"
+      "psubw     %%mm5, %%mm3\n\t"
+      "psubw     %%mm1, %%mm0\n\t"
+      "paddw     %%mm3, %%mm6\n\t"
+      "psraw     $1, %%mm6\n\t"
+      "psubw     %%mm6, %%mm4\n\t"
+      "paddw     %%mm4, %%mm3\n\t"
+
+      "movq      %%mm0, (%%eax)\n\t"
+      "movq      %%mm4, (%%ebx)\n\t"
+      "movq      %%mm3, (%%ecx)\n\t"
+      "movq      %%mm1, (%%edx)\n\t"
+
+      "emms\n\t"
+      :
+      : "r" (x0), "r" (x1), "r" (x2), "r" (x3)
+    );
+#endif
+#else
     __asm
     {
       mov       eax, [x0];
@@ -244,6 +424,7 @@ namespace FRIED
 
       emms;
     }
+#endif
   #else
     // vertical
     indct4_s(x0[0],x1[0],x2[0],x3[0]);
@@ -449,6 +630,214 @@ namespace FRIED
   void lbt4post4x4(sS16 *x0,sS16 *x1,sS16 *x2,sS16 *x3)
   {
 #if 1
+#ifdef __GNUC__
+#if defined(__x86_64__)
+    asm (
+      "mov       %0, %%rax\n\t"
+      "mov       %1, %%rbx\n\t"
+      "mov       %2, %%rcx\n\t"
+      "mov       %3, %%rdx\n\t"
+
+      // split the load, because movq SUCKS for non-8byte-aligned data
+      "movq      (%%rax), %%mm0\n\t"
+      "movq      (%%rbx), %%mm1\n\t"
+      "movq      (%%rcx), %%mm2\n\t"
+      "movq      (%%rdx), %%mm3\n\t"
+
+      // vertical lbt postfilter stage 1
+      "psubw     %%mm0, %%mm3\n\t"
+      "psubw     %%mm1, %%mm2\n\t"
+      "movq      %%mm2, %%mm4\n\t"
+      "paddw     %%mm0, %%mm0\n\t"
+      "paddw     %%mm1, %%mm1\n\t"
+      "paddw     %%mm3, %%mm0\n\t"
+      "paddw     %%mm2, %%mm1\n\t"
+      "psraw     $1, %%mm4\n\t"
+
+      // vertical lbt postfilter stage 2
+      "paddw     %%mm2, %%mm2\n\t"
+      "psubw     %%mm4, %%mm3\n\t"
+      "psubw     %%mm3, %%mm2\n\t"
+      "psraw     $2, %%mm2\n\t"
+      "paddw     %%mm2, %%mm3\n\t"
+
+      // vertical lbt postfilter stage 3
+      "psubw     %%mm3, %%mm0\n\t"
+      "psubw     %%mm2, %%mm1\n\t"
+      "paddw     %%mm2, %%mm2;\n\t"
+      "paddw     %%mm3, %%mm3;\n\t"
+      "paddw     %%mm1, %%mm2\n\t"
+      "paddw     %%mm0, %%mm3\n\t"
+
+      // transpose (afterwards value from mm4 now in mm2)
+      "movq      %%mm0, %%mm4\n\t"
+      "movq      %%mm2, %%mm5\n\t"
+      "punpcklwd %%mm1, %%mm0\n\t"
+      "punpckhwd %%mm1, %%mm4\n\t"
+      "punpcklwd %%mm3, %%mm2\n\t"
+      "punpckhwd %%mm3, %%mm5\n\t"
+
+      "movq      %%mm0, %%mm1\n\t"
+      "movq      %%mm4, %%mm3\n\t"
+      "punpckldq %%mm2, %%mm0\n\t"
+      "punpckhdq %%mm2, %%mm1\n\t"
+      "punpckldq %%mm5, %%mm4\n\t"
+      "punpckhdq %%mm5, %%mm3\n\t"
+
+      // horizontal lbt postfilter stage 1
+      "psubw     %%mm0, %%mm3\n\t"
+      "psubw     %%mm1, %%mm4\n\t"
+      "movq      %%mm4, %%mm2\n\t"
+      "paddw     %%mm0, %%mm0\n\t"
+      "paddw     %%mm1, %%mm1\n\t"
+      "psraw     $1, %%mm2\n\t"
+      "paddw     %%mm3, %%mm0\n\t"
+      "paddw     %%mm4, %%mm1\n\t"
+
+      // horizontal lbt postfilter stage 2
+      "paddw     %%mm4, %%mm4\n\t"
+      "psubw     %%mm2, %%mm3\n\t"
+      "psubw     %%mm3, %%mm4\n\t"
+      "psraw     $2, %%mm4\n\t"
+      "paddw     %%mm4, %%mm3\n\t"
+
+      // horizontal lbt postfilter stage 3
+      "psubw     %%mm4, %%mm1\n\t"
+      "psubw     %%mm3, %%mm0\n\t"
+      "paddw     %%mm4, %%mm4\n\t"
+      "paddw     %%mm3, %%mm3\n\t"
+      "paddw     %%mm1, %%mm4\n\t"
+      "paddw     %%mm0, %%mm3\n\t"
+
+      // transpose
+      "movq      %%mm0, %%mm2\n\t"
+      "movq      %%mm4, %%mm5\n\t"
+      "punpcklwd %%mm1, %%mm0\n\t"
+      "punpckhwd %%mm1, %%mm2\n\t"
+      "punpcklwd %%mm3, %%mm4\n\t"
+      "punpckhwd %%mm3, %%mm5\n\t"
+
+      "movq      %%mm0, %%mm1\n\t"
+      "movq      %%mm2, %%mm3\n\t"
+      "punpckldq %%mm4, %%mm0\n\t"
+      "punpckhdq %%mm4, %%mm1\n\t"
+      "punpckldq %%mm5, %%mm2\n\t"
+      "punpckhdq %%mm5, %%mm3\n\t"
+
+      "movq      %%mm0, (%%rax)\n\t"
+      "movq      %%mm1, (%%rbx)\n\t"
+      "movq      %%mm2, (%%rcx)\n\t"
+      "movq      %%mm3, (%%rdx)\n\t"
+
+      "emms;\n\t"
+      :
+      : "r" (x0), "r" (x1), "r" (x2), "r" (x3)
+    );
+#endif
+#if defined(__i386__)
+    asm (
+      "mov       %0, %%eax\n\t"
+      "mov       %1, %%ebx\n\t"
+      "mov       %2, %%ecx\n\t"
+      "mov       %3, %%edx\n\t"
+
+      // split the load, because movq SUCKS for non-8byte-aligned data
+      "movq      (%%eax), %%mm0\n\t"
+      "movq      (%%ebx), %%mm1\n\t"
+      "movq      (%%ecx), %%mm2\n\t"
+      "movq      (%%edx), %%mm3\n\t"
+
+      // vertical lbt postfilter stage 1
+      "psubw     %%mm0, %%mm3\n\t"
+      "psubw     %%mm1, %%mm2\n\t"
+      "movq      %%mm2, %%mm4\n\t"
+      "paddw     %%mm0, %%mm0\n\t"
+      "paddw     %%mm1, %%mm1\n\t"
+      "paddw     %%mm3, %%mm0\n\t"
+      "paddw     %%mm2, %%mm1\n\t"
+      "psraw     $1, %%mm4\n\t"
+
+      // vertical lbt postfilter stage 2
+      "paddw     %%mm2, %%mm2\n\t"
+      "psubw     %%mm4, %%mm3\n\t"
+      "psubw     %%mm3, %%mm2\n\t"
+      "psraw     $2, %%mm2\n\t"
+      "paddw     %%mm2, %%mm3\n\t"
+
+      // vertical lbt postfilter stage 3
+      "psubw     %%mm3, %%mm0\n\t"
+      "psubw     %%mm2, %%mm1\n\t"
+      "paddw     %%mm2, %%mm2;\n\t"
+      "paddw     %%mm3, %%mm3;\n\t"
+      "paddw     %%mm1, %%mm2\n\t"
+      "paddw     %%mm0, %%mm3\n\t"
+
+      // transpose (afterwards value from mm4 now in mm2)
+      "movq      %%mm0, %%mm4\n\t"
+      "movq      %%mm2, %%mm5\n\t"
+      "punpcklwd %%mm1, %%mm0\n\t"
+      "punpckhwd %%mm1, %%mm4\n\t"
+      "punpcklwd %%mm3, %%mm2\n\t"
+      "punpckhwd %%mm3, %%mm5\n\t"
+
+      "movq      %%mm0, %%mm1\n\t"
+      "movq      %%mm4, %%mm3\n\t"
+      "punpckldq %%mm2, %%mm0\n\t"
+      "punpckhdq %%mm2, %%mm1\n\t"
+      "punpckldq %%mm5, %%mm4\n\t"
+      "punpckhdq %%mm5, %%mm3\n\t"
+
+      // horizontal lbt postfilter stage 1
+      "psubw     %%mm0, %%mm3\n\t"
+      "psubw     %%mm1, %%mm4\n\t"
+      "movq      %%mm4, %%mm2\n\t"
+      "paddw     %%mm0, %%mm0\n\t"
+      "paddw     %%mm1, %%mm1\n\t"
+      "psraw     $1, %%mm2\n\t"
+      "paddw     %%mm3, %%mm0\n\t"
+      "paddw     %%mm4, %%mm1\n\t"
+
+      // horizontal lbt postfilter stage 2
+      "paddw     %%mm4, %%mm4\n\t"
+      "psubw     %%mm2, %%mm3\n\t"
+      "psubw     %%mm3, %%mm4\n\t"
+      "psraw     $2, %%mm4\n\t"
+      "paddw     %%mm4, %%mm3\n\t"
+
+      // horizontal lbt postfilter stage 3
+      "psubw     %%mm4, %%mm1\n\t"
+      "psubw     %%mm3, %%mm0\n\t"
+      "paddw     %%mm4, %%mm4\n\t"
+      "paddw     %%mm3, %%mm3\n\t"
+      "paddw     %%mm1, %%mm4\n\t"
+      "paddw     %%mm0, %%mm3\n\t"
+
+      // transpose
+      "movq      %%mm0, %%mm2\n\t"
+      "movq      %%mm4, %%mm5\n\t"
+      "punpcklwd %%mm1, %%mm0\n\t"
+      "punpckhwd %%mm1, %%mm2\n\t"
+      "punpcklwd %%mm3, %%mm4\n\t"
+      "punpckhwd %%mm3, %%mm5\n\t"
+
+      "movq      %%mm0, %%mm1\n\t"
+      "movq      %%mm2, %%mm3\n\t"
+      "punpckldq %%mm4, %%mm0\n\t"
+      "punpckhdq %%mm4, %%mm1\n\t"
+      "punpckldq %%mm5, %%mm2\n\t"
+      "punpckhdq %%mm5, %%mm3\n\t"
+
+      "movq      %%mm0, (%%eax)\n\t"
+      "movq      %%mm1, (%%ebx)\n\t"
+      "movq      %%mm2, (%%ecx)\n\t"
+      "movq      %%mm3, (%%edx)\n\t"
+
+      "emms;\n\t"
+      :
+      : "r" (x0), "r" (x1), "r" (x2), "r" (x3)
+    );
+#endif
+#else
     __asm
     {
       mov       eax, [x0];
@@ -576,6 +965,7 @@ namespace FRIED
 
       emms;
     }
+#endif
 #else
     // vertical
     lbtpost1D(x0[0],x1[0],x2[0],x3[0]);

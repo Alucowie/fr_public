@@ -7,7 +7,9 @@
 #include "fried.hpp"
 #include "fried_internal.hpp"
 
+#ifdef _WIN32
 #include <crtdbg.h>
+#endif
 
 namespace FRIED
 {
@@ -42,6 +44,78 @@ namespace FRIED
     // TODO: write the corresponding row using the correct innerloop
   }
 
+#ifdef __GNUC__
+#if defined(__x86_64__)
+  #define MM_LOAD4(reg0,reg1,reg2,reg3,offset) \
+    "mov       %2, %%rax\n\t" \
+    "mov       %3, %%rbx\n\t" \
+    "mov       %4, %%rcx\n\t" \
+    "mov       %5, %%rdx\n\t" \
+    "movq      "#offset"(%%rax), %%"#reg0"\n\t" \
+    "movq      "#offset"(%%rbx), %%"#reg1"\n\t" \
+    "movq      "#offset"(%%rcx), %%"#reg2"\n\t" \
+    "movq      "#offset"(%%rdx), %%"#reg3"\n\t"
+
+  #define MM_STORE4(reg0,reg1,reg2,reg3,rc0,rc01,rc1,rc11,rc2,rc21,rc3,rc31) \
+    "mov       "#rc0"(%%rsi, %%rax), %%rax\n\t" \
+    "mov       "#rc1"(%%rsi, %%rbx), %%rbx\n\t" \
+    "mov       "#rc2"(%%rsi, %%rcx), %%rcx\n\t" \
+    "mov       "#rc3"(%%rsi, %%rdx), %%rdx\n\t" \
+    "movq      %%"#reg0", "#rc01"(%%rax, %%rdi)\n\t" \
+    "movq      %%"#reg1", "#rc11"(%%rbx, %%rdi)\n\t" \
+    "movq      %%"#reg2", "#rc21"(%%rcx, %%rdi)\n\t" \
+    "movq      %%"#reg3", "#rc31"(%%rdx, %%rdi)\n\t"
+
+  #define MM_TRANSPOSE(reg0,reg1,reg2,reg3,reg4,reg5) \
+    "movq      %%"#reg0", %%"#reg4"\n\t" \
+    "movq      %%"#reg2", %%"#reg5"\n\t" \
+    "punpcklwd %%"#reg1", %%"#reg0"\n\t" \
+    "punpckhwd %%"#reg1", %%"#reg4"\n\t" \
+    "punpcklwd %%"#reg3", %%"#reg2"\n\t" \
+    "punpckhwd %%"#reg3", %%"#reg5"\n\t" \
+    "movq      %%"#reg0", %%"#reg1"\n\t" \
+    "movq      %%"#reg4", %%"#reg3"\n\t" \
+    "punpckldq %%"#reg2", %%"#reg0"\n\t" \
+    "punpckhdq %%"#reg2", %%"#reg1"\n\t" \
+    "punpckldq %%"#reg5", %%"#reg4"\n\t" \
+    "punpckhdq %%"#reg5", %%"#reg3"\n\t"
+#endif
+#if defined(__i386__)
+  #define MM_LOAD4(reg0,reg1,reg2,reg3,offset) \
+    "mov       %2, %%eax\n\t" \
+    "mov       %3, %%ebx\n\t" \
+    "mov       %4, %%ecx\n\t" \
+    "mov       %5, %%edx\n\t" \
+    "movq      "#offset"(%%eax), %%"#reg0"\n\t" \
+    "movq      "#offset"(%%ebx), %%"#reg1"\n\t" \
+    "movq      "#offset"(%%ecx), %%"#reg2"\n\t" \
+    "movq      "#offset"(%%edx), %%"#reg3"\n\t"
+
+  #define MM_STORE4(reg0,reg1,reg2,reg3,rc0,rc01,rc1,rc11,rc2,rc21,rc3,rc31) \
+    "mov       "#rc0"(%%esi, %%eax), %%eax\n\t" \
+    "mov       "#rc1"(%%esi, %%ebx), %%ebx\n\t" \
+    "mov       "#rc2"(%%esi, %%ecx), %%ecx\n\t" \
+    "mov       "#rc3"(%%esi, %%edx), %%edx\n\t" \
+    "movq      %%"#reg0", "#rc01"(%%eax, %%edi)\n\t" \
+    "movq      %%"#reg1", "#rc11"(%%ebx, %%edi)\n\t" \
+    "movq      %%"#reg2", "#rc21"(%%ecx, %%edi)\n\t" \
+    "movq      %%"#reg3", "#rc31"(%%edx, %%edi)\n\t"
+
+  #define MM_TRANSPOSE(reg0,reg1,reg2,reg3,reg4,reg5) \
+    "movq      %%"#reg0", %%"#reg4"\n\t" \
+    "movq      %%"#reg2", %%"#reg5"\n\t" \
+    "punpcklwd %%"#reg1", %%"#reg0"\n\t" \
+    "punpckhwd %%"#reg1", %%"#reg4"\n\t" \
+    "punpcklwd %%"#reg3", %%"#reg2"\n\t" \
+    "punpckhwd %%"#reg3", %%"#reg5"\n\t" \
+    "movq      %%"#reg0", %%"#reg1"\n\t" \
+    "movq      %%"#reg4", %%"#reg3"\n\t" \
+    "punpckldq %%"#reg2", %%"#reg0"\n\t" \
+    "punpckhdq %%"#reg2", %%"#reg1"\n\t" \
+    "punpckldq %%"#reg5", %%"#reg4"\n\t" \
+    "punpckhdq %%"#reg5", %%"#reg3"\n\t"
+#endif
+#else
   #define MM_LOAD4(reg0,reg1,reg2,reg3,offset) \
     __asm mov       eax, [c0] \
     __asm mov       ebx, [c1] \
@@ -75,9 +149,66 @@ namespace FRIED
     __asm punpckhdq reg1, reg2 \
     __asm punpckldq reg4, reg5 \
     __asm punpckhdq reg3, reg5
+#endif
 
   static __forceinline void shuffle4x16(sS16 **dest,sInt xOffs,sS16 *c0,sS16 *c1,sS16 *c2,sS16 *c3)
   {
+#ifdef __GNUC__
+#define EMPTY()
+#define DEFER(m) m EMPTY()
+#define EVAL(...) __VA_ARGS__
+#define rc(s) ((s>>4)*4),((s&0xf)*2)
+#if defined(__x86_64__)
+    asm (
+      "mov       %0, %%rsi\n\t"
+      "movsxd    %1, %%rdi\n\t"
+      "add       %%rdi, %%rdi\n\t"
+
+      MM_LOAD4(mm0,mm1,mm2,mm3,0)
+      MM_TRANSPOSE(mm0,mm1,mm2,mm3,mm4,mm5)
+      MM_LOAD4(mm2,mm5,mm6,mm7,8)
+      EVAL(DEFER(MM_STORE4)(mm0,mm1,mm4,mm3,rc(0x00),rc(0x04),rc(0x44),rc(0x40)))
+      MM_TRANSPOSE(mm2,mm5,mm6,mm7,mm0,mm1)
+      MM_LOAD4(mm1,mm3,mm4,mm6,16)
+      EVAL(DEFER(MM_STORE4)(mm2,mm5,mm0,mm7,rc(0x80),rc(0xc0),rc(0xc4),rc(0x84)))
+      MM_TRANSPOSE(mm1,mm3,mm4,mm6,mm2,mm5)
+      MM_LOAD4(mm0,mm4,mm5,mm7,24)
+      EVAL(DEFER(MM_STORE4)(mm1,mm3,mm2,mm6,rc(0x88),rc(0xc8),rc(0xcc),rc(0x8c)))
+      MM_TRANSPOSE(mm0,mm4,mm5,mm7,mm1,mm3)
+      EVAL(DEFER(MM_STORE4)(mm0,mm4,mm1,mm7,rc(0x4c),rc(0x48),rc(0x08),rc(0x0c)))
+
+      "emms\n\t"
+      :
+      : "r" (dest), "r" (xOffs),
+        "r" (c0), "r" (c1), "r" (c2), "r" (c3)
+    );
+#endif
+#if defined(__i386__)
+    asm (
+      "mov       %0, %%esi\n\t"
+      "mov       %1, %%edi\n\t"
+      "add       %%edi, %%edi\n\t"
+
+      MM_LOAD4(mm0,mm1,mm2,mm3,0)
+      MM_TRANSPOSE(mm0,mm1,mm2,mm3,mm4,mm5)
+      MM_LOAD4(mm2,mm5,mm6,mm7,8)
+      EVAL(DEFER(MM_STORE4)(mm0,mm1,mm4,mm3,rc(0x00),rc(0x04),rc(0x44),rc(0x40)))
+      MM_TRANSPOSE(mm2,mm5,mm6,mm7,mm0,mm1)
+      MM_LOAD4(mm1,mm3,mm4,mm6,16)
+      EVAL(DEFER(MM_STORE4)(mm2,mm5,mm0,mm7,rc(0x80),rc(0xc0),rc(0xc4),rc(0x84)))
+      MM_TRANSPOSE(mm1,mm3,mm4,mm6,mm2,mm5)
+      MM_LOAD4(mm0,mm4,mm5,mm7,24)
+      EVAL(DEFER(MM_STORE4)(mm1,mm3,mm2,mm6,rc(0x88),rc(0xc8),rc(0xcc),rc(0x8c)))
+      MM_TRANSPOSE(mm0,mm4,mm5,mm7,mm1,mm3)
+      EVAL(DEFER(MM_STORE4)(mm0,mm4,mm1,mm7,rc(0x4c),rc(0x48),rc(0x08),rc(0x0c)))
+
+      "emms\n\t"
+      :
+      : "r" (dest), "r" (xOffs),
+        "r" (c0), "r" (c1), "r" (c2), "r" (c3)
+    );
+#endif
+#else
     __asm
     {
       mov       esi, [dest];
@@ -99,6 +230,7 @@ namespace FRIED
     MM_STORE4(mm0,mm4,mm1,mm7,0x4c,0x48,0x08,0x0c);
 
     __asm emms;
+#endif
   }
 
   static void inv_reorder(sS16 **dest,sInt xOffs,sS16 *src,sInt cwidth)
@@ -312,11 +444,9 @@ namespace FRIED
   static void ihlbt_group2(sInt swidth, sInt so, sS16 **srp, bool fbot)
   {
     // macroblocks only
-    sS16 *pa,*pb,*p0,*p1,*p2,*p3;
+    sS16 *p0,*p1,*p2,*p3;
     sInt col;
 
-    pa = srp[ 8] + so;
-    pb = srp[12] + so;
     p0 = srp[16] + so;
     p1 = srp[20] + so;
     p2 = srp[24] + so;
@@ -459,7 +589,7 @@ bool LoadFRIED(const sU8 *data, sInt size, sInt &xout, sInt &yout, sU8 *&dataout
   const sU8 *dataEnd = data + size;
 
   // check file format
-  if(size < sizeof(FileHeader))
+  if(((unsigned long)size) < sizeof(FileHeader))
     return false;
 
   // check signature

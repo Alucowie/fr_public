@@ -19,6 +19,7 @@ cpp_winlibs = ['-lwinmm', '-ldxguid' , '-ldinput']
 endif
 
 subdir('base_console')
+subdir('fried')
 subdir('shadercompile')
 
 effect_jpegps_hpp = custom_target(

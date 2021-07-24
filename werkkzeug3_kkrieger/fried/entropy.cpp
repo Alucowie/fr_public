@@ -43,6 +43,7 @@ namespace FRIED
     GRadpkr(vk,krp);
   }
 
+#if 0
   static sInt GRdecode(BitDecoder &coder,sInt &krp)
   {
     sInt high = 0;
@@ -57,6 +58,7 @@ namespace FRIED
 
     return val;
   }
+#endif
 
   static sU16 GRlnv0[14],GRlnv1[28],GRlnv2[56],GRlnv3[112],GRlnv4[224],GRlnv5[448];
   static sU16 *GRlnv[] = { GRlnv0,GRlnv1,GRlnv2,GRlnv3,GRlnv4,GRlnv5 };
@@ -101,7 +103,7 @@ namespace FRIED
 
   static void CalcGolombTables()
   {
-    for(sInt k=0;k<sizeof(GRlnv)/sizeof(*GRlnv);k++)
+    for(sU32 k=0;k<sizeof(GRlnv)/sizeof(*GRlnv);k++)
       CalcGolombTable(GRlnv[k],k);
 
     for(sInt i=0;i<48;i++)
@@ -328,7 +330,7 @@ namespace FRIED
     sInt kp = kinit << 3;
     sInt krp = krinit << 3;
     sS16 *yp = y,*yend = y + n;
-    sS16 *ystart = y;
+    //sS16 *ystart = y;
 
     while(yp < yend)
     {
@@ -365,7 +367,7 @@ namespace FRIED
         }
         else // normal run
         {
-          sInt oldkrp = krp;
+          //sInt oldkrp = krp;
 
           run = coder.GetBits(k);
           sign = coder.GetBitsNoCheck(1);

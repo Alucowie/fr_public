@@ -15,8 +15,10 @@ namespace FRIED
 
   // ---- macroblock AC scanning pattern
 
+#if 0
   static sInt macscan[15] = { 1,5,4,8,9,6,2,3,7,10,13,12,14,15,11 };
   static sInt zigzag[15]  = { 4,1,2,5,8,12,9,6,3,7,10,13,14,11,15 };
+#endif
   static sInt zigzag2[16] = { 0,4,1,2,5,8,12,9,6,3,7,10,13,14,11,15 };
 
   // ---- transform row norms (2-norm)
@@ -26,9 +28,10 @@ namespace FRIED
 
   // ---- helper functions
 
+#if 0
   static sInt imuls(sInt a,sInt b,sInt s,sInt bias)
   {
-    __int64 prod = ((__int64) a) * b;
+    long long prod = ((long long) a) * b;
 
     if(prod >= 0)
       prod -= bias;
@@ -38,9 +41,38 @@ namespace FRIED
     prod += 1 << (s - 1);
     return sInt(prod >> s);
   }
+#endif
 
   static sInt imul14(sInt a,sInt b)
   {
+#ifdef __GNUC__
+#if defined(__x86_64__)
+    asm (
+      "mov   %1, %%eax\n\t"
+      "imul  %2\n\t"
+      "add   $8192, %%eax\n\t"
+      "adc   $0, %%edx\n\t"
+      "shrd  $14, %%edx, %%eax\n\t"
+
+      "mov   %%eax, %0\n\t"
+      : "=r" (a)
+      : "r" (a), "r" (b)
+    );
+#endif
+#if defined(__i386__)
+    asm (
+      "mov   %1, %%eax\n\t"
+      "imul  %2\n\t"
+      "add   $8192, %%eax\n\t"
+      "adc   $0, %%edx\n\t"
+      "shrd  $14, %%edx, %%eax\n\t"
+
+      "mov   %%eax, %0\n\t"
+      : "=r" (a)
+      : "r" (a), "r" (b)
+    );
+#endif
+#else
     __asm
     {
       mov   eax, [a];
@@ -51,14 +83,17 @@ namespace FRIED
 
       mov   [a], eax;
     }
+#endif
 
     return a;
   }
 
+#if 0
   static sInt descaleOld(sInt x,sInt bias,sInt factor,sInt shift)
   {
     return imuls(x,factor,shift+14,bias);
   }
+#endif
 
   static sInt descale(sInt x,sInt bias,sInt factor,sInt shift)
   {
@@ -74,6 +109,7 @@ namespace FRIED
     return p >> shift;
   }
 
+#if 0
   static sInt rescale(sInt x,sInt factor,sInt shift)
   {
     sInt p = x * factor;
@@ -82,6 +118,7 @@ namespace FRIED
     else
       return p << (shift - 4);
   }
+#endif
 
   static void initQuantTables()
   {
@@ -128,8 +165,10 @@ namespace FRIED
     {
       f = qtab[zigzag2[i]];
 
-      for(n=0;n<cwidth;n++)
-        *p++ = descale(*p,bias,f,shift);
+      for(n=0;n<cwidth;n++) {
+        *p = descale(*p,bias,f,shift);
+        p++;
+      }
     }
 
     // now find number of zeroes
@@ -140,6 +179,7 @@ namespace FRIED
     return n+1;
   }
 
+#if 0
   static void rescaleLoop(sS16 *x,sInt count,sInt f,sInt shift)
   {
     if(shift < 4)
@@ -157,6 +197,7 @@ namespace FRIED
         x[i] = (x[i] * f) << shift;
     }
   }
+#endif
 
   static void rescaleLoopMMX(sS16 *x,sInt count,sInt f,sInt shift)
   {
@@ -164,6 +205,112 @@ namespace FRIED
     {
       shift -= 4;
 
+#ifdef __GNUC__
+#if defined(__x86_64__)
+      asm (
+        "mov       %0, %%rsi\n\t"
+        "mov       %1, %%ecx\n\t"
+        "shr       $3, %%ecx\n\t"
+        "jz        rescale1tail\n\t"
+
+        "movd      %2, %%mm6\n\t"
+        "punpcklwd %%mm6, %%mm6\n\t"
+        "punpcklwd %%mm6, %%mm6\n\t"
+        "movd      %3, %%mm7\n\t"
+
+  "rescale1lp:\n\t"
+        "movq      (%%rsi), %%mm0\n\t"
+        "movq      8(%%rsi), %%mm1\n\t"
+
+        "pmullw    %%mm6, %%mm0\n\t"
+        "pmullw    %%mm6, %%mm1\n\t"
+
+        "psllw     %%mm7, %%mm0\n\t"
+        "psllw     %%mm7, %%mm1\n\t"
+
+        "movq      %%mm0, (%%rsi)\n\t"
+        "movq      %%mm1, 8(%%rsi)\n\t"
+
+        "add       $16, %%rsi\n\t"
+        "dec       %%ecx;\n\t"
+        "jnz       rescale1lp\n\t"
+
+  "rescale1tail:\n\t"
+        "mov       %1, %%edx\n\t"
+        "and       $7, %%edx\n\t"
+        "jz        rescale1end\n\t"
+        "mov       %2, %%ebx\n\t"
+        "mov       %3, %%ecx\n\t"
+
+  "rescale1taillp:\n\t"
+        "movsx     (%%rsi), %%eax\n\t"
+        "imul      %%ebx, %%eax\n\t"
+        "shl       %%cl, %%eax\n\t"
+        "mov       %%ax, (%%rsi)\n\t"
+
+        "add       $2, %%rsi\n\t"
+        "dec       %%edx;\n\t"
+        "jnz       rescale1taillp\n\t"
+
+  "rescale1end:\n\t"
+        "emms\n\t"
+        :
+        : "r" (x), "r" (count), "r" (f), "r" (shift)
+      );
+#endif
+#if defined(__i386__)
+      asm (
+        "mov       %0, %%esi\n\t"
+        "mov       %1, %%ecx\n\t"
+        "shr       $3, %%ecx\n\t"
+        "jz        rescale1tail\n\t"
+
+        "movd      %2, %%mm6\n\t"
+        "punpcklwd %%mm6, %%mm6\n\t"
+        "punpcklwd %%mm6, %%mm6\n\t"
+        "movd      %3, %%mm7\n\t"
+
+  "rescale1lp:\n\t"
+        "movq      (%%esi), %%mm0\n\t"
+        "movq      8(%%esi), %%mm1\n\t"
+
+        "pmullw    %%mm6, %%mm0\n\t"
+        "pmullw    %%mm6, %%mm1\n\t"
+
+        "psllw     %%mm7, %%mm0\n\t"
+        "psllw     %%mm7, %%mm1\n\t"
+
+        "movq      %%mm0, (%%esi)\n\t"
+        "movq      %%mm1, 8(%%esi)\n\t"
+
+        "add       $16, %%esi\n\t"
+        "dec       %%ecx;\n\t"
+        "jnz       rescale1lp\n\t"
+
+  "rescale1tail:\n\t"
+        "mov       %1, %%edx\n\t"
+        "and       $7, %%edx\n\t"
+        "jz        rescale1end\n\t"
+        "mov       %2, %%ebx\n\t"
+        "mov       %3, %%ecx\n\t"
+
+  "rescale1taillp:\n\t"
+        "movsx     (%%esi), %%eax\n\t"
+        "imul      %%ebx, %%eax\n\t"
+        "shl       %%cl, %%eax\n\t"
+        "mov       %%ax, (%%esi)\n\t"
+
+        "add       $2, %%esi\n\t"
+        "dec       %%edx;\n\t"
+        "jnz       rescale1taillp\n\t"
+
+  "rescale1end:\n\t"
+        "emms\n\t"
+        :
+        : "r" (x), "r" (count), "r" (f), "r" (shift)
+      );
+#endif
+#else
       __asm
       {
         mov       esi, [x];
@@ -213,11 +360,118 @@ namespace FRIED
   rescale1end:
         emms;
       }
+#endif
     }
     else
     {
       shift = 4 - shift;
 
+#ifdef __GNUC__
+#if defined(__x86_64__)
+      asm (
+        "mov       %0, %%rsi\n\t"
+        "mov       %1, %%ecx\n\t"
+        "shr       $3, %%ecx\n\t"
+        "jz        rescale2tail\n\t"
+
+        "movd      %2, %%mm6\n\t"
+        "punpcklwd %%mm6, %%mm6\n\t"
+        "punpcklwd %%mm6, %%mm6\n\t"
+        "movd      %3, %%mm7\n\t"
+
+  "rescale2lp:\n\t"
+        "movq      (%%rsi), %%mm0\n\t"
+        "movq      8(%%rsi), %%mm1\n\t"
+
+        "pmullw    %%mm6, %%mm0;\n\t"
+        "pmullw    %%mm6, %%mm1\n\t"
+
+        "psraw     %%mm7, %%mm0\n\t"
+        "psraw     %%mm7, %%mm1\n\t"
+
+        "movq      %%mm0, (%%rsi)\n\t"
+        "movq      %%mm1, 8(%%rsi)\n\t"
+
+        "add       $16, %%rsi\n\t"
+        "dec       %%ecx;\n\t"
+        "jnz       rescale2lp\n\t"
+
+  "rescale2tail:\n\t"
+        "mov       %1, %%edx\n\t"
+        "and       $7, %%edx\n\t"
+        "jz        rescale2end\n\t"
+        "mov       %2, %%ebx\n\t"
+        "mov       %3, %%ecx\n\t"
+
+  "rescale2taillp:\n\t"
+        "movsx     (%%rsi), %%eax\n\t"
+        "imul      %%ebx, %%eax\n\t"
+        "shr       %%cl, %%eax\n\t"
+        "mov       %%ax, (%%rsi)\n\t"
+
+        "add       $2, %%rsi\n\t"
+        "dec       %%edx;\n\t"
+        "jnz       rescale2taillp\n\t"
+
+  "rescale2end:\n\t"
+        "emms\n\t"
+        :
+        : "r" (x), "r" (count), "r" (f), "r" (shift)
+      );
+#endif
+#if defined(__i386__)
+      asm (
+        "mov       %0, %%esi\n\t"
+        "mov       %1, %%ecx\n\t"
+        "shr       $3, %%ecx\n\t"
+        "jz        rescale2tail\n\t"
+
+        "movd      %2, %%mm6\n\t"
+        "punpcklwd %%mm6, %%mm6\n\t"
+        "punpcklwd %%mm6, %%mm6\n\t"
+        "movd      %3, %%mm7\n\t"
+
+  "rescale2lp:\n\t"
+        "movq      (%%esi), %%mm0\n\t"
+        "movq      8(%%esi), %%mm1\n\t"
+
+        "pmullw    %%mm6, %%mm0;\n\t"
+        "pmullw    %%mm6, %%mm1\n\t"
+
+        "psraw     %%mm7, %%mm0\n\t"
+        "psraw     %%mm7, %%mm1\n\t"
+
+        "movq      %%mm0, (%%esi)\n\t"
+        "movq      %%mm1, 8(%%esi)\n\t"
+
+        "add       $16, %%esi\n\t"
+        "dec       %%ecx;\n\t"
+        "jnz       rescale2lp\n\t"
+
+  "rescale2tail:\n\t"
+        "mov       %1, %%edx\n\t"
+        "and       $7, %%edx\n\t"
+        "jz        rescale2end\n\t"
+        "mov       %2, %%ebx\n\t"
+        "mov       %3, %%ecx\n\t"
+
+  "rescale2taillp:\n\t"
+        "movsx     (%%esi), %%eax\n\t"
+        "imul      %%ebx, %%eax\n\t"
+        "shr       %%cl, %%eax\n\t"
+        "mov       %%ax, (%%esi)\n\t"
+
+        "add       $2, %%esi\n\t"
+        "dec       %%edx;\n\t"
+        "jnz       rescale2taillp\n\t"
+
+  "rescale2end:\n\t"
+        "emms\n\t"
+        :
+        : "r" (x), "r" (count), "r" (f), "r" (shift)
+      );
+#endif
+#else
       __asm
       {
         mov       esi, [x];
@@ -267,6 +521,7 @@ namespace FRIED
   rescale2end:
         emms;
       }
+#endif
     }
   }
 
