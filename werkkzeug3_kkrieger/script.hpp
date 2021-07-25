@@ -187,7 +187,7 @@ class sScriptVM
 
 public:
   sScriptVM();
-  ~sScriptVM();
+  virtual ~sScriptVM();
 
   void Push(const sF32 *p,sInt count) { while(count--) Stack[Index++]=*p++; }
   void Pop(sF32 *p,sInt count)  { Index-=count; for(sInt i=0;i<count;i++) *p++ = Stack[Index+i]; }
@@ -306,7 +306,7 @@ class sScriptCompiler
 
 public:
   sScriptCompiler();
-  ~sScriptCompiler();
+  virtual ~sScriptCompiler();
 
   // compiler
 

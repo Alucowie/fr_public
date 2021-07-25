@@ -157,8 +157,8 @@ void __stdcall Exec_Effect_ChainLine(KOp *op,KEnvironment *kenv,
   // check and convert parameters
 
 
-  sVERIFY(marka>=0 && marka<sCOUNTOF(kenv->Markers));
-  sVERIFY(markb>=0 && markb<sCOUNTOF(kenv->Markers));
+  sVERIFY(marka>=0 && ((unsigned long)marka)<sCOUNTOF(kenv->Markers));
+  sVERIFY(markb>=0 && ((unsigned long)markb)<sCOUNTOF(kenv->Markers));
 
   NewA.Init3(_posa.x,_posa.y,_posa.z);
   NewB.Init3(_posb.x,_posb.y,_posb.z);

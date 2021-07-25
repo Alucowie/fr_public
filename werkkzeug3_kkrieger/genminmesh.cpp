@@ -240,7 +240,8 @@ sU32 GenMinMesh::HashVector(const GenMinVector &v)
 {
   const sU8 *src = (const sU8 *) &v.x;
   sU32 hash = 2166136261;
-  for(sInt i=0;i<sizeof(GenMinVector);i++)
+  unsigned long i;
+  for(i=0;i<sizeof(GenMinVector);i++)
     hash = (hash ^ *src++) * 16777619;
 
   return hash;
@@ -954,7 +955,7 @@ struct GenMinTempEdge
 
   bool operator < (const GenMinTempEdge &b) const
   {
-    return v0 < b.v0 || v0 == b.v0 && v1 < b.v1;
+    return v0 < b.v0 || (v0 == b.v0 && v1 < b.v1);
   }
 };
 
@@ -1335,7 +1336,7 @@ GenMinMesh * __stdcall MinMesh_Cube(sInt tx,sInt ty,sInt tz,sInt flags,sFSRT srt
     { 0,2,  1, 1,  0, 1, 0 ,0 ,  0 },  
     { 0,2,  1, 1,  0,-1, 0 ,0 , 16 },  
   };
-  const static sS8 sign[2] = { -1,1 };
+  //const static sS8 sign[2] = { -1,1 };
 
   mat.Init();
   mesh = new GenMinMesh;

@@ -418,7 +418,7 @@ void Chaos4(KOp *op,KEnvironment *kenv,sF323 a,sF323 b,sF323 c,sInt flags,sInt e
   sInt geo;
   sU16 *ip;
   volatile sVertexDouble *vp;
-  sInt i;
+  //sInt i;
   sInt tsx,tsy,ttt,tsl;
   sInt x,y,t,s;
   sF32 ri,ro,fx,fy,scale;
@@ -499,7 +499,7 @@ void Chaos4(KOp *op,KEnvironment *kenv,sF323 a,sF323 b,sF323 c,sInt flags,sInt e
         }
       }
     }
-    i = 0;
+    //i = 0;
     for(t=0;t<ttt;t++)
     {
       for(y=0;y<tsy;y++)
