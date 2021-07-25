@@ -46,7 +46,7 @@ oldfpcw			resd 1
 section .text
 
 global _AUX_
-_AUX_
+_AUX_:
 
 fci12			     dd 0.083333333333
 fc2            dd 2.0
@@ -414,7 +414,7 @@ pow:
 
 
 global _OSC_
-_OSC_
+_OSC_:
 
 struc syVOsc
 	.mode			resd 1  
@@ -423,7 +423,7 @@ struc syVOsc
 	.detune   resd 1
 	.color    resd 1
 	.gain     resd 1
-	.size
+	.size:
 endstruc
 
 struc syWOsc
@@ -442,7 +442,7 @@ struc syWOsc
 	.nfb      resd 1
 	.note     resd 1  ; note
 	.pitch    resd 1  ; note
-	.size
+	.size:
 endstruc
 
 
@@ -552,7 +552,7 @@ section .data
 
 section .text
 
-.mode0     ; tri/saw
+.mode0:     ; tri/saw
 		mov		eax, [ebp + syWOsc.cnt]
     mov   esi, [ebp + syWOsc.freq]
  
@@ -597,7 +597,7 @@ section .text
     rcl   edx, 2                   ; ..............................nc  .
 
 
-.m0loop
+.m0loop:
   		mov   ebx, eax
   		shr   ebx, 9
   		or    ebx, 0x3f800000							
@@ -612,7 +612,7 @@ section .text
 
 ; cases: on entry <p> <c2> <b> <c1> <1/f> <f>, on exit: <y> <c2> <b> <c1> <1/f> <f>
 
-.m0c21 ; y=-(g+c2(p-f+1)²-c1p²)*(1/f)
+.m0c21: ; y=-(g+c2(p-f+1)²-c1p²)*(1/f)
       fld1                             ; <1> <p> <c2> <b> <c1> <1/f> <f> <g>
       fadd   st0, st1                  ; <p+1> <p> <c2> <b> <c1> <1/f> <f> <g>
       fsub   st0, st6                  ; <p+1-f> <p> <c2> <b> <c1> <1/f> <f> <g>
@@ -628,7 +628,7 @@ section .text
       jmp    short .m0pl
 
 
-.m0c121 ; y=(-g-c1(1-f)(2p+1-f))*(1/f)
+.m0c121: ; y=(-g-c1(1-f)(2p+1-f))*(1/f)
       fadd   st0, st0                  ; <2p> <c2> <b> <c1> <1/f> <f> <g>
       fld1                             ; <1> <2p> <c2> <b> <c1> <1/f> <f> <g>
       fsub   st0, st6                  ; <1-f> <2p> <c2> <b> <c1> <1/f> <f> <g>
@@ -642,7 +642,7 @@ section .text
       jmp    short .m0pl
 
       
-.m0c212 ; y=(g-c2(1-f)(2p+1-f))*(1/f)
+.m0c212: ; y=(g-c2(1-f)(2p+1-f))*(1/f)
       fadd   st0, st0                  ; <2p> <c2> <b> <c1> <1/f> <f> <g>
       fld1                             ; <1> <2p> <c2> <b> <c1> <1/f> <f> <g>
       fsub   st0, st6                  ; <1-f> <2p> <c2> <b> <c1> <1/f> <f> <g>
@@ -655,7 +655,7 @@ section .text
       fmul   st0, st4                  ; <y> <c2> <b> <c1> <1/f> <f> <g>
       jmp    short .m0pl
 
-.m0c12  ; y=(c2(p²)-c1((p-f)²))*(1/f)
+.m0c12:  ; y=(c2(p²)-c1((p-f)²))*(1/f)
       fld   st0                       ; <p> <p> <c2> <b> <c1> <1/f> <f> <g>
       fmul  st0, st0                  ; <p²> <p> <c2> <b> <c1> <1/f> <f> <g>
       fmul  st0, st2                  ; <c2(p²)> <p> <c2> <b> <c1> <1/f> <f> <g>
@@ -667,18 +667,18 @@ section .text
       fmul  st0, st4                  ; <y> <c2> <b> <c1> <1/f> <f> <g>
       jmp   short .m0pl
 
-.m0c1  ; y=c1(2p-f)
+.m0c1:  ; y=c1(2p-f)
       fadd  st0, st0                  ; <2p> <c2> <b> <c1> <1/f> <f> <g>
       fsub  st0, st5                  ; <2p-f> <c2> <b> <c1> <1/f> <f> <g>
       fmul  st0, st3                  ; <y> <c2> <b> <c1> <1/f> <f> <g>
       jmp   short .m0pl
 
-.m0c2  ; y=c2(2p-f)
+.m0c2:  ; y=c2(2p-f)
       fadd  st0, st0                  ; <2p> <c2> <b> <c1> <1/f> <f> <g>
       fsub  st0, st5                  ; <2p-f> <c2> <b> <c1> <1/f> <f> <g>
       fmul  st0, st1                  ; <y> <c2> <b> <c1> <1/f> <f> <g>
 
-.m0pl
+.m0pl:
       fadd  st0, st6                 ; <out> <c2> <b> <c1> <1/f> <f> <g>
       add   eax, esi                 ; ...............................n  c
       rcl   edx, 1                   ; ..............................nc  .
@@ -686,14 +686,14 @@ section .text
       jz    .m0noring
   	  fmul	dword [edi + 4*ecx]      ; <out'> <c2> <b> <c1> <1/f> <f> <g>
       jmp   .m0store
-.m0noring
+.m0noring:
 		  fadd	dword [edi + 4*ecx]      ; <out'> <c2> <b> <c1> <1/f> <f> <g>
-.m0store
+.m0store:
 		  fstp	dword [edi + 4*ecx]      ; <c2> <b> <c1> <1/f> <f> <g>
 		  inc		ecx
 		jz   .m0end
     jmp  .m0loop
-.m0end
+.m0end:
     mov   [ebp + syWOsc.cnt], eax
     fstp  st0 ; <b> <c1> <1/f> <f> <g>
     fstp  st0 ; <c1> <1/f> <f> <g>
@@ -701,7 +701,7 @@ section .text
     fstp  st0 ; <f> <g>
     fstp  st0 ; <g>
     fstp  st0 ; -
-.off
+.off:
     V2PerfLeave V2Perf_OSC
 		popad				
     ret
@@ -712,7 +712,7 @@ section .text
 
 
 
-.m1casetab   dd syOscRender.m1c2,     ; ... 
+.m1casetab:  dd syOscRender.m1c2,     ; ...
              dd syOscRender.m1c1,     ; ..n , INVALID!
              dd syOscRender.m1c212,   ; .c.
              dd syOscRender.m1c21,    ; .cn
@@ -721,7 +721,7 @@ section .text
              dd syOscRender.m1c2,     ; oc. , INVALID!
              dd syOscRender.m1c121    ; ocn
 
-.mode1     ; pulse
+.mode1:     ; pulse
 		mov		eax, [ebp + syWOsc.cnt]
     mov   esi, [ebp + syWOsc.freq]
  
@@ -763,7 +763,7 @@ section .text
     rcl   edx, 2                   ; ..............................nc  .
 
 
-.m1loop
+.m1loop:
   		mov   ebx, eax
   		shr   ebx, 9
   		or    ebx, 0x3f800000							
@@ -774,7 +774,7 @@ section .text
   		jmp		dword [cs: .m1casetab + 4*edx]
 
 ; cases: on entry <cc121> <cc212> <b> <gdf> <g>, on exit: <out> <cc121> <cc212> <b> <gdf> <g>
-.m1c21  ; p2->p1 : 2(p-1)/f - 1
+.m1c21:  ; p2->p1 : 2(p-1)/f - 1
       fld   dword [ebp + syWOsc.tmp]   ; <p> <cc121> <cc212> <b> <gdf> <g>
       fld1                             ; <1> <p> <cc121> <cc212> <b> <gdf> <g>
       fsubp st1, st0                   ; <p-1> <cc121> <cc212> <b> <gdf> <g>
@@ -783,7 +783,7 @@ section .text
       fsub  st0, st5                   ; <out> <cc121> <cc212> <b> <gdf> <g>
       jmp   short .m1pl
 
-.m1c12  ; p1->p2 : 2(b-p)/f + 1
+.m1c12:  ; p1->p2 : 2(b-p)/f + 1
       fld   st2                        ; <b> <cc121> <cc212> <b> <gdf> <g>
       fsub  dword [ebp + syWOsc.tmp]   ; <b-p> <cc121> <cc212> <b> <gdf> <g>
       fadd  st0, st0                   ; <2(b-p)> <cc121> <cc212> <b> <gdf> <g>
@@ -791,32 +791,32 @@ section .text
       fadd  st0, st5                   ; <out> <cc121> <cc212> <b> <gdf> <g>
       jmp   short .m1pl
 
-.m1c121 ; p1->p2->p1 : (2b-4)/f + 1
+.m1c121: ; p1->p2->p1 : (2b-4)/f + 1
       fld  st0                          ; <out> <cc121> <cc212> <b> <gdf> <g>
       jmp  short .m1pl
 
-.m1c212 ; p2->p1->p2 : (2b-2)/f - 1
+.m1c212: ; p2->p1->p2 : (2b-2)/f - 1
       fld  st1                          ; <out> <cc121> <cc212> <b> <gdf> <g>
       jmp  short .m1pl
 
-.m1c1   ; p1 : 1
+.m1c1:   ; p1 : 1
       fld   st4                         ; <out> <cc121> <cc212> <b> <gdf> <g>
       jmp  short .m1pl
 
-.m1c2   ; p2 : -1
+.m1c2:   ; p2 : -1
       fld   st4                         ; <out> <cc121> <cc212> <b> <gdf> <g>
       fchs
 
-.m1pl
+.m1pl:
       add   eax, esi                 ; ...............................n  c
       rcl   edx, 1                   ; ..............................nc  .
       test  byte [ebp + syWOsc.ring], 1
       jz    .m1noring
   	  fmul	dword [edi + 4*ecx]
       jmp   short .m1store
-.m1noring
+.m1noring:
 		  fadd	dword [edi + 4*ecx]
-.m1store
+.m1store:
 		  fstp	dword [edi + 4*ecx]
 		  inc		ecx
 		jnz   .m1loop
@@ -834,7 +834,7 @@ section .text
            
 
 
-.mode2     ; sin
+.mode2:    ; sin
 		mov		eax, [ebp + syWOsc.cnt]
 		mov   edx, [ebp + syWOsc.freq]
 		
@@ -842,7 +842,7 @@ section .text
 		fld   qword [fcsinx5]  ; <cx5> <cx7>
 		fld   qword [fcsinx3]  ; <cx3> <cx5> <cx7>
 		
-.m2loop1
+.m2loop1:
 			mov   ebx, eax
 			add   ebx, 0x40000000
 			mov   esi, ebx
@@ -876,9 +876,9 @@ section .text
       jz    .m2noring
 			fmul	dword [edi + 4*ecx]       ; <out> <cx3> <cx5> <cx7>
       jmp   short .m2store
-.m2noring
+.m2noring:
 			fadd	dword [edi + 4*ecx]       ; <out> <cx3> <cx5> <cx7>
-.m2store
+.m2store:
 			fstp	dword [edi + 4*ecx]       ; <cx3> <cx5> <cx7>
 			inc   ecx
 		jnz   .m2loop1
@@ -892,13 +892,13 @@ section .text
     ret
 
 
-.mode3     ; noise
+.mode3:     ; noise
       mov   esi,	[ebp + syWOsc.nseed] 
 			fld   dword [ebp + syWOsc.nfres]   ; <r>
 			fld   dword [ebp + syWOsc.nffrq]   ; <f> <r>
 			fld   dword [ebp + syWOsc.nfl]			; <l> <f> <r>
 			fld   dword [ebp + syWOsc.nfb]			; <b> <l> <f> <r>
-.m3loop1
+.m3loop1:
 	    imul	esi, icnoisemul
 			add		esi, icnoiseadd
 			mov		eax, esi
@@ -933,9 +933,9 @@ section .text
       jz    .m3noring
 			fmul	dword [edi + 4*ecx]
       jmp   .m3store
-.m3noring
+.m3noring:
 			fadd	dword [edi + 4*ecx]
-.m3store
+.m3store:
 			fstp	dword [edi + 4*ecx]
 			inc		ecx
 		jnz   .m3loop1
@@ -949,10 +949,10 @@ section .text
     ret
 
 
-.mode4     ; fm sin
+.mode4:     ; fm sin
 		mov		eax, [ebp + syWOsc.cnt]
 		mov   edx, [ebp + syWOsc.freq]
-.m4loop1
+.m4loop1:
 			mov   ebx, eax
       fld   dword [edi + 4*ecx]  ; -1 .. 1
       fmul  dword [fcfmmax]
@@ -967,7 +967,7 @@ section .text
       test  byte [ebp + syWOsc.ring], 1
       jz    .m4store
 			fmul	dword [edi + 4*ecx]
-.m4store
+.m4store:
 			fstp	dword [edi + 4*ecx]
 			inc   ecx
 		jnz   .m4loop1
@@ -978,9 +978,9 @@ section .text
 
 ; CHAOS
 
-.auxa			; copy 
+.auxa:			; copy
 		lea   esi,[auxabuf]
-.auxaloop
+.auxaloop:
 			fld		dword [esi+0]
 			fadd	dword [esi+4]
 			add		esi,8
@@ -989,7 +989,7 @@ section .text
       test  byte [ebp + syWOsc.ring], 1
       jz    .auxastore
 			fmul	dword [edi + 4*ecx]
-.auxastore
+.auxastore:
 			fstp	dword [edi + 4*ecx]
 			inc   ecx
 		jnz   .auxaloop
@@ -999,7 +999,7 @@ section .text
 
 
 
-.auxb			; copy 
+.auxb:			; copy
 		lea   esi,[auxbbuf]
 		jmp .auxaloop		
 
@@ -1009,7 +1009,7 @@ section .text
 
 
 global _ENV_
-_ENV_
+_ENV_:
 
 struc syVEnv
   .ar		resd 1   
@@ -1018,7 +1018,7 @@ struc syVEnv
 	.sr   resd 1
 	.rr   resd 1
 	.vol  resd 1
-	.size
+	.size:
 endstruc
 
 struc syWEnv
@@ -1031,7 +1031,7 @@ struc syWEnv
 	.suf		resd 1  ; float sustain factor (mul'ed every frame in phase 3, transition -> 4 at gate off or ->0 at 0.0)
 	.ref    resd 1  ; float release (mul'ed every frame in phase 4, transition ->0 at 0.0)
 	.gain   resd 1  ; float gain (0.1 .. 1.0)
-	.size
+	.size:
 endstruc
 
 ; init
@@ -1112,22 +1112,22 @@ syEnvTick:
 		popad 
 		ret
 
-.state_off  ; envelope off
+.state_off:  ; envelope off
     or    eax, eax  ; gate on -> attack
 		jz		.s0ok
 		inc		byte [ebp + syWEnv.state]
 		jmp   .state_atk
-.s0ok
+.s0ok:
 		fldz
 		fstp  dword [ebp + syWEnv.val]
 		ret
 
-.state_atk  ; attack
+.state_atk: ; attack
     or    eax, eax  ; gate off -> release
 		jnz		.s1ok
 		mov		byte [ebp + syWEnv.state], 4
 		jmp   .state_rel
-.s1ok 
+.s1ok:
 		fld   dword [ebp + syWEnv.val]
 		fadd  dword [ebp + syWEnv.atd]
 		fstp	dword [ebp + syWEnv.val]
@@ -1136,15 +1136,15 @@ syEnvTick:
 		ja    .s1end                    ; val above -> decay
 		mov   [ebp + syWEnv.val], ecx
 		inc   byte [ebp + syWEnv.state]
-.s1end
+.s1end:
 		ret
 
-.state_dec
+.state_dec:
     or    eax, eax  ; gate off -> release
 		jnz		.s2ok
 		mov		byte [ebp + syWEnv.state], 4
 		jmp   .state_rel
-.s2ok 
+.s2ok:
 		fld   dword [ebp + syWEnv.val]
 		fmul  dword [ebp + syWEnv.dcf]
 		fstp	dword [ebp + syWEnv.val]
@@ -1156,12 +1156,12 @@ syEnvTick:
 		ret
 
 
-.state_sus
+.state_sus:
     or    eax, eax  ; gate off -> release
 		jnz		.s3ok
 		inc		byte [ebp + syWEnv.state]
 		jmp   .state_rel
-.s3ok 
+.s3ok:
 		fld   dword [ebp + syWEnv.val]
 		fmul  dword [ebp + syWEnv.suf]
 		fstp	dword [ebp + syWEnv.val]
@@ -1172,32 +1172,32 @@ syEnvTick:
 		mov   [ebp + syWEnv.val], ecx
 		mov   [ebp + syWEnv.state], ecx
 		ret
-.s3not2low
+.s3not2low:
 		mov   ecx,  43000000h           ; 128.0
 		cmp		ecx,	[ebp + syWEnv.val]
 		ja    .s3end                    ; val above -> decay
 		mov   [ebp + syWEnv.val], ecx
-.s3end
+.s3end:
 		ret
 
 
-.state_rel
+.state_rel:
     or    eax, eax  ; gate off -> release
 		jz		.s4ok
 		mov		byte [ebp + syWEnv.state], 1
 		jmp   .state_atk
-.s4ok 
+.s4ok:
 		fld   dword [ebp + syWEnv.val]
 		fmul  dword [ebp + syWEnv.ref]
 		fstp	dword [ebp + syWEnv.val]
-.s4checkrunout
+.s4checkrunout:
 		mov   ecx,  LOWEST
 		cmp		ecx,	[ebp + syWEnv.val]
 		jb    .s4end
 		xor   ecx, ecx
 		mov   [ebp + syWEnv.val], ecx
 		mov   [ebp + syWEnv.state], ecx
-.s4end
+.s4end:
 		ret
 
 
@@ -1207,14 +1207,14 @@ syEnvTick:
 ;#####################################################################################
 
 global _VCF_
-_VCF_
+_VCF_:
 
 
 struc syVFlt
 	.mode   resd 1
 	.cutoff resd 1
 	.reso   resd 1
-	.size
+	.size:
 endstruc
 
 struc syWFlt
@@ -1224,7 +1224,7 @@ struc syWFlt
 	.l      resd 1
 	.b      resd 1
   .step   resd 1
-	.size
+	.size:
 endstruc
 
 syFltInit:
@@ -1323,7 +1323,7 @@ syFltRender:
   cmp		esi, edi
 	je    .m0end
 	rep   movsd
-.m0end
+.m0end:
 	ret
 
 .mode1: ; low
@@ -1380,7 +1380,7 @@ syFltRender:
 ;#####################################################################################
 
 global _LFO_
-_LFO_
+_LFO_:
 
 struc syVLFO
   .mode		resd 1  ; 0: saw, 1: tri, 2: pulse, 3: sin, 4: s&h
@@ -1390,7 +1390,7 @@ struc syVLFO
   .phase	resd 1  ; start phase shift
   .pol      resd 1  ; polarity: + , . , +/-
   .amp		resd 1  ; amplification (0 .. 1)
-  .size
+  .size:
 endstruc
 
 struc syWLFO
@@ -1405,11 +1405,11 @@ struc syWLFO
 	.dc     resd 1  ; float: output DC
 	.nseed  resd 1  ; int: random seed
 	.last   resd 1  ; int: last counter value (for s&h transition)
-  .size
+  .size:
 endstruc
 
 
-syLFOInit
+syLFOInit:
   pushad
 	xor			eax, eax
 	mov			[ebp + syWLFO.cntr], eax
@@ -1420,7 +1420,7 @@ syLFOInit
 	ret
 
 
-syLFOSet
+syLFOSet:
   pushad
 	
 	fld		dword [esi + syVLFO.mode]
@@ -1453,19 +1453,19 @@ syLFOSet
 	cmp     al, 2       ; +/- polarity?
 	jz      .isp2
 	fsub    st0, st0	
-.isp2
+.isp2:
 	fstp    dword [ebp + syWLFO.dc]
 	cmp     al, 1       ; +/- polarity?
 	jnz     .isntp1
 	fchs
-.isntp1
+.isntp1:
 	fstp    dword [ebp + syWLFO.gain]
 
 	popad
 	ret
 
 
-syLFOKeyOn
+syLFOKeyOn:
   pushad
 	mov eax, [ebp + syWLFO.fs]
 	or  eax, eax
@@ -1475,7 +1475,7 @@ syLFOKeyOn
 	xor eax, eax
 	not eax
 	mov [ebp + syWLFO.last], eax
-.end
+.end:
 	popad
 	ret
 
@@ -1483,7 +1483,7 @@ syLFOKeyOn
 syLTTab		dd syLFOTick.mode0, syLFOTick.mode1, syLFOTick.mode2, syLFOTick.mode3
 				  dd syLFOTick.mode4, syLFOTick.mode0, syLFOTick.mode0, syLFOTick.mode0
 
-syLFOTick
+syLFOTick:
   pushad
 	mov			eax, [ebp + syWLFO.cntr]
 	mov			edx, [ebp + syWLFO.mode]
@@ -1500,12 +1500,12 @@ syLFOTick
 	jz      .isok
 	xor     eax, eax
 	not     eax
-.isok
+.isok:
 	mov			[ebp + syWLFO.cntr], eax
 	popad
 	ret
 
-.mode0 ; saw
+.mode0: ; saw
   shr			eax, 9
 	or      eax, 3f800000h
 	mov     [temp], eax
@@ -1514,19 +1514,19 @@ syLFOTick
 	fsubp   st1, st0     ; <0..1>
 	ret
 
-.mode1 ; tri
+.mode1: ; tri
   shl			eax, 1
 	sbb     ebx, ebx
 	xor     eax, ebx
 	jmp     .mode0
 
-.mode2 ; pulse
+.mode2: ; pulse
 	shl     eax, 1
 	sbb     eax, eax
   jmp			.mode0
 
 
-.mode3 ; sin
+.mode3: ; sin
   call    .mode0
 	fmul    dword [fc2pi] ; <0..2pi>
 	call    fastsinrc     ; <-1..1>
@@ -1535,7 +1535,7 @@ syLFOTick
 	ret
 
 
-.mode4 ; s&h
+.mode4: ; s&h
 	cmp   eax, [ebp + syWLFO.last]
 	mov		[ebp + syWLFO.last], eax
   jae   .nonew
@@ -1543,7 +1543,7 @@ syLFOTick
   imul	eax, icnoisemul
 	add		eax, icnoiseadd
 	mov		[ebp + syWLFO.nseed], eax
-.nonew
+.nonew:
 	mov   eax, [ebp + syWLFO.nseed]
 	jmp   .mode0
 
@@ -1563,7 +1563,7 @@ syLFOTick
 ; mode5..9:  filters     -,  cutoff, reso
 
 global _DIST_
-_DIST_
+_DIST_:
 
 struc syVDist
 	.mode			resd 1			; 0: off, 1: overdrive, 2: clip, 3: bitcrusher, 4: decimator
@@ -1571,7 +1571,7 @@ struc syVDist
 	.ingain   resd 1      ; -12dB ... 36dB
 	.param1   resd 1      ; outgain/crush/outfreq
 	.param2   resd 1      ; offset/offset/xor/jitter
-	.size
+	.size:
 endstruc
 
 struc syWDist
@@ -1594,7 +1594,7 @@ struc syWDist
 	.dlp2br   resd 1			; float: decimator post-filter buffer (right)
 	.fw1      resb syWFlt.size  ; left/mono filter workspace
 	.fw2      resb syWFlt.size  ; right filter workspace
-	.size
+	.size:
 endstruc
 
 
@@ -1642,11 +1642,11 @@ syDistSet:
 		popad
 		ret
 
-.mode0
+.mode0:
 		fstp st0
 		ret
 
-.mode1 ; overdrive
+.mode1: ; overdrive
  		fmul    dword [fci128]
 		fld			dword [ebp + syWDist.gain1]
 		fld1
@@ -1654,9 +1654,9 @@ syDistSet:
 		fdivp   st1, st0
 		jmp     .mode2b
 
-.mode2 ; clip
+.mode2: ; clip
  		fmul    dword [fci128]
-.mode2b
+.mode2b:
 		fstp    dword [ebp + syWDist.gain2]
 		fld     dword [esi + syVDist.param2]
 		fsub    dword [fc64]
@@ -1666,7 +1666,7 @@ syDistSet:
 		fstp    dword [ebp + syWDist.offs]
 		ret
 
-.mode3 ; bitcrusher
+.mode3: ; bitcrusher
 		fmul    dword [fc256]                  ; 0 .. 32xxx
 		fld1 
 		faddp   st1, st0                       ; 1 .. 32xxx
@@ -1683,7 +1683,7 @@ syDistSet:
 		mov     [ebp + syWDist.crxor], eax
 		ret
 
-.mode4 ; decimator
+.mode4: ; decimator
 		fmul    dword [fci128]
 		call    calcfreq
 		fmul    dword [fc32bit]
@@ -1699,7 +1699,7 @@ syDistSet:
 		fstp    dword [ebp + syWDist.dlp2c]
     ret
 
-.modeF ; filters
+.modeF: ; filters
     fstp    dword [temp + syVFlt.cutoff]    
     fld     dword [esi + syVDist.param2]
     fstp    dword [temp + syVFlt.reso]
@@ -1735,19 +1735,19 @@ syDistRenderMono:
 		popad
 		ret
 
-.mode0  ; bypass
+.mode0:  ; bypass
 		cmp			esi, edi
 		je			.m0end
 		rep     movsd
-.m0end
+.m0end:
 		ret
 
-.mode1  ; overdrive
+.mode1:  ; overdrive
 			fld1							; <1>
 			fchs							; <-1>
 			xor   ebx, ebx
 			mov   bl, 8
-.m1loop
+.m1loop:
 			fld		dword [esi]
 			lea   esi, [esi+4]
 			fmul  dword [ebp + syWDist.gain1]
@@ -1765,7 +1765,7 @@ syDistRenderMono:
 	  fstp  st0          ; -
 		ret
 
-.mode2 ; clip
+.mode2: ; clip
 			fld		dword [esi]
 			lea   esi, [esi+4]
 			fmul  dword [ebp + syWDist.gain1]
@@ -1789,10 +1789,10 @@ syDistRenderMono:
 		jnz .mode2
 		ret
 
-.mode3 ; bitcrusher
+.mode3: ; bitcrusher
     mov   ebx, 7fffh
     mov   edx, -7fffh
-.m3loop      
+.m3loop:
       fld		dword [esi]
 			lea		esi,	[esi+4]
 			fmul	dword [ebp + syWDist.crush1]
@@ -1814,11 +1814,11 @@ syDistRenderMono:
 		ret
 
 
-.mode4 ; decimator
+.mode4: ; decimator
   mov eax, [ebp + syWDist.dvall]
   mov edx, [ebp + syWDist.dfreq]
   mov ebx, [ebp + syWDist.dcount]
-.m4loop
+.m4loop:
 		add		ebx, edx
 		cmovc eax, [esi]
 		add		esi, byte 4
@@ -1831,7 +1831,7 @@ syDistRenderMono:
 
 			      
 
-.modeF ; filters
+.modeF: ; filters
   lea   ebp, [ebp + syWDist.fw1]
   jmp   syFltRender
 
@@ -1854,12 +1854,12 @@ syDistRenderStereo:
 	popad
 	ret
 
-.mode4 ; decimator
+.mode4: ; decimator
 	shr ecx, 1
 	mov eax, [ebp + syWDist.dvall]
 	mov edx, [ebp + syWDist.dvalr]
 	mov ebx, [ebp + syWDist.dcount]
-.m4loop
+.m4loop:
 		add   ebx, [ebp + syWDist.dfreq]
 		cmovc eax, [esi]
 		cmovc edx, [esi + 4]
@@ -1879,7 +1879,7 @@ syDistRenderStereo:
 
 
 
-.modeF ; filters
+.modeF: ; filters
     shr   ecx, 1
     xor   eax, eax
     mov   al, 8
@@ -1899,7 +1899,7 @@ syDistRenderStereo:
 
 
 global _V2V_
-_V2V_
+_V2V_:
 
 struc syVV2
   .panning  resd 1              ; panning
@@ -1917,7 +1917,7 @@ struc syVV2
 	.lfo1     resb syVLFO.size    ; LFO 1
 	.lfo2     resb syVLFO.size    ; LFO 2
 	.oscsync  resd 1              ; osc keysync flag
-	.size
+	.size:
 endstruc
 
 
@@ -1949,7 +1949,7 @@ struc syWV2
 	.lfo2     resb syWLFO.size    ; LFO 2
 	.dist     resb syWDist.size   ; distorter
 
-	.size
+	.size:
 endstruc
 
 
@@ -2045,7 +2045,7 @@ syV2Render:
 	mov  edi, vcebuf2
 	call syFltRender
 	lea  ebp, [ebp - syWV2.vcf2 + 0]
-.nopar1
+.nopar1:
 	; dann auf jeden fall filter 1 rendern
 	lea  ebp, [ebp - 0 + syWV2.vcf1]
 	mov  esi, vcebuf
@@ -2062,7 +2062,7 @@ syV2Render:
 	mov  edi, vcebuf
   fld  dword [ebp + syWV2.f1gain]   ; <g1>
   fld  dword [ebp + syWV2.f2gain]   ; <g2> <g1>
-.parloop
+.parloop:
     fld		dword [esi]               ; <v2> <g2> <g1>
     fmul  st0, st1                  ; <v2'> <g2> <g1>
 		add		esi, byte 4    
@@ -2077,7 +2077,7 @@ syV2Render:
   fstp st0                          ; -
 	pop ecx
 	jmp .fltend
-.nopar2  
+.nopar2:
   ; ... also seriell ... filter 2 drüberrechnen
 	lea  ebp, [ebp - 0 + syWV2.vcf2]
 	mov  esi, vcebuf
@@ -2085,7 +2085,7 @@ syV2Render:
 	call syFltRender
 	lea  ebp, [ebp - syWV2.vcf2 + 0]
  
-.fltend
+.fltend:
 
 	; distortion
 	mov  esi, vcebuf
@@ -2098,7 +2098,7 @@ syV2Render:
 	mov	 edi, chanbuf
 	mov  esi, vcebuf
 	fld  dword [ebp + syWV2.curvol] ; cv
-.copyloop1
+.copyloop1:
 		fld		dword [esi]		; out cv
 		fmul  st1						; out' cv
 		fxch  st1						; cv out'
@@ -2175,11 +2175,11 @@ syV2Set:
   fld1                              ; <1> <x>
   fsubr   st1, st0                  ; <1> <1-x>
   jmp     short .fbgoon
-.fbmin
+.fbmin:
   fld1                              ; <1> <x>
   fadd    st1, st0                  ; <g1> <g2>
   fxch    st1                       ; <g2> <g1>
-.fbgoon
+.fbgoon:
   fstp    dword [ebp + syWV2.f2gain] ; <g1>
   fstp    dword [ebp + syWV2.f1gain] ; -
 
@@ -2250,7 +2250,7 @@ syV2NoteOn:
 	mov [ebp + syWV2.osc2 + syWOsc.cnt], eax
 	mov [ebp + syWV2.osc3 + syWOsc.cnt], eax
 
-.nosync
+.nosync:
 
 	;fldz
 ;	fst  dword [ebp + syWV2.curvol]
@@ -2298,7 +2298,7 @@ storeV2Values:
 	or    ebx, ebx
 	jns   .doit
 	jmp   .end      ; voice gar ned belegt?
-.doit
+.doit:
 	movzx eax, byte [data + SYN.chans + 8*ebx] ; pgmnummer
 	mov   edi, [data + SYN.patchmap]
 	mov   edi, [edi + 4*eax]							 ; edi -> sounddaten
@@ -2313,7 +2313,7 @@ storeV2Values:
 
 	; voicedependent daten übertragen
   xor   ecx, ecx
-.goloop
+.goloop:
 		movzx eax, byte [edi + ecx]
 		mov   [temp], eax
 		fild  dword [temp]
@@ -2329,35 +2329,35 @@ storeV2Values:
 	jnz  .modloop
 	jmp  .modend
 
-.modloop
+.modloop:
 		movzx		eax, byte [edi + v2mod.source]  ; source
 		or      eax, eax
 		jnz     .mnotvel
 		fld     dword [ebp + syWV2.velo]
 		jmp			.mdo
-.mnotvel
+.mnotvel:
 		cmp     al, 8
 		jae     .mnotctl
 		movzx   eax, byte [data + SYN.chans + 8*ebx + eax]
 		mov     [temp], eax
 		fild    dword [temp]
 		jmp     .mdo
-.mnotctl
+.mnotctl:
     cmp     al, 12
     jae     .mnotvm
 		and     al, 3
 		mov     eax, [sVTab + 4*eax]
 		fld     dword [ebp + eax]
 		jmp     .mdo
-.mnotvm
+.mnotvm:
     cmp     al, 13
     jne     .mnotnote
-.mnotnote
+.mnotnote:
     fild    dword [ebp + syWV2.note]
     fsub    dword [fc48]
     fadd    st0, st0
     jmp     .mdo
-.mdo
+.mdo:
 		movzx   eax, byte [edi + v2mod.val]
 		mov     [temp], eax
 		fild    dword [temp]
@@ -2370,7 +2370,7 @@ storeV2Values:
 		jb     .misok
 		fstp   st0
 		jmp    .mlend
-.misok
+.misok:
 		fadd    dword [esi + 4*eax]
 		fstp    dword [temp]
 		; clippen
@@ -2378,22 +2378,22 @@ storeV2Values:
 		or      edx, edx
 		jns     .mnoclip1
 		xor     edx, edx
-.mnoclip1
+.mnoclip1:
     cmp     edx, 43000000h
 		jbe     .mnoclip2
 		mov     edx, 43000000h
-.mnoclip2
+.mnoclip2:
 		mov			[esi + 4*eax], edx
-.mlend
+.mlend:
 		lea edi, [edi+3]
 	  dec ecx
 	jz .modend
 	jmp .modloop
-.modend
+.modend:
   
 	call syV2Set
 
-.end
+.end:
 	popad
 	ret
 
@@ -2405,11 +2405,11 @@ storeV2Values:
 ;#####################################################################################
 
 global _BASS_
-_BASS_
+_BASS_:
 
 struc syVBoost
   .amount   resd 1    ; boost in dB (0..18)
-  .size
+  .size:
 endstruc
 
 struc syWBoost
@@ -2423,7 +2423,7 @@ struc syWBoost
   .x2       resd 2
   .y1       resd 2
   .y2       resd 2
-  .size
+  .size:
 endstruc
 
 syBoostInit:
@@ -2448,7 +2448,7 @@ syBoostSet:
   popad
   ret
 
-.isena
+.isena:
   ;    A  = 10^(dBgain/40) bzw ne stark gefakete version davon
   fmul      dword [fci128]
   call      pow2                           ; <A>
@@ -2537,7 +2537,7 @@ syBoostSet:
 ; y[n] = (b0/a0)*x[n] + (b1/a0)*x[n-1] + (b2/a0)*x[n-2] - (a1/a0)*y[n-1] - (a2/a0)*y[n-2]
 syBoostProcChan:                        ; <y2> <x2> <y1> <x2>
   pushad
-  .doloop
+  .doloop:
     ; y0 = b0'*in + b1'*x1 + b2'*x2 + a1'*y1 + a2'*y2
     fmul    dword [ebp + syWBoost.a2]   ; <y2a2> <x2> <y1> <x1>
     fxch    st1                         ; <x2> <y2a2> <y1> <x1>
@@ -2599,7 +2599,7 @@ syBoostRender:
   fstp    dword [ebp + syWBoost.y1 + 4] ; <x1>
   fstp    dword [ebp + syWBoost.x1 + 4] ; -
 
-.nooo
+.nooo:
   V2PerfLeave V2Perf_BASS
   popad
   ret
@@ -2614,7 +2614,7 @@ syBoostRender:
 ;#####################################################################################
 
 global _MODDEL_
-_MODDEL_
+_MODDEL_:
 
 struc syVModDel
   .amount   resd 1    ; dry/eff value (0=-eff, 64=dry, 127=eff)
@@ -2624,7 +2624,7 @@ struc syVModDel
 	.mrate    resd 1    ; modulation rate
 	.mdepth   resd 1    ; modulation depth
 	.mphase   resd 1    ; modulation stereo phase (0=-180°, 64=0°, 127=180°)
-	.size
+	.size:
 endstruc
 
 struc syWModDel
@@ -2644,11 +2644,11 @@ struc syWModDel
 	.dryout   resd 1    ; float: dry out
 	.effout   resd 1    ; float: eff out
 
-	.size
+	.size:
 endstruc
 
 
-syModDelInit
+syModDelInit:
   pushad
 	xor eax, eax
 	mov [ebp + syWModDel.dbptr],eax
@@ -2656,7 +2656,7 @@ syModDelInit
 	mov esi, [ebp + syWModDel.db1]
 	mov edi, [ebp + syWModDel.db2]
 	mov ecx, [ebp + syWModDel.dbufmask]
-.clloop
+.clloop:
 	  stosd
 		mov		[esi+4*ecx],eax
 		dec		ecx
@@ -2664,7 +2664,7 @@ syModDelInit
 	popad
 	ret
 
-syModDelSet
+syModDelSet:
   pushad
 	fld			dword [esi + syVModDel.amount]
 	fsub		dword [fc64]
@@ -2713,7 +2713,7 @@ syModDelSet
 	popad
 	ret
 
-syModDelProcessSample  
+syModDelProcessSample:
 ; fpu: <r> <l> <eff> <dry> <fb>
 ; edx: buffer index
 
@@ -2804,7 +2804,7 @@ syModDelProcessSample
   ret
 
 
-syModDelRenderAux2Main
+syModDelRenderAux2Main:
   pushad
   V2PerfEnter V2Perf_MODDEL
 
@@ -2817,7 +2817,7 @@ syModDelRenderAux2Main
 	fld     dword [ebp + syWModDel.effout]				;  <eff> <dry> <fb>
 	mov     edx,	[ebp + syWModDel.dbptr]
 	lea     esi,  [aux2buf]
-.rloop
+.rloop:
 		fld     dword [esi]						;  <m> <eff> <dry> <fb>
 %if FIXDENORMALS
     fadd    dword [dcoffset]
@@ -2838,12 +2838,12 @@ syModDelRenderAux2Main
 	fstp    st0                     ; <fb>
 	fstp    st0                     ; -
 
-.dont
+.dont:
   V2PerfLeave V2Perf_MODDEL
 	popad
 	ret
 
-syModDelRenderChan
+syModDelRenderChan:
   pushad
   V2PerfEnter V2Perf_MODDEL
 
@@ -2856,7 +2856,7 @@ syModDelRenderChan
 	fld     dword [ebp + syWModDel.effout]				;  <eff> <dry> <fb>
 	mov     edx,	[ebp + syWModDel.dbptr]
 	lea     esi,  [chanbuf]
-.rloop
+.rloop:
 		fld     dword [esi]						;  <l> <eff> <dry> <fb>
 %if FIXDENORMALS
     fadd    dword [dcoffset]
@@ -2876,7 +2876,7 @@ syModDelRenderChan
 	fstp    st0                     ; <fb>
 	fstp    st0                     ; -
 
-.dont
+.dont:
   V2PerfLeave V2Perf_MODDEL
 	popad
 	ret
@@ -2890,7 +2890,7 @@ syModDelRenderChan
 ;#####################################################################################
 
 global _COMPRESSOR_
-_COMPRESSOR_
+_COMPRESSOR_:
 
 %define  COMPDLEN 5700
 
@@ -2920,7 +2920,7 @@ struc syVComp
   .attack       resd 1  ; attack value
   .release      resd 1  ; release value
   .outgain      resd 1  ; output gain 
-	.size
+	.size:
 endstruc
 
 struc syWComp
@@ -2947,7 +2947,7 @@ struc syWComp
   .dbuf         resd 2*COMPDLEN ; lookahead delay buffer
   .rmsbuf       resd 2*8192     ; RMS ring buffer
 
-	.size
+	.size:
 endstruc
 
 syCompInit:
@@ -2985,7 +2985,7 @@ syCompSet:
   fst     dword [ebp + syWComp.curgain1]
   fstp    dword [ebp + syWComp.curgain2]
 
-.norst
+.norst:
   fld     dword [esi + syVComp.lookahead]
   fmul    dword [fcsamplesperms]
   fistp   dword [ebp + syWComp.dblen]
@@ -3006,7 +3006,7 @@ syCompSet:
   jz      .noag
   fstp    st0
   fld1
-.noag
+.noag:
 	fld     dword [esi + syVComp.outgain]
 	fsub    dword [fc64]
 	fmul    dword [fci16]
@@ -3039,7 +3039,7 @@ syCompSet:
 syCompLDMonoPeak:
   pushad
   fld     dword [ebp + syWComp.pkval1]     ; <pv>
-.lp
+.lp:
     fld     dword [esi]           ; <l> <pv>
     fadd    dword [esi + 4]       ; <l+r> <pv>
     fmul    dword [fci2]          ; <in> <pv>
@@ -3055,7 +3055,7 @@ syCompLDMonoPeak:
     cmp     eax,  [temp + 4]
     jbe     .nonp
     mov     [temp + 4], eax
-.nonp
+.nonp:
     fld     dword [temp + 4]      ; <npv>
     fld     st0
     fmul    dword [ebp + syWComp.invol]
@@ -3073,7 +3073,7 @@ syCompLDMonoRMS:
   fld    dword [ebp + syWComp.rmsval1]  ; <rv>
   mov    eax,  [ebp + syWComp.rmscnt]
   lea    edx,  [ebp + syWComp.rmsbuf]
-.lp
+.lp:
     fsub    dword [edx + 4*eax]   ; <rv'>
     fld     dword [esi]           ; <l> <rv'>
     fadd    dword [esi + 4]       ; <l+r> <rv'>
@@ -3105,7 +3105,7 @@ syCompLDStereoPeak:
   pushad
   fld     dword [ebp + syWComp.pkval2]     ; <rpv>
   fld     dword [ebp + syWComp.pkval1]     ; <lpv> <rpv>
-.lp
+.lp:
     fmul    dword [fccpdfalloff]  ; <lpv'> <rpv>
     fxch    st1                   ; <rpv> <lpv'>
     fmul    dword [fccpdfalloff]  ; <rpv'> <lpv'>
@@ -3123,13 +3123,13 @@ syCompLDStereoPeak:
     cmp     eax,  [temp]
     jbe     .nonp1
     mov     [temp], eax
-.nonp1
+.nonp1:
     mov     eax,  [esi+4]
     and     eax,  7fffffffh       ; fabs()
     cmp     eax,  [temp+4]
     jbe     .nonp2
     mov     [temp+4], eax
-.nonp2
+.nonp2:
     lea     esi,  [esi+8]
     fld     dword [temp+4]        ; <nrpv>
     fld     st0
@@ -3153,7 +3153,7 @@ syCompLDStereoRMS:
   fld    dword [ebp + syWComp.rmsval1]  ; <lrv> <rrv>
   mov    eax,  [ebp + syWComp.rmscnt]
   lea    edx,  [ebp + syWComp.rmsbuf]
-.lp
+.lp:
     fsub    dword [edx + 8*eax]     ; <lrv'> <rrv>
     fxch    st1                     ; <rrv> <lrv'>
     fsub    dword [edx + 8*eax + 4] ; <rrv'> <lrv'>
@@ -3207,7 +3207,7 @@ syCompLDStereoRMS:
 ; st0: current gain value
 syCompProcChannel:
   pushad
-.cloop
+.cloop:
 
     fst     dword [temp]
 
@@ -3221,7 +3221,7 @@ syCompProcChannel:
     cmp     edx,  [ebp + syWComp.dblen]
     jbe     .norst
     xor     edx, edx
-.norst
+.norst:
     
     ; destgain ermitteln
     mov     eax,  [edi]
@@ -3229,7 +3229,7 @@ syCompProcChannel:
     jae     .docomp
     fld1                                  ; <dgain> <v> <gain>
     jmp     .cok
-.docomp
+.docomp:
     fld     dword [edi]                   ; <lvl> <v> <gain>
     fld1                                  ; <1> <lvl> <v> <gain>
     fsubp   st1, st0                      ; <lvl-1> <v> <gain>
@@ -3238,7 +3238,7 @@ syCompProcChannel:
     faddp   st1, st0                      ; <1+r*(lvl-1)> <v> <gain>
     fld1                                  ; <1> <1+r*(lvl-1)> <v> <gain>
     fdivrp  st1, st0                      ; <dgain> <v> <gain>
-.cok
+.cok:
     lea     edi,  [edi+8]
 
     fst     dword [temp+4]
@@ -3247,10 +3247,10 @@ syCompProcChannel:
     jb      .attack
     fld     dword [ebp + syWComp.release] ; <spd> <dgain> <v> <gain>
     jmp     .cok2
-.attack
+.attack:
     fld     dword [ebp + syWComp.attack]  ; <spd> <dgain> <v> <gain>
     
-.cok2
+.cok2:
     ; und compressen
     fxch    st1                           ; <dg> <spd> <v> <gain>
     fsub    st0, st3                      ; <dg-gain> <spd> <v> <gain>
@@ -3290,7 +3290,7 @@ syCompRender:
   popad
   ret
 
-.doit 
+.doit:
   ; STEP 1: level detect (fills LD buffers)
 
   lea     edi,  [vcebuf]
@@ -3311,7 +3311,7 @@ syCompRender:
   fstp st0
   pop  edi
   pop  ecx
-.fpuok
+.fpuok:
 
   ; STEP 2: compress!
   lea     ebx, [ebp + syWComp.dbuf]
@@ -3376,14 +3376,14 @@ lenar0 	equ 205		; right all pass delay 0
 lenar1 	equ 77		; right all pass delay 1
 
 global _REVERB_
-_REVERB_
+_REVERB_:
 
 struc syVReverb
 	.revtime	resd 1
 	.highcut  resd 1
   .lowcut   resd 1
 	.vol      resd 1
-	.size
+	.size:
 endstruc
 
 struc syCReverb
@@ -3396,13 +3396,13 @@ struc syCReverb
   .gainin	resd 1          ; input gain
   .damp		resd 1          ; high cut   (1-val²)
   .lowcut resd 1          ; low cut    (val²)
-	.size
+	.size:
 endstruc
 
 struc syWReverb
  .setup   resb syCReverb.size
  ; positions of delay lines
- .dyn
+ .dyn:
  .poscl0 	resd 1
  .poscl1 	resd 1
  .poscl2 	resd 1
@@ -3441,7 +3441,7 @@ struc syWReverb
  .linear0 	resd lenar0
  .linear1 	resd lenar1
 
- .size
+ .size:
 endstruc
 
 ; see struct above
@@ -3450,7 +3450,7 @@ syRvDefs  dd 0.966384599, 0.958186359, 0.953783929, 0.950933178, 0.994260075, 0.
 					dd 0.8	; high cut
 
 
-syReverbInit	
+syReverbInit:
 	pushad
 	xor    eax, eax
  	mov    ecx, syWReverb.size
@@ -3459,7 +3459,7 @@ syReverbInit
 	popad
 	ret
 
-syReverbReset
+syReverbReset:
 	pushad
 	xor    eax, eax
  	mov    ecx, syWReverb.size-syWReverb.dyn
@@ -3469,7 +3469,7 @@ syReverbReset
 	ret
 
 
-syReverbSet
+syReverbSet:
   pushad
 
   fld    dword [esi + syVReverb.revtime]
@@ -3480,7 +3480,7 @@ syReverbSet
 	fmul   st0, st0
 	fmul   dword [SRfclinfreq]
 	xor    ecx, ecx
-.rtloop
+.rtloop:
 	  fld  st0
     fld  dword [syRvDefs+4*ecx]
 		call pow
@@ -3509,7 +3509,7 @@ syReverbSet
 	ret
 
 
-syReverbProcess
+syReverbProcess:
   pushad
   V2PerfEnter V2Perf_REVERB
 
@@ -3521,7 +3521,7 @@ syReverbProcess
   xor    ebx, ebx
 	mov    eax, ecx
 
-.sloop          ; prinzipiell nur ne große schleife
+.sloop:          ; prinzipiell nur ne große schleife
 	; step 1: get input sample
 	fld		 dword [esi]																  						; <in'> <damp> <lc> <0>
 	fmul	 dword [ebp + syWReverb.setup + syCReverb.gainin]     	; <in> <damp> <lc> <0>
@@ -3765,7 +3765,7 @@ syReverbProcess
 	call   syReverbReset
 
 
-.dontpanic
+.dontpanic:
 
   V2PerfLeave V2Perf_REVERB
 	popad
@@ -3777,7 +3777,7 @@ syReverbProcess
 ;#####################################################################################
 
 global _V2CHAN_
-_V2CHAN_
+_V2CHAN_:
 
 struc syVChan
 	.chanvol resd 1
@@ -3792,7 +3792,7 @@ struc syVChan
 	.cdist   resb syVDist.size
 	.chorus  resb syVModDel.size
   .compr   resb syVComp.size
-	.size
+	.size:
 endstruc
 
 struc syWChan
@@ -3808,12 +3808,12 @@ struc syWChan
 	.distw  resb syWDist.size
 	.chrw		resb syWModDel.size
   .compw  resb syWComp.size
-	.size
+	.size:
 endstruc
 
 
 ; ebp: wchan
-syChanInit
+syChanInit:
   pushad
 	lea		ebp, [ebp + syWChan.distw]
 	call	syDistInit
@@ -3828,7 +3828,7 @@ syChanInit
 
 ; esi: vchan
 ; ebp: wchan
-syChanSet
+syChanSet:
   pushad
   fld		dword [esi + syVChan.auxarcv]
 	fmul	dword [fci128]
@@ -3875,7 +3875,7 @@ syChanSet
 	popad 
 	ret
 
-syChanProcess
+syChanProcess:
   pushad
 
 	; AuxA Receive		CHAOS
@@ -3885,7 +3885,7 @@ syChanProcess
 	push	ecx
 	mov		edi, chanbuf
 	mov   esi, auxabuf
-.auxarcvloop
+.auxarcvloop:
 		fld		dword [esi]
 		fmul  dword [ebp + syWChan.aarcv]
 		fld		dword [esi+4]
@@ -3902,7 +3902,7 @@ syChanProcess
 		dec ecx
 	jnz		.auxarcvloop
 	pop		ecx
-.noauxarcv
+.noauxarcv:
 
 	; AuxB Receive		CHAOS
 	mov   eax, [ebp + syWChan.abrcv]
@@ -3911,7 +3911,7 @@ syChanProcess
 	push	ecx
 	mov		edi, chanbuf
 	mov   esi, auxbbuf
-.auxbrcvloop
+.auxbrcvloop:
 		fld		dword [esi]
 		fmul  dword [ebp + syWChan.abrcv]
 		fld		dword [esi+4]
@@ -3928,7 +3928,7 @@ syChanProcess
 		dec ecx
 	jnz		.auxbrcvloop
 	pop		ecx
-.noauxbrcv
+.noauxbrcv:
 
 
 
@@ -3950,14 +3950,14 @@ syChanProcess
 	call	syModDelRenderChan
 	lea		ebp, [ebp - syWChan.chrw + 0]
 	jmp   short .weiterso
-.otherway
+.otherway:
 	lea		ebp, [ebp + syWChan.chrw - 0]
 	call	syModDelRenderChan
 	lea		ebp, [ebp + syWChan.distw - syWChan.chrw]
 	call	syDistRenderStereo
 	lea		ebp, [ebp + 0 - syWChan.distw]
 
-.weiterso
+.weiterso:
 
 	; Aux1...
 	mov   eax, [ebp + syWChan.a1gain]
@@ -3967,7 +3967,7 @@ syChanProcess
 	push	ecx
 	push  esi
 	lea   edi, [aux1buf]
-.aux1loop
+.aux1loop:
 		fld		dword [esi]
 		fadd	dword [esi+4]
 		lea   esi, [esi+8]
@@ -3980,7 +3980,7 @@ syChanProcess
 	pop   esi
 	pop		ecx
 
-.noaux1
+.noaux1:
 
 	; ... und Aux2.
 	mov   eax, [ebp + syWChan.a2gain]
@@ -3989,7 +3989,7 @@ syChanProcess
 	push	ecx
 	push  esi
 	lea   edi, [aux2buf]
-.aux2loop
+.aux2loop:
 		fld		dword [esi]
 		fadd	dword [esi+4]
 		lea   esi, [esi+8]
@@ -4002,7 +4002,7 @@ syChanProcess
 	pop   esi
 	pop		ecx
 
-.noaux2
+.noaux2:
 
 	; AuxA...		CHAOS
 	mov   eax, [ebp + syWChan.aasnd]
@@ -4011,7 +4011,7 @@ syChanProcess
 	push	ecx
 	push  esi
 	mov   edi, auxabuf
-.auxaloop
+.auxaloop:
 		fld		dword [esi]
 		fmul  dword [ebp + syWChan.aasnd]
 		fld		dword [esi+4]
@@ -4029,7 +4029,7 @@ syChanProcess
 	jnz		.auxaloop
 	pop   esi
 	pop		ecx
-.noauxa
+.noauxa:
 
 	; AuxB...		CHAOS
 	mov   eax, [ebp + syWChan.absnd]
@@ -4038,7 +4038,7 @@ syChanProcess
 	push	ecx
 	push  esi
 	mov   edi, auxbbuf
-.auxbloop
+.auxbloop:
 		fld		dword [esi]
 		fmul  dword [ebp + syWChan.absnd]
 		fld		dword [esi+4]
@@ -4056,11 +4056,11 @@ syChanProcess
 	jnz		.auxbloop
 	pop   esi
 	pop		ecx
-.noauxb
+.noauxb:
 
   ; Chanbuf in Mainbuffer kopieren
 	mov		edi, mixbuf
-.ccloop			
+.ccloop:
 		fld		dword [esi]
 		fmul  dword [ebp + syWChan.chgain]
 		fld		dword [esi+4]
@@ -4103,7 +4103,7 @@ storeChanValues:
 	push esi
 	xor  ecx, ecx
 	mov  cl, v2sound.chan
-.goloop
+.goloop:
 		movzx eax, byte [edi + ecx]
 		mov   [temp], eax
 		fild  dword [temp]
@@ -4127,21 +4127,21 @@ storeChanValues:
 	jnz  .modloop
 	jmp  .modend
 
-.modloop
+.modloop:
 		movzx   eax, byte [edi + v2mod.dest]
 		cmp     al, v2sound.chan
 		jb      .mlegw
 		cmp     al, v2sound.endcdvals
 		jb      .mok
-.mlegw
+.mlegw:
 		jmp     .mlend
-.mok
+.mok:
 		movzx		eax, byte [edi + v2mod.source]  ; source
 		or      eax, eax
 		jnz     .mnotvel
 		fld     dword [ebp + syWV2.velo]
 		jmp			.mdo
-.mnotvel
+.mnotvel:
 		cmp     al, 8
 		jae     .mnotctl		
 ;		jae     .mlend
@@ -4149,21 +4149,21 @@ storeChanValues:
 		mov     [temp], eax
 		fild    dword [temp]
 		jmp     .mdo
-.mnotctl
+.mnotctl:
     cmp     al, 12
     jae     .mnotvm
 		and     al, 3
 		mov     eax, [sVTab + 4*eax]
 		fld     dword [ebp + eax]
 		jmp     .mdo
-.mnotvm
+.mnotvm:
     cmp     al, 13
     jne     .mnotnote
-.mnotnote
+.mnotnote:
     fild    dword [ebp + syWV2.note]
     fsub    dword [fc48]
     fadd    st0, st0		
-.mdo
+.mdo:
 		movzx   eax, byte [edi + v2mod.val]
 		mov     [temp], eax
 		fild    dword [temp]
@@ -4180,23 +4180,23 @@ storeChanValues:
 		or      edx, edx
 		jns     .mnoclip1
 		xor     edx, edx
-.mnoclip1
+.mnoclip1:
     cmp     edx, 43000000h
 		jbe     .mnoclip2
 		mov     edx, 43000000h
-.mnoclip2
+.mnoclip2:
 		mov			[esi + 4*eax], edx
-.mlend
+.mlend:
 		lea edi, [edi+3]
 	  dec ecx
 	jz .modend
 	jmp .modloop
-.modend
+.modend:
   
   pop ebp
 	call syChanSet
 
-.end
+.end:
 	popad
 	ret
 
@@ -4214,7 +4214,7 @@ storeChanValues:
 %ifdef RONAN
 
 global _RONAN_
-_RONAN_
+_RONAN_:
 
 extern _ronanCBInit@0
 extern _ronanCBTick@0
@@ -4226,28 +4226,28 @@ extern _ronanCBProcess@8
 extern _ronanCBSetSR@4
 
 ; ebp: this
-syRonanInit
+syRonanInit:
 	pushad
 	call _ronanCBInit@0
 	popad
 	ret
 
 ; ebp: this
-syRonanNoteOn
+syRonanNoteOn:
 	pushad
 	call _ronanCBNoteOn@0
 	popad
 	ret
 
 ; ebp: this
-syRonanNoteOff
+syRonanNoteOff:
 	pushad
 	call _ronanCBNoteOff@0
 	popad
 	ret
 
 ; ebp: this
-syRonanTick
+syRonanTick:
 	pushad
 	call _ronanCBTick@0
 	popad
@@ -4256,7 +4256,7 @@ syRonanTick
 ; ebp: this
 ; esi: buffer
 ; ecx: count
-syRonanProcess
+syRonanProcess:
 	pushad
 	V2PerfEnter V2Perf_RONAN
 	push    ecx
@@ -4278,26 +4278,26 @@ struc v2sound
    ; voice dependent sachen
 
 	.voice			resb syVV2.size/4
-	.endvdvals
+	.endvdvals:
 
   ; globale pro-channel-sachen
 	.chan				resb syVChan.size/4
-	.endcdvals
+	.endcdvals:
 
 	; manuelles rumgefake
   .maxpoly		resb 1
 
 	; modmatrix
 	.modnum			resb 1
-	.modmatrix
-	.size
+	.modmatrix:
+	.size:
 endstruc
 
 struc v2mod
 	.source   resb 1   ; source: vel/ctl1-7/aenv/env2/lfo1/lfo2
 	.val      resb 1   ; 0 = -1 .. 128=1
 	.dest     resb 1   ; destination (index into v2sound)
-	.size     
+	.size:
 endstruc
 
 
@@ -4312,7 +4312,7 @@ section .bss
 struc CHANINFO
   .pgm      resb 1
 	.ctl      resb 7
-	.size
+	.size:
 endstruc
 
 struc SYN
@@ -4333,14 +4333,14 @@ struc SYN
   .chansv		resb 16*syVChan.size
   .chansw		resb 16*syWChan.size
 
-	.globalsstart
+	.globalsstart:
 	.rvbparm  resb syVReverb.size
 	.delparm  resb syVModDel.size
 	.vlowcut  resd 1
 	.vhighcut resd 1
   .cprparm  resb syVComp.size
 	.guicolor	resb 1			; CHAOS gui logo color (has nothing to do with sound but should be saved with patch)
-	.globalsend
+	.globalsend:
 
 	.reverb   resb syWReverb.size
 	.delay    resb syWModDel.size
@@ -4358,11 +4358,11 @@ struc SYN
   .mainvu   resd 2
 %endif  
 
-	.size
+	.size:
 endstruc
 
 global _DATA_
-_DATA_
+_DATA_:
 data			resb SYN.size
 
 
@@ -4396,7 +4396,7 @@ _synthInit@8:
 
 		mov cl, POLY
 		mov ebp, data + SYN.voicesw
-.siloop1
+.siloop1:
       call	syV2Init
 			lea		ebp, [ebp+syWV2.size]
 			mov   dword [data + SYN.chanmap - 4 + 4*ecx], -1
@@ -4405,7 +4405,7 @@ _synthInit@8:
 
 		mov cl, 0
 		mov ebp, data + SYN.chansw
-.siloop2
+.siloop2:
 			mov   byte [data + SYN.chans + 8*ecx + 7], 7fh
 			mov   eax, ecx
 			shl   eax, 14
@@ -4487,7 +4487,7 @@ _synthRender@16:
 		  fldcw [oldfpcw] ; nix zu tun? -> ende
 		  popad
 		  ret 16
-.doit
+.doit:
 
 			; neuer Frame nötig?
 			mov   ebx, [data + SYN.tickd]
@@ -4496,7 +4496,7 @@ _synthRender@16:
 
 	    ; tick abspielen
 			xor   edx, edx
-.tickloop 
+.tickloop:
         mov		eax, [data + SYN.chanmap + 4*edx]
 				or		eax, eax
 				js		.tlnext
@@ -4513,14 +4513,14 @@ _synthRender@16:
 				not   eax
         mov		[data + SYN.chanmap + 4*edx], eax
 				jmp   .tlnext
-.stillok
-.tlnext 
+.stillok:
+.tlnext:
 				inc   edx
 				cmp   dl, POLY
 			jne .tickloop
 
 			xor   ebx, ebx
-.tickloop2
+.tickloop2:
 				call  storeChanValues
 				inc   ebx
 				cmp   bl, 16
@@ -4535,7 +4535,7 @@ _synthRender@16:
 			mov   [data + SYN.tickd], ecx
 			call  .RenderBlock
 
-.nonewtick 
+.nonewtick:
 
       ; daten in destination umkopieren
 			mov   eax, [todo]
@@ -4550,7 +4550,7 @@ _synthRender@16:
 			cmp   eax, ecx
 		  jge   .tickdg
 			mov   ecx, eax
-.tickdg
+.tickdg:
 			sub   eax, ecx
 			sub   ebx, ecx
 			mov   [todo], eax
@@ -4566,7 +4566,7 @@ _synthRender@16:
 			or    eax, eax
 			jz    .seploopreplace
 
-			.seploopadd
+			.seploopadd:
 			  mov eax, [edi]
 				mov edx, [ebx]
 				add eax, [esi]
@@ -4580,7 +4580,7 @@ _synthRender@16:
 		  jnz .seploopadd
 			jz  .seploopend
 
-			.seploopreplace
+			.seploopreplace:
 				mov eax, [esi]
 				mov edx, [esi+4]
 				lea esi, [esi+8]
@@ -4591,13 +4591,13 @@ _synthRender@16:
 				dec ecx
 		  jnz .seploopreplace
 			
-			.seploopend
+			.seploopend:
 			mov [outptr], edi
 			mov [outptr+4], ebx
 			jmp .fragloop
 
 
-.interleaved
+.interleaved:
 			shl   ecx, 1
 			rep   movsd
 			mov   [outptr], edi
@@ -4606,7 +4606,7 @@ _synthRender@16:
 
 
 
-.RenderBlock
+.RenderBlock:
 		pushad
 		V2PerfClear
 		V2PerfEnter V2Perf_TOTAL
@@ -4641,11 +4641,11 @@ _synthRender@16:
 
     ; process all channels
 		xor   ecx, ecx
-.chanloop
+.chanloop:
       push ecx
 			; check if voices are active
 			xor edx, edx		
-.cchkloop
+.cchkloop:
 				cmp ecx, [data + SYN.chanmap + 4*edx]
 				je  .dochan
 				inc edx
@@ -4657,7 +4657,7 @@ _synthRender@16:
       mov		[data + SYN.chanvu + 8*ecx + 4], eax   
 %endif						
 			jmp .chanend
-.dochan
+.dochan:
 			; clear channel buffer
 			mov edi, chanbuf
 			mov ecx, [todo+4]
@@ -4667,7 +4667,7 @@ _synthRender@16:
 
 			; process all voices belonging to that channel
 			xor		edx, edx
-.vceloop
+.vceloop:
 				pop		ecx
 				push	ecx
 				cmp		ecx, [data + SYN.chanmap + 4*edx]
@@ -4680,7 +4680,7 @@ _synthRender@16:
 				mov   ecx, [todo+4]
 				call	syV2Render
 				
-.vceend 
+.vceend:
 				inc edx
 				cmp dl, POLY
 			jne .vceloop
@@ -4695,7 +4695,7 @@ _synthRender@16:
 			mov		ecx, [todo+4]
 			lea   esi, [chanbuf]
 			call  syRonanProcess
-.noronan
+.noronan:
 %endif
 			
 			pop		ecx
@@ -4714,14 +4714,14 @@ _synthRender@16:
 		  call  .vumeter
 %endif		  
 			
-.chanend
+.chanend:
 			pop ecx
 			inc ecx
 			cmp cl, 16
 		je .clend
 		jmp .chanloop
 
-.clend
+.clend:
 
 		
 		; Reverb/Delay draufrechnen
@@ -4742,7 +4742,7 @@ _synthRender@16:
 		fld   dword [data + SYN.lcbufr]   ; <lcbr> <hcbr>
 		fld   dword [data + SYN.hcbufl]   ; <hcbl> <lcbr> <hcbr>
 		fld   dword [data + SYN.lcbufl]   ; <lcbl> <hcbl> <lcbr> <hcbr>
-.lhcloop
+.lhcloop:
 			; low cut
 			fld			st0                       ; <lcbl> <lcbl> <hcbl> <lcbr> <hcbr>
 			fsubr		dword [esi]								; <in-l=lcoutl> <lcbl> <hcbl> <lcbr> <hcbr>
@@ -4770,7 +4770,7 @@ _synthRender@16:
 			faddp   st4, st0                  ; <lcbl'> <hcbl'> <lcbr'> <hcbr'>
 			fld     st3                       ; <hcoutr> <lcbl'> <hcbl'> <lcbr'> <hcbr'>
 			fld     st2                       ; <hcoutl> <hcoutr> <lcbl'> <hcbl'> <lcbr'> <hcbr'>
-.nohighcut
+.nohighcut:
 			fstp    dword [esi]               ; <outr> <lcbl'> <hcbl> <lcbr'> <hcbr>
 			fstp    dword [esi+4]             ; <lcbl'> <hcbl> <lcbr'> <hcbr>
 			lea			esi, [esi+8]
@@ -4790,7 +4790,7 @@ _synthRender@16:
 		lea		ebp, [data + SYN.compr]
     call  syCompRender
 
-.renderend
+.renderend:
 %ifdef VUMETER
 		mov		ecx, [todo+4]
 		mov   esi, mixbuf
@@ -4806,7 +4806,7 @@ _synthRender@16:
 
 
 %ifdef VUMETER
-.vumeter
+.vumeter:
       ; esi: srcbuf, ecx: len, edi: &outv
       pushad
       mov   [temp], ecx
@@ -4814,19 +4814,19 @@ _synthRender@16:
 		  jnz		.vurms
 		  
 		  ; peak vu meter
-		  .vploop
+		  .vploop:
 		    mov		eax, [esi]
 		    and   eax, 0x7fffffff
 		    cmp   eax, [edi]
 		    jbe   .vplbe1
 		    mov   [edi], eax
-		    .vplbe1
+		    .vplbe1:
 		    mov		eax, [esi+4]
 		    and   eax, 0x7fffffff
 		    cmp   eax, [edi+4]
 		    jbe   .vplbe2
 		    mov   [edi+4], eax
-		    .vplbe2
+		    .vplbe2:
 		    fld   dword [edi]
 		    fmul  dword [fcvufalloff]
 		    fstp  dword [edi]
@@ -4839,11 +4839,11 @@ _synthRender@16:
 				popad
 				ret
 
-.vurms		  
+.vurms:
 			  ; rms vu meter			 
 		    fldz											; <lsum>
 		    fldz											; <rsum> <lsum>
-		    .vrloop
+		    .vrloop:
 		      fld     dword [esi]     ; <l> <rsum> <lsum>
 		      fmul    st0, st0        ; <l²> <rsum> <lsum>
 		      faddp   st2, st0        ; <rsum> <lsum'>
@@ -4872,7 +4872,7 @@ _synthRender@16:
 ; PROCESS MIDI MESSAGES
 
 global _MIDI_
-_MIDI_
+_MIDI_:
 
 global _synthProcessMIDI@4
 
@@ -4899,22 +4899,22 @@ _synthProcessMIDI@4:
 	fldcw	[temp]
 
 	mov		esi, [esp + 36]
-.mainloop
+.mainloop:
 		xor		eax, eax	
 		mov		al, [esi]
 		test	al, 80h
 		jz    .nocmd
 		cmp   al, 0fdh  ; end of stream ?
 		jne   .noend
-.end
+.end:
     fldcw [oldfpcw]
 		popad
 		ret 4
-.noend
+.noend:
     mov   [data + SYN.mrstat], eax ; update running status
 		inc   esi
 		mov		al, [esi]
-.nocmd
+.nocmd:
 		mov   ebx, [data + SYN.mrstat]
 		mov   ecx, ebx
 		and   cl, 0fh
@@ -4946,7 +4946,7 @@ ProcessNoteOff:
 	popad
 %endif
 	
-.srvloop
+.srvloop:
     cmp   ecx, [data + SYN.chanmap+4*edx] ; richtiger channel?
 		jne		.srvlno
 		mov		eax, edx
@@ -4959,12 +4959,12 @@ ProcessNoteOff:
 
 		call  syV2NoteOff
 		jmp   .end
-.srvlno
+.srvlno:
     inc   edx
 		cmp   dl, POLY
 	jne .srvloop
 		  
-.end
+.end:
   add esi, byte 2
 	ret
 
@@ -4979,7 +4979,7 @@ ProcessNoteOn:
 	or  al, al
 	jnz .isnoteon
 	jmp ProcessNoteOff
-.isnoteon
+.isnoteon:
 
 %ifdef RONAN
 	cmp		cl, 15 ; Speechsynth-Channel?
@@ -4987,7 +4987,7 @@ ProcessNoteOn:
 	pushad
 	call  _ronanCBNoteOn@0
 	popad
-.noronan
+.noronan:
 %endif
 
 	movzx eax, byte [data + SYN.chans + 8*ecx]   ; pgmnummer
@@ -4998,12 +4998,12 @@ ProcessNoteOn:
 	; maximale polyphonie erreicht?
 	xor ebx, ebx
 	mov edx, POLY
-.chmploop
+.chmploop:
     mov eax, [data + SYN.chanmap+4*edx - 4]
 		cmp eax, ecx
 		jne .notthischan
 		inc ebx
-.notthischan
+.notthischan:
     dec edx
 	jnz .chmploop
 
@@ -5012,7 +5012,7 @@ ProcessNoteOn:
 
 	; freie voice suchen
 	xor edx, edx
-.sfvloop1
+.sfvloop1:
     mov	eax, [data + SYN.chanmap+4*edx]
 		or	eax, eax
 		js	.foundfv
@@ -5025,7 +5025,7 @@ ProcessNoteOn:
 	xor	ebx, ebx
 	xor edx, edx
 	not edx
-.sfvloop2
+.sfvloop2:
 		mov		eax, ebx
 		imul	eax, syWV2.size
 		mov   eax, [data + SYN.voicesw + eax + syWV2.gate]
@@ -5035,7 +5035,7 @@ ProcessNoteOn:
 		jbe		.sfvl2no
 		mov		edi, [data + SYN.allocpos+4*ebx]
 		mov		edx, ebx
-.sfvl2no
+.sfvl2no:
 		inc ebx
 		cmp bl, POLY
 	jne .sfvloop2
@@ -5046,26 +5046,26 @@ ProcessNoteOn:
 	; immer noch keine freie? gut, dann die ganz älteste
 	mov eax, [data + SYN.curalloc]
 	xor	ebx, ebx
-.sfvloop3
+.sfvloop3:
 		cmp eax, [data + SYN.allocpos+4*ebx]
 		jbe .sfvl3no
 		mov eax, [data + SYN.allocpos+4*ebx]
 		mov edx, ebx
-.sfvl3no
+.sfvl3no:
 		inc ebx
 		cmp bl, POLY
 	jne .sfvloop3
 	; ok... die nehmen wir jezz.
-.foundfv
+.foundfv:
 	jmp .donoteon
 
-.killvoice		
+.killvoice:
   ; älteste voice dieses channels suchen
 	mov	edi, [data + SYN.curalloc]
 	xor	ebx, ebx
 	xor edx, edx
 	not edx
-.skvloop2
+.skvloop2:
 		cmp		ecx, [data + SYN.chanmap+4*ebx]
 		jne		.skvl2no
 		mov		eax, ebx
@@ -5077,7 +5077,7 @@ ProcessNoteOn:
 		jbe		.skvl2no
 		mov		edi, [data + SYN.allocpos+4*ebx]
 		mov		edx, ebx
-.skvl2no
+.skvl2no:
 		inc ebx
 		cmp bl, POLY
 	jne .skvloop2
@@ -5088,20 +5088,20 @@ ProcessNoteOn:
   ; nein? -> älteste voice suchen
 	mov eax, [data + SYN.curalloc]
 	xor ebx, ebx
-.skvloop
+.skvloop:
 		cmp ecx, [data + SYN.chanmap+4*ebx]
 		jne .skvlno
 		cmp eax, [data + SYN.allocpos+4*ebx]
 		jbe .skvlno
 		mov eax, [data + SYN.allocpos+4*ebx]
 		mov edx, ebx
-.skvlno
+.skvlno:
     inc ebx
 		cmp bl, POLY
 	jne .skvloop
 	; ... und damit haben wir die voice, die fliegt.
 
-.donoteon
+.donoteon:
 	; (ecx immer noch chan, edx voice, ebp ptr auf sound)
 	mov [data + SYN.chanmap  + 4*edx], ecx  ; channel
 	mov [data + SYN.voicemap + 4*ecx], edx  ; current voice
@@ -5159,12 +5159,12 @@ ProcessControlChange:
 %endif
 
 	
-.end
+.end:
   add esi,2
 	ret
 	
 %ifdef FULLMIDI	
-.chanmode
+.chanmode:
   cmp al, 120
   jb  .end
   ja  .noalloff
@@ -5172,12 +5172,12 @@ ProcessControlChange:
 	; CC #120 : All Sound Off
 	xor edx, edx
 	mov ebp, data + SYN.voicesw
-.siloop1
+.siloop1:
     cmp   byte [data + SYN.chanmap - 4 + 4*edx], cl
     jnz   .noreset
     call	syV2Init
 		mov   dword [data + SYN.chanmap - 4 + 4*edx], -1
-.noreset
+.noreset:
 		lea		ebp, [ebp+syWV2.size]
 		inc   dl
 		cmp   dl, POLY
@@ -5186,7 +5186,7 @@ ProcessControlChange:
 	jmp short .end
   
   
-.noalloff
+.noalloff:
   cmp al, 121
   ja  .noresetcc
   ; CC #121 : Reset All Controllers
@@ -5194,7 +5194,7 @@ ProcessControlChange:
 
 	jmp short .end
   
-.noresetcc
+.noresetcc:
   cmp al, 123
   jb  .end
   ; CC #123 : All Notes Off
@@ -5206,16 +5206,16 @@ ProcessControlChange:
 	pushad
 	call  _ronanCBNoteOff@0
 	popad
-.noronanoff
+.noronanoff:
 %endif
 	
 	xor edx, edx
 	mov ebp, data + SYN.voicesw
-.noffloop1
+.noffloop1:
     cmp   byte [data + SYN.chanmap - 4 + 4*edx], cl
     jnz   .nonoff
 		call  syV2NoteOff
-.nonoff
+.nonoff:
 		lea		ebp, [ebp+syWV2.size]
 		inc   dl
 		cmp   dl, POLY
@@ -5244,17 +5244,17 @@ ProcessProgramChange:
   xor edx, edx
 	xor eax, eax
 	not eax
-.notausloop
+.notausloop:
 	  cmp ecx, [data + SYN.chanmap + 4*edx]
 		jnz .nichtaus
 		mov [data + SYN.chanmap + 4*edx], eax
-.nichtaus
+.nichtaus:
 		inc edx
 		cmp dl, POLY
 	jne .notausloop
 
 	; pgm setzen und controller resetten
-.sameprg
+.sameprg:
 	mov   cl, 6
   inc		esi
 	inc		edi
@@ -5293,7 +5293,7 @@ ProcessRealTime:
 	call _synthInit@8
 	popad
 
-.noreset
+.noreset:
 %endif
 	ret
 
@@ -5303,14 +5303,14 @@ ProcessRealTime:
 
 
 global _synthSetGlobals@4
-_synthSetGlobals@4
+_synthSetGlobals@4:
 	pushad
 	xor   eax, eax
 	xor   ecx, ecx
 	mov   esi, [esp+36]
 	lea   edi, [data + SYN.rvbparm]
   mov   cl,  (SYN.globalsend-SYN.globalsstart)/4
-.cvloop
+.cvloop:
 		lodsb
 		mov   [temp], eax
 		fild  dword [temp]
@@ -5401,13 +5401,13 @@ _synthGetPoly@4:
 	rep stosd
 
 	mov edi, [esp + 36]
-.gploop
+.gploop:
 		mov ebx, [data + SYN.chanmap + 4*eax]
 		or  ebx, ebx
 		js  .gplend
 		inc dword [edi + 4*ebx]
 		inc dword [edi + 4*16]
-.gplend
+.gplend:
     inc eax
 		cmp al, POLY
 	jne .gploop
@@ -5423,7 +5423,7 @@ _synthGetPgm@4:
 	mov edi, [esp + 36]
 	xor ecx, ecx
 
-.gploop
+.gploop:
 		movzx eax, byte [data + SYN.chans + 8*ecx]
 		stosd
     inc ecx
