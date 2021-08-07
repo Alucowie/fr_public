@@ -82,6 +82,9 @@
     <ClCompile Include="..\engine.cpp" />
     <ClCompile Include="..\kdoc.cpp" />
     <ClCompile Include="..\mainplayer.cpp" />
+    <ClCompile Include="..\_iob.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\materials\material11.hpp">
@@ -154,6 +157,9 @@
     <ClInclude Include="..\engine.hpp" />
     <ClInclude Include="..\kdoc.hpp" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="..\_iob.hpp">
+      <Filter>System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="demo_resource.rc" />

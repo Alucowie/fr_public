@@ -145,6 +145,7 @@
     <ClCompile Include="..\wintimeline.cpp" />
     <ClCompile Include="..\wintool.cpp" />
     <ClCompile Include="..\winview.cpp" />
+    <ClCompile Include="..\_iob.cpp" />
     <ClCompile Include="wz3_main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -176,6 +177,7 @@
     <ClInclude Include="..\wintimeline.hpp" />
     <ClInclude Include="..\wintool.hpp" />
     <ClInclude Include="..\winview.hpp" />
+    <ClInclude Include="..\_iob.hpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="wz3_data.asm">

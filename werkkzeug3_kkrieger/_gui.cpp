@@ -398,7 +398,7 @@ void sGuiManager::OnFrame()
   sGuiWindow *win;
   sScreenInfo si;
   sInt count;
-  static OldMouseX,OldMouseY;
+  static int OldMouseX, OldMouseY;
   sZONE(GuiFrame);
 
   for(i=0;i<PostIndex;i++)
@@ -4696,6 +4696,7 @@ void sControl::OnPaint()
 void sControl::OnKey(sU32 key)
 {
   sChar *s;
+  const sChar *cs;
   sF32 fval;
   sInt len,i;
   sU32 ak;
@@ -4838,34 +4839,34 @@ void sControl::OnKey(sU32 key)
     if(Style & sCS_EDITNUM)
     {
       EditMode = 0;
-      s = Edit;
+      cs = Edit;
       switch(Type)
       {
       case sCT_FIXED:
-        sScanSpace(s);
-        fval = sScanFloat(s);
-        sScanSpace(s);
-        if(*s==0)
+        sScanSpace(cs);
+        fval = sScanFloat(cs);
+        sScanSpace(cs);
+        if(*cs==0)
         {
           DataS[DragZone] = sRange<sInt>(fval*0x10000,Max[DragZone],Min[DragZone]);
           Post(DoneCmd);
         }
         break;
       case sCT_INT:
-        sScanSpace(s);
-        i = sScanInt(s);
-        sScanSpace(s);
-        if(*s==0)
+        sScanSpace(cs);
+        i = sScanInt(cs);
+        sScanSpace(cs);
+        if(*cs==0)
         {
           DataS[DragZone] = sRange<sInt>(i,Max[DragZone],Min[DragZone]);
           Post(DoneCmd);
         }
         break;
       case sCT_HEX:
-        sScanSpace(s);
-        i = sScanHex(s);
-        sScanSpace(s);
-        if(*s==0)
+        sScanSpace(cs);
+        i = sScanHex(cs);
+        sScanSpace(cs);
+        if(*cs==0)
         {
           DataU[DragZone] = sRange<sU32>(i,Max[DragZone],Min[DragZone]);
           Post(DoneCmd);
@@ -4873,10 +4874,10 @@ void sControl::OnKey(sU32 key)
         break;
       case sCT_RGBA:
       case sCT_RGB:
-        sScanSpace(s);
-        i = sScanInt(s);
-        sScanSpace(s);
-        if(*s==0)
+        sScanSpace(cs);
+        i = sScanInt(cs);
+        sScanSpace(cs);
+        if(*cs==0)
         {
           DataU[DragZone] = sRange<sU32>(i,255,0);
           DataU[DragZone] |= DataU[DragZone]<<8;
@@ -4885,20 +4886,20 @@ void sControl::OnKey(sU32 key)
         break;
       case sCT_URGBA:
       case sCT_URGB:
-        sScanSpace(s);
-        i = sScanInt(s);
-        sScanSpace(s);
-        if(*s==0)
+        sScanSpace(cs);
+        i = sScanInt(cs);
+        sScanSpace(cs);
+        if(*cs==0)
         {
           DataU8[DragZone] = sRange<sU32>(i,255,0);
           Post(DoneCmd);
         }
         break;
       case sCT_FLOAT:
-        sScanSpace(s);
-        fval = sScanFloat(s);
-        sScanSpace(s);
-        if(*s==0)
+        sScanSpace(cs);
+        fval = sScanFloat(cs);
+        sScanSpace(cs);
+        if(*cs==0)
         {
           DataF[DragZone] = sRange<sF32>(fval,Max[DragZone],Min[DragZone]);
           Post(DoneCmd);
@@ -4906,10 +4907,10 @@ void sControl::OnKey(sU32 key)
         break;
       case sCT_FRGBA:
       case sCT_FRGB:
-        sScanSpace(s);
-        fval = sScanFloat(s)/255.0f;
-        sScanSpace(s);
-        if(*s==0)
+        sScanSpace(cs);
+        fval = sScanFloat(cs)/255.0f;
+        sScanSpace(cs);
+        if(*cs==0)
         {
           DataF[DragZone] = sRange<sF32>(fval,Max[DragZone],Min[DragZone]);
           Post(DoneCmd);

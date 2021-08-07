@@ -1175,7 +1175,8 @@ sU32 CV2MPlayer::CalcPositions(sS32 **a_dest)
 	sU32 posnum=0;
 	sU32 ttime, td, this32;
 	sF64 curtimer=0;
-	
+	sU32 pn;
+
 	while (gnr<m_base.gdnum)
 	{
 		ttime=lastevtime+(gp[2*m_base.gdnum]<<16)+(gp[m_base.gdnum]<<8)+gp[0];
@@ -1195,7 +1196,7 @@ sU32 CV2MPlayer::CalcPositions(sS32 **a_dest)
 	gp=m_base.gptr;
 	lastevtime=0;
 	pb32=32;
-	for (sU32 pn=0; pn<posnum; pn++)
+	for (pn=0; pn<posnum; pn++)
 	{
 		sU32 curtime=pn*m_base.timediv/8;
 		if (gnr<m_base.gdnum)

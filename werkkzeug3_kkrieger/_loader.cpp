@@ -690,7 +690,7 @@ namespace XSILoader
 {
 ;
 
-sChar *Scan;
+const sChar *Scan;
 sInt ErrorFlag;
 sInt ErrorLine;
 sInt Version;
@@ -1008,7 +1008,7 @@ XSICluster *SI_Shape()
     else if(sCmpMem((sChar *)String,"TEX_COORD_UV",12)==0)
     {
       XSIClusterTSpace *ts = new XSIClusterTSpace;
-      sChar *s = 12+(sChar *)String;
+      const sChar *s = 12+(sChar *)String;
       
       ts->Count = count;
       ts->UV = new sF32[count*2];

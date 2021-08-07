@@ -79,6 +79,7 @@
     <ClCompile Include="..\werkkzeug.cpp" />
     <ClCompile Include="..\werkops.cpp" />
     <ClCompile Include="wz3_main.cpp" />
+    <ClCompile Include="..\_iob.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\genbitmap.hpp">
@@ -149,6 +150,7 @@
     <ClInclude Include="..\novaplayer.hpp" />
     <ClInclude Include="..\script.hpp" />
     <ClInclude Include="..\werkkzeug.hpp" />
+    <ClInclude Include="..\_iob.hpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="effect_jpeg.psh">

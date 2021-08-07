@@ -9,12 +9,13 @@
 static const sChar *ReplaceExtension(const sChar *name,const sChar *newExt)
 {
   static sChar buffer[512];
+  sInt i;
   
   sVERIFY(newExt[0] == '.');
   sCopyString(buffer,name,sizeof(buffer));
 
   // try and find last . in filename
-  for(sInt i=sGetStringLen(buffer)-1;i>=0;i--)
+  for(i=sGetStringLen(buffer)-1;i>=0;i--)
     if(buffer[i] == '.')
       break;
 

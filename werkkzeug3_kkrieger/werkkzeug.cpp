@@ -330,7 +330,7 @@ WerkkzeugApp::WerkkzeugApp()
   sAppendString(buffer,"/default.k",sizeof(buffer));
   FileWindow->SetPath(buffer);
 
-  AddTitle("Werkkzeug "VERSION,0,sCMDLS_EXIT);
+  AddTitle("Werkkzeug " VERSION ,0,sCMDLS_EXIT);
 
 // document
 
@@ -427,7 +427,7 @@ WerkkzeugApp::WerkkzeugApp()
     SceneListWin->UpdateList();
   }
 */
-  LogWin->PrintLine(APPNAME" "VERSION" started.");
+  LogWin->PrintLine(APPNAME" " VERSION " started.");
 }
 
 WerkkzeugApp::~WerkkzeugApp()
@@ -1305,12 +1305,12 @@ void WerkkzeugApp::Export(sChar *name)
   sBool ok;
   sU8 *data,*dataStart;
   static sChar msg[128];
-  WerkExport export;
+  WerkExport export1;
 
   ok = sTRUE;
   data = dataStart = new sU8[64*1024*1024];
 
-  if(!export.Export(Doc,data))
+  if(!export1.Export(Doc,data))
     ok = sFALSE;
   else
   {
@@ -1344,7 +1344,7 @@ void WerkkzeugApp::MakeDemo(sChar *name)
   sU8 *exe,*packedExe;
   sInt outSize;
   static sChar msg[1024];
-  WerkExport export;
+  WerkExport export1;
   //MAPFile map;
   CCAPackerBackEnd pbe;
   PackerFrontEnd *pfe = 0;
@@ -1379,7 +1379,7 @@ void WerkkzeugApp::MakeDemo(sChar *name)
   map.ReadMapFile((sChar*)mapf);
   delete[] mapf;*/
 
-  if(!export.Export(Doc,data))
+  if(!export1.Export(Doc,data))
   {
     sSPrintF(msg,sizeof(msg),"Export failed");
     ok = sFALSE;

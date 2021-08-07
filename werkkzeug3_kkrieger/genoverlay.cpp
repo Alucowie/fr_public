@@ -28,8 +28,10 @@ extern "C" void __stdcall wsprintfA(sChar *str,const sChar *format,...);
 
 /****************************************************************************/
 
+#if sLINK_MTRL20
 #include "effect_jpegps.hpp"
 #include "effect_jpegvs.hpp"
+#endif
 
 static const sU32 EffectJPEGStates[] = {
   sD3DRS_ALPHATESTENABLE,               0,

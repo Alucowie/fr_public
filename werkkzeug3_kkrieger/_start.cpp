@@ -11,6 +11,7 @@
 #define WINVER 0x500
 #define _WIN32_WINNT 0x0500
 #define DIRECTINPUT_VERSION 0x0800
+#define DIRECTSOUND_VERSION 0x0800
 
 #define sPLAYER_SCREENX     800
 #define sPLAYER_SCREENY     600
@@ -45,7 +46,8 @@ const sChar *sWindowTitle="fr-044: patient zero";
 #undef LoadBitmap
 #pragma comment(lib,"winmm.lib")
 #pragma comment(lib,"opengl32.lib")
-#pragma comment(lib,"dinput.lib")
+#pragma comment(lib,"dinput8.lib")
+#pragma comment(lib, "legacy_stdio_definitions.lib")
 #if !sINTRO || _DEBUG
 #pragma comment(lib,"dxguid.lib")
 #else
@@ -116,7 +118,7 @@ sBool IntroHighTexRes = sTRUE;
 const sInt IntroScreenX=sPLAYER_SCREENX;
 const sInt IntroScreenY=sPLAYER_SCREENY;
 const sInt IntroFlags = sPLAYER_FULLSCREEN ? sSF_FULLSCREEN : 0;
-const sInt IntroTargetAspect = 0;
+sInt IntroTargetAspect = 0;
 sBool IntroHighTexRes = sTRUE;
 #endif
 sInt IntroLoop;
@@ -2152,8 +2154,9 @@ void sSystem_::Tag()
 
   ExitProcess(0);
 #else
-  WAborting = sTRUE;
-  if(DXD)
+  if (this)
+    WAborting = sTRUE;
+  if(this && DXD)
     DXD->Release();
   _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)&~(_CRTDBG_LEAK_CHECK_DF|_CRTDBG_ALLOC_MEM_DF));
   if(msg)
@@ -5744,7 +5747,7 @@ void sSystem_::FontPrint(sInt x,sInt y,const sU16 *string,sInt len)
     len++;
     while(string[len]) len++;
   }
-  ExtTextOutW(GDIDC,x,y,0,0,string,len,0);
+  ExtTextOutW(GDIDC,x,y,0,0,(LPWSTR)string,len,0);
 }
 
 void sSystem_::FontEnd()

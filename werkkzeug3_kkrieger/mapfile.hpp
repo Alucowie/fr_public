@@ -12,7 +12,7 @@ class MAPFileReader : public DebugInfoReader
   struct Section;
   sArray<Section> Sections;
 
-  sInt ScanString(sChar *&string,DebugInfo &to);
+  sInt ScanString(const sChar *&string, DebugInfo &to);
   static sBool IsHexString(const sChar *str,sInt count);
 
   Section *GetSection(sInt num,sU32 offs);

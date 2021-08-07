@@ -180,7 +180,7 @@ class sXSILoader : public sObject
 public:
 
   sBool Error;
-  sChar *Scan;
+  const sChar *Scan;
   sInt Version;
 
   sList<sXSITexture> *Textures;

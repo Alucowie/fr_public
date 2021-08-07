@@ -25,7 +25,7 @@ struct MAPFileReader::Section
   sInt Class;
 };
 
-sInt MAPFileReader::ScanString(sChar *&string,DebugInfo &to)
+sInt MAPFileReader::ScanString(const sChar *&string, DebugInfo &to)
 {
   sChar buffer[3072];
   sInt i;
@@ -94,7 +94,8 @@ sBool MAPFileReader::ReadDebugInfo(sChar *fileName,DebugInfo &to)
     UnDecorateSymbolName = (PUnDecorateSymbolName) GetProcAddress(module,"UnDecorateSymbolName");
 
   // actual reading code
-  sChar *line,buffer[2048];
+  const sChar *line;
+  sChar buffer[2048];
   sInt j,code,data;
   sInt snum,offs,type,name,VA,fname;
   sInt symStart = to.Symbols.Count;
