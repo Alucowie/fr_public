@@ -5116,7 +5116,7 @@ void sControl::OnDrag(sDragData &dd)
     {
       if(qual & sKEYQ_SHIFT)
         DataU[0] = DragStartU[0]^(1<<DragZone);
-      else if(DataU[0] != (1 << DragZone))
+      else if(DataU[0] != (1U << DragZone))
         DataU[0] = (1<<DragZone);
       else
         DataU[0] = 0;

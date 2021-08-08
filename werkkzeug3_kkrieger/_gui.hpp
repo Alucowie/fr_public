@@ -599,7 +599,7 @@ class sToolBorder : public sGuiWindow
   sInt Height;
   sInt DragFakeX;
   sInt DragFakeY;
-  sInt DragFakeMode;
+  sU32 DragFakeMode;
   sInt DragMode;
   sInt DragX,DragY;
 public:
