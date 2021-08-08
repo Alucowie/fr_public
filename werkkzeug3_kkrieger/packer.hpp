@@ -18,6 +18,7 @@ public:
   sF64 InvAvgMatchLen;
   sF32 AvgLiteralLen;
 
+  virtual ~PackerBackEnd();
   virtual sU32 MaxOutputSize(sU32 inSize)=0;
   virtual DepackFunction GetDepacker()=0;
 
