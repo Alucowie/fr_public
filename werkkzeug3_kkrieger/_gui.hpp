@@ -360,7 +360,7 @@ class sDialogWindow : public sGuiWindow
 {
   sU32 CmdOk;
   sU32 CmdCancel;
-  sChar *Text;
+  const sChar *Text;
   sControl *OkButton;
   sControl *CanButton;
 
@@ -381,10 +381,10 @@ public:
 
   void InitString(sChar *buffer,sInt size); // use this before InitOkCancen!
 
-  void InitAB(sGuiWindow *sendto,sChar *title,sChar *message,sU32 cmdok,sU32 cmdcan,sChar *ok,sChar *can);
-  void InitOk(sGuiWindow *sendto,sChar *title,sChar *message,sU32 cmdok);
-  void InitOkCancel(sGuiWindow *sendto,sChar *title,sChar *message,sU32 cmdok,sU32 cmdcan);
-  void InitYesNo(sGuiWindow *sendto,sChar *title,sChar *message,sU32 cmdok,sU32 cmdcan);
+  void InitAB(sGuiWindow *sendto, const sChar *title, const sChar *message, sU32 cmdok, sU32 cmdcan, const sChar *ok, const sChar *can);
+  void InitOk(sGuiWindow *sendto, const sChar *title, const sChar *message, sU32 cmdok);
+  void InitOkCancel(sGuiWindow *sendto, const sChar *title, const sChar *message, sU32 cmdok, sU32 cmdcan);
+  void InitYesNo(sGuiWindow *sendto, const sChar *title, const sChar *message, sU32 cmdok, sU32 cmdcan);
 
   sGuiWindow *SendTo;
 };
@@ -585,7 +585,7 @@ public:
   void OnPaint();
   void OnDrag(sDragData &);
 
-  sChar *Title;
+  const sChar *Title;
   bool CloseCmd;
   sInt Maximised;
   sInt DontResize;
@@ -1115,7 +1115,7 @@ class sReportWindow : public sGuiWindow
   sInt Line;
 protected:
   void PrintLine(const sChar *format,...);
-  void PrintGroup(sChar *label);
+  void PrintGroup(const sChar *label);
 public: 
   sReportWindow();
   void OnPaint();
@@ -1180,7 +1180,7 @@ public:
   void SetText(class sText *);
   void SetText(sChar *);
   sChar *GetText();
-  void Engine(sInt pos,sInt len,sChar *insert);
+  void Engine(sInt pos, sInt len, const sChar *insert);
   void DelSel();
   sInt GetCursorX();
   sInt GetCursorY();

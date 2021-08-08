@@ -62,7 +62,7 @@ public:
   void Exit();
 
   // only use those before reading is finished!!
-  sInt MakeString(sChar *string);
+  sInt MakeString(const sChar *string);
   sChar* GetStringPrep(sInt index)          { return &StringData[index]; }
   void SetBaseAddress(sU32 base)            { BaseAddress = base; }
 

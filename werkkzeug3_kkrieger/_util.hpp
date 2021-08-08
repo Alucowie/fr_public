@@ -144,7 +144,7 @@ public:
   void Tag();
   void Init(sInt matcount=64,sInt jobcount=0x4000,sInt textcount=0x10000,sInt extcount=0x4000,sInt rectcount=0x1000,sInt linecount=0x10000);
 
-  sInt LoadFont(sChar *name,sInt height,sInt width=0,sInt style=0);
+  sInt LoadFont(const sChar *name,sInt height,sInt width=0,sInt style=0);
   sInt LoadBitmap(sBitmap *);
   sInt LoadBitmapAlpha(sBitmap *);
   sInt LoadBitmap(sChar *);
@@ -193,7 +193,7 @@ public:
 
 struct sPerfMonToken              // declare name and color of a zone
 {
-  sChar *Name;
+  const sChar *Name;
   sU32 Color;
   sInt Index;
  // sPerfMonToken(sChar *name,sU32 color);  

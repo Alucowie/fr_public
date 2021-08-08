@@ -28,7 +28,7 @@ void DebugInfo::Exit()
   Strings.Exit();
 }
 
-sInt DebugInfo::MakeString(sChar *string)
+sInt DebugInfo::MakeString(const sChar *string)
 {
   // TODO: write a better implementation using hashing
 
@@ -79,7 +79,7 @@ void DebugInfo::FinishedReading()
 
   Symbols.Count = 0;
   sU32 oldVA = 0;
-  sChar *oldName = "";
+  const sChar *oldName = "";
   sInt oldSize = 0;
 
   for(sInt i=0;i<symCount;i++)

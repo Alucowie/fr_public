@@ -2018,7 +2018,9 @@ void sDialogWindow::SetFocus()
 
 /****************************************************************************/
 
-void sDialogWindow::InitAB(sGuiWindow *sendto,sChar *title,sChar *message,sU32 cmdok,sU32 cmdcan,sChar *ok,sChar *can)
+void sDialogWindow::InitAB(sGuiWindow *sendto, const sChar *title,
+                           const sChar *message, sU32 cmdok,
+                           sU32 cmdcan, const sChar *ok, const sChar *can)
 {
   sSizeBorder *sb;
 
@@ -2051,17 +2053,20 @@ void sDialogWindow::InitAB(sGuiWindow *sendto,sChar *title,sChar *message,sU32 c
   SetFocus();
 }
 
-void sDialogWindow::InitOk(sGuiWindow *sendto,sChar *title,sChar *message,sU32 cmdok)
+void sDialogWindow::InitOk(sGuiWindow *sendto, const sChar *title,
+                           const sChar *message, sU32 cmdok)
 {
   InitAB(sendto,title,message,cmdok,0,"Ok",0);
 }
 
-void sDialogWindow::InitOkCancel(sGuiWindow *sendto,sChar *title,sChar *message,sU32 cmdok,sU32 cmdcan)
+void sDialogWindow::InitOkCancel(sGuiWindow *sendto, const sChar *title,
+                                 const sChar *message, sU32 cmdok, sU32 cmdcan)
 {
   InitAB(sendto,title,message,cmdok,cmdcan,"Ok","Cancel");
 }
 
-void sDialogWindow::InitYesNo(sGuiWindow *sendto,sChar *title,sChar *message,sU32 cmdok,sU32 cmdcan)
+void sDialogWindow::InitYesNo(sGuiWindow *sendto, const sChar *title,
+                              const sChar *message, sU32 cmdok, sU32 cmdcan)
 {
   InitAB(sendto,title,message,cmdok,cmdcan,"Yes","No");
 }
@@ -7165,7 +7170,7 @@ void sReportWindow::PrintLine(const sChar *format,...)
   Line++;
 }
 
-void sReportWindow::PrintGroup(sChar *label)
+void sReportWindow::PrintGroup(const sChar *label)
 {
   sRect r;
   
@@ -7756,7 +7761,7 @@ sChar *sTextControl::GetText()
 
 /****************************************************************************/
 
-void sTextControl::Engine(sInt pos,sInt count,sChar *insert)
+void sTextControl::Engine(sInt pos, sInt count, const sChar *insert)
 {
   sInt len;
   sInt i;

@@ -578,7 +578,7 @@ void sGuiPainter::Init(sInt mat,sInt job,sInt text,sInt ext,sInt rect,sInt line)
 /****************************************************************************/
 /****************************************************************************/
 
-sInt sGuiPainter::LoadFont(sChar *name,sInt height,sInt width,sInt style)
+sInt sGuiPainter::LoadFont(const sChar *name,sInt height,sInt width,sInt style)
 {
   sHostFont *hf;
   sInt xs,ys;
