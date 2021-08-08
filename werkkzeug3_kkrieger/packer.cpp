@@ -215,14 +215,14 @@ void GoodPackerFrontEnd::DoPack(PackerCallback cb)
       sizec = BackEnd->MatchLen(CM.Offs,CM.Len);
 
       // try to find a better match
-      if(CM.Offs!=BackEnd->PrevOffset || Ahead && BackEnd->MatchLen(BM.Offs,Ahead)<BackEnd->LiteralLen(AheadStart,Ahead))
+      if(CM.Offs!=BackEnd->PrevOffset || (Ahead && BackEnd->MatchLen(BM.Offs,Ahead)<BackEnd->LiteralLen(AheadStart,Ahead)))
       {
         for(testAhead=1;!betterMatch && CM.Len>testAhead && testAhead<3;testAhead++)
         {
           FindMatch(tm,SourcePtr+testAhead,lookAhead-testAhead);
           sizet = BackEnd->MatchLen(tm.Offs,tm.Len);
-          if(sizet<1e+20f && CM.Len < tm.Len+(sizec-sizet)*BackEnd->InvAvgMatchLen
-            || Ahead && tm.Len >= CM.Len && sizet<sizec)
+          if((sizet<1e+20f && CM.Len < tm.Len+(sizec-sizet)*BackEnd->InvAvgMatchLen)
+            || (Ahead && tm.Len >= CM.Len && sizet<sizec))
             betterMatch = true;
         }
 
@@ -507,7 +507,7 @@ void RangeCoder::Encode(sU32 cumfreq,sU32 freq,sU32 totfreq)
   Low += cumfreq * Range;
   Range *= freq;
 
-  while ((Low ^ Low+Range)<sRANGETOP || Range<sRANGEBOT && ((Range = -sInt(Low) & sRANGEBOT-1),1))
+  while ((Low ^ (Low+Range))<sRANGETOP || (Range<sRANGEBOT && ((Range = -sInt(Low) & (sRANGEBOT-1)),1)))
   {
     Buffer[Bytes++] = Low>>24;
     Low <<= 8;
@@ -542,7 +542,7 @@ void RangeCoder::Decode(sU32 cumfreq,sU32 freq)
 {
   Low += cumfreq * Range;
   Range *= freq;
-  while((Low ^ Low+Range)<sRANGETOP || Range<sRANGEBOT && ((Range = -sInt(Low) & sRANGEBOT-1),1))
+  while((Low ^ (Low+Range))<sRANGETOP || (Range<sRANGEBOT && ((Range = -sInt(Low) & (sRANGEBOT-1)),1)))
   {
     Code = (Code<<8) + Buffer[Bytes++];
     Range <<= 8;
@@ -912,7 +912,7 @@ sF32 CCAPackerBackEnd::MatchLen(sU32 pos,sU32 len,sU32 PO)
   if(!PO)
     PO = PrevOffset;
 
-  if(!pos || len<2 || pos != PO && ((pos>=96 && len<3) || (pos>=2048 && len<4)))
+  if(!pos || len<2 || (pos != PO && ((pos>=96 && len<3) || (pos>=2048 && len<4))))
     return 1e+20f;
 
   if(pos==PO)
@@ -1248,7 +1248,7 @@ sF32 NRVPackerBackEnd::MatchLen(sU32 offs,sU32 len,sU32 PO)
   if(!PO)
     PO = PrevOffset;
 
-  if(len<2U || len==2 && offs > (Variant ? 0x500U : 0xd00U) && offs!=PO)
+  if(len<2U || (len==2 && offs > (Variant ? 0x500U : 0xd00U) && offs!=PO))
     return 1e+20f;
 
   len = len - 1 - (offs > (Variant ? 0x500U : 0xd00U));

@@ -400,7 +400,7 @@ sChar *DebugInfo::WriteReport()
       sInt f1 = Symbols[j].FileNum;
       sInt f2 = Symbols[j-1].FileNum;
 
-      if(f1 == -1 || f2 != -1 && sCmpStringI(Files[f1].Name.String,Files[f2].Name.String) < 0)
+      if(f1 == -1 || (f2 != -1 && sCmpStringI(Files[f1].Name.String,Files[f2].Name.String) < 0))
         sSwap(Symbols[j],Symbols[j-1]);
     }
 
