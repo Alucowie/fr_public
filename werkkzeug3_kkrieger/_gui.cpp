@@ -7460,7 +7460,7 @@ void sTextControl::OnPaint()
           r.x1 = x+sPainter->GetWidth(font,p,i)+sPainter->GetWidth(font," ");
         else
           r.x1 = x+sPainter->GetWidth(font,p,s1-pos);
-          sPainter->Paint(sGui->FlatMat,r,sGui->Palette[sGC_SELBACK]);
+        sPainter->Paint(sGui->FlatMat,r,sGui->Palette[sGC_SELBACK]);
       }
       sPainter->Print(font,x,y,p,sGui->Palette[sGC_TEXT],i);
     }
