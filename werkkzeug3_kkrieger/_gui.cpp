@@ -2258,7 +2258,7 @@ void sMenuFrame::OnCalcSize()
 
 void sMenuFrame::OnLayout()
 {
-  sInt y,count,i,c,tx;
+  sInt y,/*count,*/i,c,tx;
   sGuiWindow *p;
 
   tx = Client.x0;
@@ -2266,7 +2266,7 @@ void sMenuFrame::OnLayout()
   c = 0;
   y = Client.y0;
   p = Childs;
-  count = 0;
+  //count = 0;
   while(p)
   {
     p->Position.x0 = tx;
@@ -4559,13 +4559,13 @@ void sControl::OnPaint()
     {
       col = sGui->Palette[sGC_BACK];
 
-      rx = Client; rx.x0++;rx.x1++;rx.y0;rx.y1;
+      rx = Client; rx.x0++;rx.x1++;/*rx.y0;rx.y1;*/
       sPainter->PrintC(font,rx,align,buffer,col,TextSize);
-      rx = Client; rx.x0--;rx.x1--;rx.y0;rx.y1;
+      rx = Client; rx.x0--;rx.x1--;/*rx.y0;rx.y1;*/
       sPainter->PrintC(font,rx,align,buffer,col,TextSize);
-      rx = Client; rx.x0;rx.x1;rx.y0++;rx.y1++;
+      rx = Client; /*rx.x0;rx.x1;*/rx.y0++;rx.y1++;
       sPainter->PrintC(font,rx,align,buffer,col,TextSize);
-      rx = Client; rx.x0;rx.x1;rx.y0--;rx.y1--;
+      rx = Client; /*rx.x0;rx.x1;*/rx.y0--;rx.y1--;
       sPainter->PrintC(font,rx,align,buffer,col,TextSize);
     }
     sPainter->PrintC(font,rl,align,buffer,(Style&sCS_SIDELABEL) ? sGui->Palette[sGC_TEXT] : col1,TextSize);
@@ -6794,14 +6794,14 @@ void sOpWindow::OnDrag(sDragData &dd)
 {
   sOpInfo oi;
   bool found;
-  sInt max;
+  //sInt max;
   sRect r;
   bool pickit;
   sInt mode;
   sU32 keyq;
   sInt cellx,celly;
 
-  max = GetOpCount();
+  //max = GetOpCount();
 
   if(MMBScrolling(dd,DragStartX,DragStartY)) return;
 
@@ -7380,7 +7380,7 @@ void sTextControl::OnCalcSize()
 void sTextControl::OnPaint()
 {
   sChar *p;
-  sInt i,x,y,h,xs;
+  sInt i,x,y,h/*,xs*/;
   sInt pos;
   sRect r;
   sInt font;
@@ -7457,7 +7457,7 @@ void sTextControl::OnPaint()
       }
       sPainter->Print(font,x,y,p,sGui->Palette[sGC_TEXT],i);
     }
-    xs = sPainter->GetWidth(font,p,i)+4+sPainter->GetWidth(font," ");
+    //xs = sPainter->GetWidth(font,p,i)+4+sPainter->GetWidth(font," ");
     y+=h;
     p+=i;
     pos+=i;
@@ -7909,11 +7909,11 @@ void sTextControl::ScrollToCursor()
 
 sInt sTextControl::ClickToPos(sInt mx,sInt my)
 {
-  sInt i,j,x,y,h,pos;
+  sInt i,j,/*x,*/y,h,pos;
 
   h = sPainter->GetHeight(sGui->FixedFont);
   y = Client.y0+2;
-  x = Client.x0+2;
+  //x = Client.x0+2;
   pos = 0;
   for(;;)
   {

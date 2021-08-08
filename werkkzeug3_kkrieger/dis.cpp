@@ -623,7 +623,7 @@ void DisUnFilter(sU8 *packed,sU8 *dest,sU32 oldAddr,sU32 newAddr,ReorderBuffer &
 
   // read instr table
   sInt nInstr = *buffer[0]++;
-  sU8 *bptr = buffer[0];
+  //sU8 *bptr = buffer[0];
 
   for(i=0;i<nInstr;i++)
   {

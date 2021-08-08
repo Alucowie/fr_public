@@ -1166,10 +1166,10 @@ sU32 NRVPackerBackEnd::SizePrefix11(sU32 i)
 
 void NRVPackerBackEnd::EncodePrefix12(sU32 i)
 {
-  sU32 t,bp,io;
+  sU32 t,bp/*,io*/;
 
   bp = 0;
-  io = i;
+  //io = i;
 
   if(i>=2)
   {
