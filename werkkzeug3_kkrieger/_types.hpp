@@ -371,9 +371,9 @@ __forceinline void sSetMem(sPtr dd,sInt s,sInt c)               { memset(dd,s,c)
 __forceinline void sCopyMem(sPtr dd,const void *ss,sInt c)      { memcpy(dd,ss,c); }
 __forceinline sInt sCmpMem(const void *dd,const void *ss,sInt c) { return (sInt)memcmp(dd,ss,c); }
 #if !sUNICODE
-__forceinline sInt sGetStringLen(const sChar *s)                { return (sInt)strlen(s); }
+__forceinline unsigned long sGetStringLen(const sChar *s)                { return strlen(s); }
 #else
-__forceinline sInt sGetStringLen(const sChar *s)                { for(sInt i=0;s[i];i++); return i; }
+__forceinline unsigned long sGetStringLen(const sChar *s)                { unsigned long i; for(i=0;s[i];i++); return i; }
 #endif
 
 /****************************************************************************/
@@ -1386,7 +1386,7 @@ public:
   sInt operator!=(const sString &s) const { return sCmpString(Buffer,s.Buffer)!=0; }
   const sChar &operator[](sInt i) const { return Buffer[i]; }
   sChar &operator[](sInt i)    { return Buffer[i]; }
-  sInt Count() const           { return sGetStringLen(Buffer); }
+  unsigned long Count() const           { return sGetStringLen(Buffer); }
   bool IsEmpty() const         { return Buffer[0]==0; }
   sInt Size() const            { return size; }
   void Write(sU32 *&data)      { sWriteString(data,Buffer); }

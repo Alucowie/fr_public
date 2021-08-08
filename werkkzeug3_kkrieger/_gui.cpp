@@ -4369,7 +4369,8 @@ void sControl::OnPaint()
   sInt strs;
   sChar buffer[64];
 //  sU32 cols[4];
-  sInt i,x0,x1,xs,tw,space;
+  unsigned long i;
+  sInt x0, x1, xs, tw, space;
   sRect rr,rx,rc,rl;
   sInt font;
   sInt labelsize;
@@ -4460,7 +4461,7 @@ void sControl::OnPaint()
     else
       rl.x1 = rc.x0 = rc.x0+Client.XSize()/4;
   }
-  if(Type==sCT_MASK && rc.XSize()>rc.YSize()*Zones)
+  if(Type==sCT_MASK && rc.XSize()>rc.YSize()*(sInt)Zones)
     rc.x1 = rc.x0 + rc.YSize()*Zones;
 
   if(Style & sCS_FATBORDER)
@@ -4703,7 +4704,7 @@ void sControl::OnKey(sU32 key)
   sChar *s;
   const sChar *cs;
   sF32 fval;
-  sInt len,i;
+  unsigned long len, i;
   sU32 ak;
 
   if(Style&sCS_STATIC) return;
@@ -4953,7 +4954,7 @@ void sControl::OnKey(sU32 key)
 
 void sControl::OnDrag(sDragData &dd)
 {
-  sInt i,i0,i1;
+  unsigned long i, i0, i1;
   sRect r;
 //  sInt speed;
   sInt dx;
@@ -5011,7 +5012,7 @@ void sControl::OnDrag(sDragData &dd)
       else
         r.x0 += r.XSize()/4;
     }
-    if(Type==sCT_MASK && r.XSize()>r.YSize()*Zones)
+    if(Type==sCT_MASK && r.XSize()>r.YSize()*(sInt)Zones)
       r.x1 = r.x0 + r.YSize()*Zones;
 
 
@@ -7381,10 +7382,10 @@ void sTextControl::OnPaint()
 {
   sChar *p;
   sInt i,x,y,h/*,xs*/;
-  sInt pos;
+  unsigned long pos;
   sRect r;
   sInt font;
-  sInt s0,s1;
+  unsigned long s0,s1;
 
   if(RecalcSize) // usefull for Logwindow
   {
@@ -7481,9 +7482,9 @@ void sTextControl::OnPaint()
 
 void sTextControl::OnKey(sU32 key)
 {
-  sInt len;
+  unsigned long len;
   sU32 ckey;
-  sInt i,j;
+  unsigned long i,j;
   sChar buffer[2];
 
 // prepare...
@@ -7828,7 +7829,7 @@ sInt sTextControl::GetCursorX()
 
 sInt sTextControl::GetCursorY()
 {
-  sInt i;
+  unsigned long i;
   sInt y;
 
   y=0;
@@ -7872,7 +7873,8 @@ void sTextControl::SetCursor(sInt x,sInt y)
 
 void sTextControl::ScrollToCursor()
 {
-  sInt i,x,y,h,pos;
+  sInt i,x,y,h;
+  unsigned long pos;
   sRect r;
 
   Post(CursorCmd);

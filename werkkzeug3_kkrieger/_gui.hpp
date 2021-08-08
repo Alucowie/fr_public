@@ -731,7 +731,7 @@ struct sControlTemplate
 class sControl : public sGuiWindow
 {
   sInt DragMode;
-  sInt DragZone;
+  unsigned long DragZone;
   sInt DragChanged;
   sInt LastDX;
   union
@@ -801,7 +801,7 @@ public:
 
   sF32 Min[4],Max[4],Step,Default[4];  // parameters for numbers
   sF32 DragStep;                  // step after applying all modifiers
-  sInt Zones;                     // for vector edits, and bitmasks
+  unsigned long Zones;            // for vector edits, and bitmasks
 
   const sChar *Cycle;             // choices for cycle, '|' seperated
   sU8 CycleSize;                  // number of choices
@@ -810,10 +810,10 @@ public:
   sU8 CycleOffset;                // start with this value. 
 
   sChar *Edit;                    // edit buffer
-  sInt EditSize;                  // size parameter
+  unsigned long EditSize;         // size parameter
   sInt EditMode;                  // editing is active
-  sInt EditZone;                  // when editing number
-  sInt Cursor;                    // cursor position for editing
+  unsigned long EditZone;         // when editing number
+  unsigned long Cursor;           // cursor position for editing
   sInt Overwrite;                 // cursor mode
   sInt EditScroll;                // scrolling for edit control
   sInt SetCursor;                 // x-position where to set cursor, or -65536
@@ -1158,9 +1158,9 @@ public:
 
 class sTextControl : public sGuiWindow
 {
-  sInt Cursor;
+  unsigned long Cursor;
   sInt Overwrite;
-  sInt SelPos;
+  unsigned long SelPos;
   sInt SelMode;                   // 0 = off, 1 = normal, 2 = rect    
   sInt RecalcSize;
   sInt MMBX,MMBY;
