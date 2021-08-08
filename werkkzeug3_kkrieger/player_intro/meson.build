@@ -45,7 +45,7 @@ music = [
 
 system = [
   '../_lekktor.cpp',
-  '../_start.cpp',
+  '../_start_opengl.cpp',
   '../_types.cpp']
 
 src = [
