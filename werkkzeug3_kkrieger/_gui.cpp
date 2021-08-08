@@ -7165,8 +7165,11 @@ sReportWindow::sReportWindow()
 void sReportWindow::PrintLine(const sChar *format,...)
 {
   sChar buffer[512];
+  va_list args;
 
-  sFormatString(buffer,512,format,&format);
+  va_start(args, format);
+  sFormatString(buffer, 512, format, args);
+  va_end(args);
   sPainter->Print(sGui->FixedFont,Client.x0+5,Client.y0+5+Line*Height,buffer,sGui->Palette[sGC_TEXT]);
   Line++;
 }
@@ -7270,8 +7273,11 @@ void sLogWindow::PrintLine(const sChar *string)
 void sLogWindow::PrintFLine(const sChar *format,...)
 {
   sChar buffer[sLW_ROWMAX];
+  va_list args;
 
-  sFormatString(buffer,sLW_ROWMAX,format,&format);
+  va_start(args, format);
+  sFormatString(buffer, sLW_ROWMAX, format, args);
+  va_end(args);
   PrintLine(buffer);
 }
 
