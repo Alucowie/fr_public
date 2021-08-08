@@ -691,6 +691,7 @@ void KOp::ExecEvent(KEnvironment *kenv, KEvent *event, bool)
 
   // time of year computation
 #if sUSE_TIME_OF_YEAR
+#if 0
   SYSTEMTIME systemTime;
   sU64 timeYear,startYear,endYear;
 
@@ -707,6 +708,9 @@ void KOp::ExecEvent(KEnvironment *kenv, KEvent *event, bool)
   SystemTimeToFileTime(&systemTime,(FILETIME *) &endYear);
 
   kenv->Var[3].w = 1.0 * (timeYear - startYear) / (endYear - startYear);
+#else
+  kenv->Var[3].w = 1.0;
+#endif
 #endif
 
   if(event->Spline)                         // set spline
