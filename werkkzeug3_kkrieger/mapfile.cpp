@@ -4,7 +4,7 @@
 #include "mapfile.hpp"
 #include "debuginfo.hpp"
 #include "_start.hpp"
-#include <algorithm>
+//#include <algorithm>
 
 typedef sU32 (__stdcall *PUnDecorateSymbolName)(sChar *name,sChar *buffer,sInt bufferLen,sU32 flasgs);
 

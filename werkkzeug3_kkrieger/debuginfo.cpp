@@ -2,7 +2,7 @@
 
 #include "_types.hpp"
 #include "mapfile.hpp"
-#include <algorithm>
+//#include <algorithm>
 
 // HACK: report buffer is 1mb fixed size
 
