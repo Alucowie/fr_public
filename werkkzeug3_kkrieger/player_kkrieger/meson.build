@@ -6,12 +6,14 @@ generators = [
   '../geneffect.cpp',
   '../genmaterial.cpp',
   '../genmesh.cpp',
+  '../genminmesh.cpp',
   '../genoverlay.cpp',
   '../genscene.cpp']
 
 materials = [
   '../materials/material11.cpp',
   '../materials/material20.cpp',
+  '../materials/materialdirect.cpp',
   '../materials/rtmanager.cpp',
   '../shadercodegen.cpp']
 
