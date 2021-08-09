@@ -4,10 +4,11 @@
 #include "_startconsole.hpp"
 #ifdef __linux__
 #include <stdlib.h>
-#endif
+#else
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <crtdbg.h>
+#endif
 #include <malloc.h>
 
 /****************************************************************************/
