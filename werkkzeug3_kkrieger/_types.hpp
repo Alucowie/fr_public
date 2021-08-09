@@ -1854,17 +1854,17 @@ public:
 template <class Type> class sArray2 : public sArray<Type> // add support for sFORALL() and constructor/destructor to sArray 
 {
 public:
-  sArray2()                                 { Init(); }
-  ~sArray2()                                { Exit(); }
-  sArray2(const sArray2 &x)                 { Init(); Copy(x); }
-  sArray2 & operator= (const sArray2 &x)    { Copy(x); }
+  sArray2()                                 { sArray<Type>::Init(); }
+  ~sArray2()                                { sArray<Type>::Exit(); }
+  sArray2(const sArray2 &x)                 { sArray<Type>::Init(); sArray<Type>::Copy(x); }
+  sArray2 & operator= (const sArray2 &x)    { sArray<Type>::Copy(x); }
   Type *Add()                               { return sArray<Type>::Add(); }
   void Add(const Type &x)                   { *sArray<Type>::Add()=x; }
-  sInt GetCount() const                     { return Count; }
-  Type *GetFOR(sInt i)                      { return &Array[i]; }
-  const Type *GetFOR(sInt i) const          { return &Array[i]; }
-  void Swap(sInt i,sInt j)                  { sSwap(Array[i],Array[j]); }
-  void Clear()                              { Count = 0; }
+  sInt GetCount() const                     { return sArray<Type>::Count; }
+  Type *GetFOR(sInt i)                      { return &sArray<Type>::Array[i]; }
+  const Type *GetFOR(sInt i) const          { return &sArray<Type>::Array[i]; }
+  void Swap(sInt i,sInt j)                  { sSwap(sArray<Type>::Array[i],sArray<Type>::Array[j]); }
+  void Clear()                              { sArray<Type>::Count = 0; }
 };
 
 template <class Type> class sAutoArray       // Array of pointers, deleted when array gets deleted
