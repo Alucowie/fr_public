@@ -1312,10 +1312,6 @@ sBool sScanString(const sChar *&scan,sChar *buffer,sInt size)
 
 sBool sScanName(const sChar *&scan,sChar *buffer,sInt size)
 {
-  sBool done;
-
-  done = sFALSE;
-
   if(!((*scan>='a' && *scan<='z') || 
        (*scan>='A' && *scan<='Z') || *scan=='_' )) 
     return sFALSE;
