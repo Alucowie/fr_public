@@ -331,7 +331,9 @@ __forceinline sF32 sFade(sF32 a,sF32 b,sF32 fade)												{return a+(b-a)*fad
 
 // integer
 
+#ifndef __linux__
 typedef unsigned int size_t;
+#endif
 
 extern "C"
 {
