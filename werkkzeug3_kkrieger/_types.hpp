@@ -213,17 +213,29 @@ class sBitmap;
 typedef unsigned char             sU8;      // for packed arrays
 typedef unsigned short            sU16;     // for packed arrays
 typedef unsigned int              sU32;     // for packed arrays and bitfields
+#ifdef __GNUC__
+typedef unsigned long long        sU64;     // use as needed
+#else
 typedef unsigned __int64          sU64;     // use as needed
+#endif
 typedef signed char               sS8;      // for packed arrays
 typedef short                     sS16;     // for packed arrays
 typedef int                       sS32;     // for packed arrays
+#ifdef __GNUC__
+typedef signed long long          sS64;     // use as needed
+#else
 typedef signed __int64            sS64;     // use as needed
+#endif
 #if !sMOBILE
 typedef float                     sF32;     // basic floatingpoint
 typedef double                    sF64;     // use as needed
 #endif
 typedef int                       sInt;     // use this most!
+#ifdef __GNUC__
+typedef long                      sDInt;    // type for pointer diff
+#else
 typedef int __w64                 sDInt;    // type for pointer diff
+#endif
 #if sUNICODE
 typedef unsigned short            sChar;    // type for strings
 #else
