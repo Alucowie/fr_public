@@ -1471,7 +1471,11 @@ sBool sFormatString(sChar *d,sInt left,const sChar *s,const sChar **fp)
 #else
           if(fval<0)
             field1++;
+#ifdef __linux__
+          string = fcvt(fval,field1,&i,&sign);
+#else
           string = _fcvt(fval,field1,&i,&sign);
+#endif
 #endif
           if(i<0)
           {
@@ -1498,7 +1502,11 @@ sBool sFormatString(sChar *d,sInt left,const sChar *s,const sChar **fp)
 #else
           if(fval<0)
             field1++;
+#ifdef __linux__
+          string = ecvt(fval,field1,&i,&sign);
+#else
           string = _ecvt(fval,field1,&i,&sign);
+#endif
 #endif
           if(*string)
           {
