@@ -7,3 +7,4 @@ add_project_arguments('-mmmx', language : 'cpp')
 add_project_arguments('-msse', language : 'cpp')
 
 subdir('base_console')
+subdir('shadercompile')
