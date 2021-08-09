@@ -38,3 +38,4 @@ effect_jpegvs_hpp = custom_target(
 subdir('materials')
 
 subdir('player_intro')
+subdir('player_kkrieger')
