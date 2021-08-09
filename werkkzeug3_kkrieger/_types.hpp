@@ -331,6 +331,10 @@ __forceinline sF32 sFade(sF32 a,sF32 b,sF32 fade)												{return a+(b-a)*fad
 
 // integer
 
+#ifdef __GNUC__
+#define __cdecl __attribute__((__cdecl__))
+#endif
+
 #ifndef __linux__
 typedef unsigned int size_t;
 #endif
