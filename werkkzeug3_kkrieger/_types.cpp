@@ -5,6 +5,7 @@
 #include "_start.hpp"
 #endif
 #include <stdarg.h>
+#include <climits>
 #ifdef __linux__
 #include <stdlib.h>
 #include <stdio.h>
@@ -1534,7 +1535,7 @@ sBool sFormatString(sChar *d,sInt left,const sChar *s,const sChar **fp)
         }
         else if(c=='d' || c=='i')
         {          
-          if(val==0x80000000)
+          if(val==INT_MAX)
           {
             val = val/10;
             buffer[len++] = '8';
@@ -1663,7 +1664,7 @@ sBool sFormatString(sChar *d,sInt left,const sChar *s,const sChar **fp)
         {
           if(sAbs(val)>=0x00010000)
           {
-            if(val>0x80000000)             
+            if((sU32)val>0x80000000)
               val |= 0x000000ff;
             else
               val &= 0xffffff00;
