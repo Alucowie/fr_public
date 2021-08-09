@@ -246,7 +246,7 @@ static sBool IsSeperator(const sChar *scan)
 {
   return (*scan == 0 || 
     *scan == ' ' || *scan == '\n' || *scan == '\t' || *scan == '\r' ||
-    scan[0] == '/' && (scan[1] == '/' || scan[1] == '*') ||
+    (scan[0] == '/' && (scan[1] == '/' || scan[1] == '*')) ||
     *scan == '(' || *scan == ')' || *scan == '[' || *scan == ']' ||
     *scan == ',' ||
     *scan == '=' || *scan == '!' || *scan == '<' || *scan == '>');
