@@ -1844,7 +1844,7 @@ template <class Type> class sAutoPtr        // automatically delete ptr when goi
 public:
   sAutoPtr()                                { Ptr = 0; }
   sAutoPtr(Type *x) : Ptr(x)                {}
-  ~sAutoPtr()                               { delete Ptr }
+  ~sAutoPtr()                               { delete Ptr; }
   sAutoPtr(const sAutoPtr &x) : Ptr(x)      { x=0; }
   sAutoPtr & operator= (const sAutoPtr &x)  { delete Ptr; Ptr=x; x=0; }
 
