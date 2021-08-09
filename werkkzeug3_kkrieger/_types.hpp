@@ -108,7 +108,11 @@ inline void __cdecl operator delete(void *p, const char *, int s) { ::operator d
 #endif
 //#endif
 
+#ifdef __GNUC__
+#define sNORETURN __attribute__((__noreturn__))  // use this for dead end funtions
+#else
 #define sNORETURN __declspec(noreturn)  // use this for dead end funtions
+#endif
 
 /****************************************************************************/
 /***                                                                      ***/
