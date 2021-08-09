@@ -2,6 +2,9 @@
 
 #include "_types.hpp"
 #include "_startconsole.hpp"
+#ifdef __linux__
+#include <stdlib.h>
+#endif
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <crtdbg.h>
@@ -24,6 +27,22 @@ sInt sFatality = 0;
 
 #if !sINTRO
 #undef new
+#ifdef __linux__
+void * operator new(size_t size, char const *file, int line)
+{
+  return malloc(size);
+}
+
+void * operator new[](size_t size, char const *file, int line)
+{
+  return malloc(size);
+}
+
+void operator delete(void *p)
+{
+    free(p);
+}
+#else
 void * __cdecl operator new(unsigned int size,const char *file,int line)
 {
   void *p;
@@ -50,6 +69,7 @@ void operator delete(void *p)
 		_free_dbg(p,_NORMAL_BLOCK);
 	}
 }
+#endif
 
 #define new new(__FILE__,__LINE__)
 #endif

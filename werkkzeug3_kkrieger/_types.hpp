@@ -37,6 +37,9 @@
 #define sPLATFORM     sPLAT_PC
 #endif
 
+#ifdef __linux__
+#include <cstddef>
+#endif
 
 /****************************************************************************/
 
@@ -83,6 +86,16 @@
 
 //#if _DEBUG                          // fix memory management
 #if !sINTRO && sPLATFORM!=sPLAT_PDA
+#ifdef __linux__
+
+void * operator new(size_t);
+void * operator new(size_t, char const *,int);
+void * operator new[](size_t);
+void * operator new[](size_t, char const *,int);
+inline void operator delete(void *p, const char *, int s) { ::operator delete(p); }
+#define new new(__FILE__,__LINE__)
+#else
+
 #define _MFC_OVERRIDES_NEW
 void *  __cdecl operator new(unsigned int);
 void *  __cdecl operator new(unsigned int,const char *,int);
@@ -91,6 +104,7 @@ void *  __cdecl operator new[](unsigned int,const char *,int);
 #endif
 inline void __cdecl operator delete(void *p, const char *, int s) { ::operator delete(p); }
 #define new new(__FILE__,__LINE__)
+#endif
 #endif
 //#endif
 
