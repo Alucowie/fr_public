@@ -4,6 +4,9 @@
 #include "_startconsole.hpp"
 #include "shadercompile.hpp"
 #include <ctype.h>
+#ifdef __GNUC__
+#include <libgen.h>
+#endif
 
 // return filename with replaced extension (should include '.')
 static const sChar *ReplaceExtension(const sChar *name,const sChar *newExt)
@@ -32,6 +35,9 @@ static const sChar *ReplaceExtension(const sChar *name,const sChar *newExt)
 static const sChar *MakeCIdentifier(const sChar *name)
 {
   static sChar buffer[512];
+#ifdef __GNUC__
+  name = basename((char*)name);
+#endif
 
   sCopyString(buffer,"g_",sizeof(buffer));
   sAppendString(buffer,name,sizeof(buffer));
