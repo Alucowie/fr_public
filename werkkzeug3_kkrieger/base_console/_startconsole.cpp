@@ -4,6 +4,10 @@
 #include "_startconsole.hpp"
 #ifdef __linux__
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 #else
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -197,12 +201,33 @@ void sSystem_::PrintF(const sChar *format,...)
 sU8 *sSystem_::LoadFile(const sChar *name,sInt &size)
 {
   sInt result;
-  HANDLE handle;
-  DWORD test;
   sU8 *mem;
-   
+
   mem = 0;
   result = sFALSE;
+#ifdef __linux__
+  int fd;
+  ssize_t test;
+
+  fd = open(name, O_CREAT | O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+  if(fd != -1)
+  {
+    size = lseek(fd, 0, SEEK_END);
+    if(size != -1)
+    {
+      mem = new sU8[size];
+      lseek(fd, 0, SEEK_SET);
+      if((test = read(fd, mem, size)))
+        result = sTRUE;
+      if(size != (sInt)test)
+        result = sFALSE;
+    }
+    close(fd);
+  }
+#else
+  HANDLE handle;
+  DWORD test;
+
   handle = CreateFile(name,GENERIC_READ,FILE_SHARE_READ,0,OPEN_EXISTING,0,0);
   if(handle != INVALID_HANDLE_VALUE)
   {
@@ -217,6 +242,7 @@ sU8 *sSystem_::LoadFile(const sChar *name,sInt &size)
     }
     CloseHandle(handle);
   }
+#endif
 
   if(!result)
   {
@@ -241,13 +267,34 @@ sU8 *sSystem_::LoadFile(const sChar *name)
 sChar *sSystem_::LoadText(const sChar *name)
 {
   sInt result;
-  HANDLE handle;
-  DWORD test;
   sU8 *mem;
-  sInt size;
-   
+
   mem = 0;
   result = sFALSE;
+#ifdef __linux__
+  int fd;
+  ssize_t size;
+  off_t test;
+
+  fd = open(name, O_CREAT | O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+  if (fd != -1) {
+    size = lseek(fd, 0, SEEK_END);
+    if (size != -1) {
+      mem = new sU8[size+1];
+      lseek(fd, 0, SEEK_SET);
+      if ((test = read(fd, mem, size)))
+        result = sTRUE;
+      if (size != (sInt)test)
+        result = sFALSE;
+      mem[size] = 0;
+    }
+    close(fd);
+  }
+#else
+  HANDLE handle;
+  sInt size;
+  DWORD test;
+
   handle = CreateFile(name,GENERIC_READ,FILE_SHARE_READ,0,OPEN_EXISTING,0,0);
   if(handle != INVALID_HANDLE_VALUE)
   {
@@ -263,6 +310,7 @@ sChar *sSystem_::LoadText(const sChar *name)
     }
     CloseHandle(handle);
   }
+#endif
 
   if(!result)
   {
@@ -277,10 +325,27 @@ sChar *sSystem_::LoadText(const sChar *name)
 sBool sSystem_::SaveFile(const sChar *name,const sU8 *data,sInt size)
 {
   sInt result;
+
+  result = sFALSE;
+
+#ifdef __linux__
+  int fd;
+  ssize_t test;
+
+  fd = open(name, O_CREAT | O_WRONLY | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+  if (fd == -1)
+      fd = open(name, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+  if (fd != -1) {
+      if ((test = write(fd, data, size)))
+          result = sTRUE;
+      if (size != (sInt)test)
+          result = sFALSE;
+      close(fd);
+  }
+#else
   HANDLE handle;
   DWORD test;
 
-  result = sFALSE;
   handle = CreateFile(name,GENERIC_WRITE,FILE_SHARE_WRITE,0,CREATE_NEW,0,0);  
   if(handle == INVALID_HANDLE_VALUE)
     handle = CreateFile(name,GENERIC_WRITE,FILE_SHARE_WRITE,0,TRUNCATE_EXISTING,0,0);  
@@ -292,6 +357,7 @@ sBool sSystem_::SaveFile(const sChar *name,const sU8 *data,sInt size)
       result = sFALSE;
     CloseHandle(handle);
   }
+#endif
 
   return result;
 }
