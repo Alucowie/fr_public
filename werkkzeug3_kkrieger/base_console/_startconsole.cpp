@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <time.h>
 #else
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -372,7 +373,16 @@ sBool sSystem_::SaveFile(const sChar *name,const sU8 *data,sInt size)
 
 sInt sSystem_::GetTime()
 {
+#ifdef __linux__
+    struct timespec ts;
+    unsigned theTick = 0U;
+    clock_gettime(CLOCK_BOOTTIME, &ts );
+    theTick  = ts.tv_nsec / 1000000;
+    theTick += ts.tv_sec * 1000;
+    return theTick;
+#else
   return GetTickCount();
+#endif
 }
 
 /****************************************************************************/
