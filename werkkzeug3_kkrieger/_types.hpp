@@ -84,6 +84,11 @@
 
 /****************************************************************************/
 
+#ifndef _WIN32
+#define __stdcall
+#define _stdcall
+#endif
+
 //#if _DEBUG                          // fix memory management
 #if !sINTRO && sPLATFORM!=sPLAT_PDA
 #ifdef __linux__
