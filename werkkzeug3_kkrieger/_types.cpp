@@ -1870,7 +1870,7 @@ void sInitPerlin()
 
 	// 3d gradients
 	for(i=0;i<64;i++)
-    (&sPerlinGradient3D[0].x)[i] = GValue[GTable[i]];
+    (&sPerlinGradient3D[0].x)[i] = GValue[(int)GTable[i]];
 
   // permutation
 	for(i=0;i<256;i++)
