@@ -337,7 +337,11 @@ typedef unsigned int size_t;
 
 extern "C"
 {
+#ifdef __linux__
+  int __cdecl abs(int) noexcept;
+#else
   int __cdecl abs(int);
+#endif
   void * __cdecl memset( void *dest, int c, size_t count );
   void * __cdecl memcpy( void *dest, const void *src, size_t count );
   int __cdecl memcmp( const void *buf1, const void *buf2, size_t count );
