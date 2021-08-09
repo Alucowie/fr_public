@@ -144,7 +144,11 @@ sInt main(sInt argc,sChar **argv)
 
 void sSystem_::Log(sChar *s)
 {
+#ifdef __linux__
+  puts(s);
+#else
   OutputDebugString(s);
+#endif
 }
 
 /****************************************************************************/
@@ -172,11 +176,15 @@ void sSystem_::Tag()
 void sSystem_::PrintF(const sChar *format,...)
 {
   sChar buffer[2048];
-  DWORD written;
 
   sFormatString(buffer,2048,format,&format);
+#ifdef __linux__
+  puts(buffer);
+#else
+  DWORD written;
   WriteFile(GetStdHandle(STD_OUTPUT_HANDLE),buffer,
     sGetStringLen(buffer),&written,0);
+#endif
 }
 
 /****************************************************************************/

@@ -5,6 +5,10 @@
 #include "_start.hpp"
 #endif
 #include <stdarg.h>
+#ifdef __linux__
+#include <stdlib.h>
+#include <stdio.h>
+#endif
 #if sLINK_INTMATH
 #include "_intmath.hpp"
 #endif
@@ -2231,8 +2235,12 @@ void sVerifyFalse(const sChar *file,sInt line)
 #if !sINTRO || !sRELEASE
 
 extern sInt sFatality;
+#ifndef __linux__
 extern "C" void __stdcall OutputDebugStringA(char *string);
 extern "C" int __stdcall wvsprintfA(char *buffer,const char *fmt,va_list args);
+#else
+#define OutputDebugStringA(string) puts(string)
+#endif
 
 void __cdecl sFatal(const sChar *format,...)
 {
@@ -2290,7 +2298,11 @@ void __cdecl sDPrintF(const sChar *format,...)
   va_list list;
 
   va_start(list,format);
+#ifdef __linux__
+  vsprintf(buffer, format, list);
+#else
   wvsprintfA(buffer,format,list);
+#endif
   va_end(list);
 
   OutputDebugStringA(buffer);
