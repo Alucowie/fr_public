@@ -160,10 +160,16 @@ void sSystem_::Log(sChar *s)
 
 sNORETURN void sSystem_::Abort(sChar *msg)
 {
+#ifndef __linux__
   _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)&~(_CRTDBG_LEAK_CHECK_DF|_CRTDBG_ALLOC_MEM_DF));
+#endif
   if(msg)
     PrintF("\afatal error: %s\n",msg);
+#ifdef __linux__
+  exit(0);
+#else
   ExitProcess(0);
+#endif
 }
 
 /****************************************************************************/
