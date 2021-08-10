@@ -549,7 +549,7 @@ extern "C" void __stdcall ronanCBTick()
 
 //					printf2("'%s' -> ",w.ptr);
 
-					sInt fs,len=1,len2;
+					sU32 fs,len=1,len2;
 					for (fs=0; fs<NSYLS-1; fs++)
 					{
 						const syldef &s=syls[fs];

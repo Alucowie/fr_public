@@ -849,8 +849,8 @@ void GenMesh::SplitFace(sU32 i0,sU32 i1,sU32 dmask,sInt dmode)
   do
   {
     sVERIFY(GetFaceId(i)==f0);
-		sVERIFY(NextFaceEdge(PrevFaceEdge(i)) == i);
-		sVERIFY(PrevFaceEdge(NextFaceEdge(i)) == i);
+		sVERIFY(NextFaceEdge(PrevFaceEdge(i)) == (sInt)i);
+		sVERIFY(PrevFaceEdge(NextFaceEdge(i)) == (sInt)i);
     Edge[i/2].Face[i&1] = f1;
     i = NextFaceEdge(i);
   }
@@ -897,7 +897,7 @@ void GenMesh::SplitBridge(sU32 a,sU32 d,sInt &va,sInt &vb,sU32 dmask,sInt dmode,
   }
   else
   {
-    for(i=n1;i!=d;i=PrevVertEdge(i))
+    for(i=n1;(sU32)i!=d;i=PrevVertEdge(i))
     {
       if(Edge[i/2].Crease)
       {

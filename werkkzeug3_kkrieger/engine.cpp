@@ -2307,8 +2307,8 @@ void EngMesh::UpdateShadowCacheJob(Job *job,sVector *planes,SVCache *svCache,con
 {
   sZONE(ShadowJob);
 
-  sVERIFY(job->PlaneCount <= sizeof(SFaceIn) / sizeof(SFaceIn[0]));
-  sVERIFY(PartCount < sizeof(SPartSkip) / sizeof(SPartSkip[0]));
+  sVERIFY((sU32)job->PlaneCount <= sizeof(SFaceIn) / sizeof(SFaceIn[0]));
+  sVERIFY((sU32)PartCount < sizeof(SPartSkip) / sizeof(SPartSkip[0]));
 
   // light front/back side determination
   for(sInt i=0;i<job->PlaneCount;i++)

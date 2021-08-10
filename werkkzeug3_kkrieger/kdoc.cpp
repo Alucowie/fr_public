@@ -934,7 +934,7 @@ void KEnvironment::InitView()
   TimeJitter = 0;
   TimeReset = 1;
 
-  for(sInt i=0;i<sCOUNTOF(Markers);i++)
+  for(sU32 i=0;i<sCOUNTOF(Markers);i++)
     Markers[i].Init();
 
   if(Game)

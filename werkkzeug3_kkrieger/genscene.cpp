@@ -1573,7 +1573,7 @@ GenScene * __stdcall Init_Scene_Marker(GenScene *add,sInt marker)
 
 void __stdcall Exec_Scene_Marker(KOp *op,KEnvironment *kenv,sInt marker)
 {
-  sVERIFY(marker>=0 && marker<sCOUNTOF(kenv->Markers));
+  sVERIFY(marker>=0 && (sU32)marker<sCOUNTOF(kenv->Markers));
   kenv->Markers[marker] = kenv->ExecStack.Top();
   ExecSceneInputs(op,kenv,0);
 }

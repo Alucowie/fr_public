@@ -533,7 +533,7 @@ GenSplineMeta::GenSplineMeta()
 {
   sVERIFY(sCOUNTOF(Times)==sCOUNTOF(Splines));
 
-  for(sInt i=0;i<sCOUNTOF(Splines);i++)
+  for(sU32 i=0;i<sCOUNTOF(Splines);i++)
   {
     Times[i] = 0;
     Splines[i] = 0;
@@ -542,14 +542,14 @@ GenSplineMeta::GenSplineMeta()
 
 GenSplineMeta::~GenSplineMeta()
 {
-  for(sInt i=0;i<sCOUNTOF(Splines);i++)
+  for(sU32 i=0;i<sCOUNTOF(Splines);i++)
     sRelease(Splines[i]);
 }
 
 void GenSplineMeta::Sort()
 {
   Count = 0;
-  for(sInt i=0;i<sCOUNTOF(Splines);i++)
+  for(sU32 i=0;i<sCOUNTOF(Splines);i++)
   {
     Times[i] = sRange<sF32>(Times[i],1,0);
     if(Splines[i]==0)
@@ -558,9 +558,9 @@ void GenSplineMeta::Sort()
       Count++;
   }
 
-  for(sInt i=0;i<sCOUNTOF(Splines)-1;i++)
+  for(sU32 i=0;i<sCOUNTOF(Splines)-1;i++)
   {
-    for(sInt j=i+1;j<sCOUNTOF(Splines);j++)
+    for(sU32 j=i+1;j<sCOUNTOF(Splines);j++)
     {
       if(Times[i]>Times[j])
       {
