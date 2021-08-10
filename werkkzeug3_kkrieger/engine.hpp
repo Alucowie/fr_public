@@ -219,9 +219,11 @@ struct EngLight
 class EngMaterialInsert
 {
 public:
+  virtual ~EngMaterialInsert() = default;
   virtual sInt GetPriority() = 0;
   virtual void BeforeUsage(sInt pass,sInt usage,const EngLight *light) = 0;
   virtual void AfterUsage(sInt pass,sInt usage,const EngLight *light) = 0;
+  virtual ~EngMaterialInsert() = 0;
 };
 
 /****************************************************************************/
