@@ -1390,7 +1390,7 @@ sBool sFormatString(sChar *d,sInt left,const sChar *s,const sChar **fp)
   sInt arg;
   sInt sign;
   sInt i;
-#if !sMOBILE
+#if !sMOBILE && !sINTRO
   sF64 fval;
 #endif
   static sChar hex[17] = sTXT("0123456789abcdef");
@@ -1451,10 +1451,10 @@ sBool sFormatString(sChar *d,sInt left,const sChar *s,const sChar **fp)
         sign = 0;
         if(c=='f' || c=='e')
         {
-#if !sMOBILE
-          fval = sVARARGF(fp,arg);arg+=2;
-#else
+#if sINTRO || sMOBILE
           arg+=2;
+#else
+          fval = sVARARGF(fp,arg);arg+=2;
 #endif
         }
         else

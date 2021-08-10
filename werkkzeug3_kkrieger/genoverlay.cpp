@@ -409,8 +409,8 @@ GenOverlayManagerClass::GenOverlayManagerClass()
 #endif
   }
 
-  sU32 data[1] = { 1 };
 #if sLINK_MTRL20
+  sU32 data[1] = { 1 };
   JPEGMaterial = new sMaterialDirect(g_effect_jpeg_vsh,g_effect_jpeg_psh,EffectJPEGStates,data);
 #else
   JPEGMaterial = 0;
@@ -1520,8 +1520,6 @@ void __stdcall Exec_IPP_Layer2D(KOp *parent,KEnvironment *kenv,sInt size,sFRect 
 
 void __stdcall Exec_IPP_Select(KOp *op,KEnvironment *kenv,sInt count)
 {
-  GenOverlayRT *prev=0, *current=0;
-
   /*for(sInt i=0;i<op->GetInputCount();i++)
   {
     GenOverlayManager->LastOutput = 0;

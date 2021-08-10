@@ -46,10 +46,12 @@ static sInt ConvertRGB(sF32 value)
   return sRange<sInt>(sFtol(value * 255.0f),255,0);
 }
 
+#if 0
 static sInt ConvertXYZ(sF32 value)
 {
   return sRange<sInt>(sFtol((value + 1.0f) * 127.5f),255,0);
 }
+#endif
 
 static sU32 PackColor(const sVector *color)
 {
@@ -57,6 +59,7 @@ static sU32 PackColor(const sVector *color)
        | (ConvertRGB(color->z) <<  0) | (ConvertRGB(color->w) << 24);
 }
 
+#if 0
 static sU32 PackVector(const sVector *vector)
 {
   return (ConvertXYZ(vector->x) << 16) | (ConvertXYZ(vector->y) << 8)
@@ -70,6 +73,7 @@ static void UnpackVector(sU32 packed,sVector &unpacked)
   unpacked.z = ((packed >>  0) & 0xff) / 127.5f - 1.0f;
   unpacked.w = ((packed >> 24) & 0xff) / 127.5f - 1.0f;
 }
+#endif
 
 /****************************************************************************/
 
@@ -794,7 +798,6 @@ void EngMesh::PaintJob(sInt jobId,GenMaterialPass *pass,const EngPaintInfo &pain
         sInt *vind = job->VertexBuffer;
         sInt count = job->VertexCount;
         sF32 scale = pass->Size;
-        sF32 aspect = pass->Aspect;
 
         // get transform
         sMatrix mat;
@@ -3246,7 +3249,6 @@ void Engine_::BuildPaintJobs()
         if(cullVisible && usage != ENGU_SHADOW)
           continue;
 
-        sMaterial *mtrl = pass->Mtrl;
         sInt passIndex = (pass->Pass + meshMat->Pass) & (ENG_MAXPASS - 1);
         passIndex = sRange(passIndex + job->PassAdjust,ENG_MAXPASS - 1,0);
 

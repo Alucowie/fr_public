@@ -331,12 +331,11 @@ KObject *KOp::Call(KEnvironment *kenv)
   KObject *o;
   KOp *op;
   KObject *result;
-  sInt error;
+#if !sINTRO
+  sInt error = 0;
+#endif
 
   p = 0;
-#if !sINTRO
-  error = 0;
-#endif
 
 // update
 
@@ -360,10 +359,12 @@ KObject *KOp::Call(KEnvironment *kenv)
     if(op)
     {
       o = op->Cache;
-      if(o==0)
-        error = 1;
-      else
+      if(o!=0)
         o->AddRef();
+#if !sINTRO
+      else
+        error = 1;
+#endif
       data[p++] = (sDInt) o;
     }
     else
@@ -425,8 +426,10 @@ KObject *KOp::Call(KEnvironment *kenv)
         Input[i]->Cache->AddRef();
         data[p++] = (sDInt) Input[i]->Cache;
       }
+#if !sINTRO
       else
         error = 1;
+#endif
     }
   }
 

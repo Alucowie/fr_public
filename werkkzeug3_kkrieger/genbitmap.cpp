@@ -757,8 +757,6 @@ GenBitmap * __stdcall Bitmap_RenderTarget(sInt xs,sInt ys,sU32 format)
 
 void __stdcall Bitmap_Inner(sU64 *d,sU64 *s,sInt count,sInt mode,sU64 *x=0)
 {
-  static const sU64 mask1 = 0x8000800080008000;
-
 #ifdef __GNUC__
 #if defined(__x86_64__)
   asm (
@@ -1856,7 +1854,7 @@ GenBitmap * __stdcall Bitmap_GlowRect(GenBitmap *bm,sF32 cx,sF32 cy,sF32 rx,sF32
   sU64 *d;
   sInt x,y;
   sF32 a;
-  sInt f,fm;
+  sInt f;
   sU64 col;
   sF32 fx,fy,tresh;
   sInt LowTable[32];
@@ -1887,8 +1885,6 @@ GenBitmap * __stdcall Bitmap_GlowRect(GenBitmap *bm,sF32 cx,sF32 cy,sF32 rx,sF32
   sx*=bm->XSize;
   sy*=bm->YSize;
 
-  sInt icx=cx,icy=cy,isx=sx,isy=sy;
-
   tresh = 1.0f/65536.0f;
   if(rx<tresh) rx=tresh;
   rx = 1.0f/(rx*rx);
@@ -1898,7 +1894,6 @@ GenBitmap * __stdcall Bitmap_GlowRect(GenBitmap *bm,sF32 cx,sF32 cy,sF32 rx,sF32
 
   alpha *= 32768.0f;
   col = GetColor64(color);
-  fm = alpha;
 
   for(x=0;x<1025;x++)
   {
@@ -2218,7 +2213,7 @@ GenBitmap * __stdcall Bitmap_Blur(GenBitmap *bm,sInt flags,sF32 sx,sF32 sy,sF32 
   sInt s1,s2,d;
   __m64 akku0,akku1,f1mf0,f0f1,out;
   __m64 pix1,pix2,mix1,mix2;
-  __m64 amplo,amplos,amphi,aklo,akhi;
+  __m64 amplo, amphi, aklo, akhi;
   __m64 ampclip,add;
 #ifdef __linux__
   static const long long addc = 0x8000800080008000;
@@ -2266,7 +2261,6 @@ GenBitmap * __stdcall Bitmap_Blur(GenBitmap *bm,sInt flags,sF32 sx,sF32 sy,sF32 
     f1mf0 = _mm_set_pi16(0,f1-f0,0,f1-f0);
     f0f1 = _mm_set_pi16(f1,f0,f1,f0);
     amplo = _mm_set_pi16(amp,amp,amp,amp);
-    amplos = _mm_srli_pi16(amplo,1);
     amphi = _mm_set_pi16(amp>>16,amp>>16,amp>>16,amp>>16);
     ampclip = _mm_set_pi32(ampc,ampc);
 #ifdef __linux__
@@ -3015,17 +3009,17 @@ GenBitmap * __stdcall Bitmap_Text(KOp *op,KEnvironment *kenv,GenBitmap *bm,sF32 
   sU64 col64;
   col64 = GetColor64(col);
   sU32 *bitmem;
-  sInt size;
-  sU8 *data;
   static letterz let[256];
 
   GenBitmap *in;
   sInt xi,yi,i;
   sU32 fade;
-  sInt xs,ys,xp,yp,yf,is,es,xp0,lsk;
+  sInt xs,ys,xp,yp,yf,es,xp0,lsk;
   sU32 *s;
 #if !sINTRO
-  sInt w0,w1,w2;
+  sU8 *data;
+  sInt size;
+  sInt w0,w1,w2,is;
   sInt count,chr;
   sInt page;
   sInt widths[3];
@@ -3048,12 +3042,13 @@ GenBitmap * __stdcall Bitmap_Text(KOp *op,KEnvironment *kenv,GenBitmap *bm,sF32 
 
   es += 2*alias;
 
-  is = inspace*xs;
   xp = x*xs+es;
   yp = y*ys+es;
 
-  data = (sU8*)op->GetBlob(size);
 #if !sINTRO
+  is = inspace*xs;
+
+  data = (sU8*)op->GetBlob(size);
   page = (flags&0x70)>>4;
   if((flags&0x80) && data && data[0]==3 && data[1]==(page!=0) && 
     *((sU16 *)(data+2))==bm->XSize && *((sU16 *)(data+4))==bm->YSize)
@@ -3525,7 +3520,7 @@ GenBitmap * __stdcall Bitmap_Gradient(sInt xs,sInt ys,sU32 col0,sU32 col1,sF32 p
 	GenBitmap *bm;
   sU64 c0,c1;
 	sInt c,cdx,cdy,x,y;
-	sInt dx,dy,pos;
+	sInt dx, dy;
 	sF32 l;
   sInt val;
   sU64 *tile;
@@ -3536,7 +3531,6 @@ GenBitmap * __stdcall Bitmap_Gradient(sInt xs,sInt ys,sU32 col0,sU32 col1,sF32 p
 	c1 = GetColor64(col1);
 
 	l = 32768.0f / length;
-  pos = posf*32768.0f;
 	dx = sFtol(sFCos(a * sPI2) * l);
 	dy = sFtol(sFSin(a * sPI2) * l);
 	cdx = sMulShift(dx,0x10000/bm->XSize);
@@ -3716,7 +3710,6 @@ GenBitmap * __stdcall Bitmap_Unwrap(GenBitmap *bm,sInt mode)
   if(CheckBitmap(bm,&in)) return 0;
 
   BilinearSetup(&ctx,in->Data,in->XSize,in->YSize,(mode >> 4) & 3);
-  sInt wrapMode = mode & 15;
 
   mem = new sU64[in->Size];
   sU16 *d = (sU16 *) mem;

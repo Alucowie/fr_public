@@ -15,7 +15,9 @@
 /****************************************************************************/
 
 static CV2MPlayer *Sound;
+#if !sINTRO
 static sMusicPlayer *Player = 0;
+#endif
 static sInt SoundTimer;
 KDoc *Document;
 KEnvironment *Environment;
@@ -149,11 +151,13 @@ void IntroSoundHandler(sS16 *stream,sInt left,void *user)
   }
 }
 
+#if !sINTRO
 static void MusicPlayerHandler(sS16 *buffer,sInt samples,void *user)
 {
   sMusicPlayer *player = (sMusicPlayer *) user;
   player->Render(buffer,samples);
 }
+#endif
 
 extern sBool ConfigDialog(sInt nr,const sChar *title);
 
@@ -168,11 +172,10 @@ sBool sAppHandler(sInt code,sDInt value)
   sInt beat;
   static const sU8 *data;
   sViewport vp,clearvp;
-  sInt i,max;
+  sInt max;
   sF32 curfps;
   static sF32 oldfps;
   static sInt FirstTime,ThisTime,LastTime;
-  static sInt framectr=0;
   sRect r;
   sInt targetHeight;
 
@@ -227,7 +230,6 @@ sBool sAppHandler(sInt code,sDInt value)
 #endif
 
     sFloatFix();
-    i = sSystem->GetTime();
     Environment->Splines = &Document->Splines.Array;
     Environment->SplineCount = Document->Splines.Count;
     Environment->Game = Game;

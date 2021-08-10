@@ -390,8 +390,6 @@ namespace Ronan
 	{
 		static Phoneme p1,p2;
 
-		register syWRonan &w=*wsptr;
-
 		static const sF32 * const p1f[]={&p1.fnf,&p1.f1f,&p1.f2f,&p1.f3f,&f4    ,&f5     ,&f6};
 		static const sF32 * const p1b[]={&bn    ,&p1.f1b,&p1.f2b,&p1.f3b,&b4    ,&b5     ,&b6};
 		static const sF32 * const p1a[]={&p1.a_n,&p1.a_1,&p1.a_2,&p1.a_3,&p1.a_4,&p1.a_56,&p1.a_56};
@@ -1677,6 +1675,7 @@ static const unsigned char v2initglobs[v2ngparms] =
 // total sound memory size
 static const int smsize=128*sizeof(void*) + 128*v2soundsize;
 
+#if !sINTRO
 static int v2version;
 static int *v2vsizes;
 static int *v2gsizes;
@@ -2030,7 +2029,6 @@ static void ConvertV2M(const unsigned char *inptr, const int inlen, unsigned cha
 
 	sInt *poffsets=(sInt *)base.patchmap;
 	sInt *noffsets=(sInt *)newptr;
-	const int ros=v2vsizes[vdelta]-255*3-1;
 
 	sU8 *nptr2=newptr;
 
@@ -2107,6 +2105,7 @@ static unsigned long GetV2MPatchData(const unsigned char *inptr, const int inlen
 
 	return base.maxp;
 }
+#endif
 
 /****************************************************************************/
 /***                                                                      ***/

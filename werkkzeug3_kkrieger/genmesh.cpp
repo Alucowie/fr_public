@@ -144,7 +144,6 @@ static sInt ClassifyVert(const sVector &v,const sVector &plane)
 
 ClipCode GenSimpleFace::Clip(const sVector &plane,GenSimpleFace *faces) const
 {
-  static const sF32 div_epsilon = 1e-20f;
   sF32 d1,d2,t;
   sInt lastside,side;
   sInt lasti,i;
@@ -1298,11 +1297,10 @@ void GenMesh::CalcFaceNormal(sVector &n,sInt e)
 
 void GenMesh::CalcFaceNormalAccurate(sVector &n,sInt f)
 {
-  sInt v0,e,ee,ne;
+  sInt e, ee, ne;
   sF32 l;
 
   e = ee = Face[f].Edge;
-  v0 = GetVertId(PrevFaceEdge(e))*VertSize();
 
   do
   {

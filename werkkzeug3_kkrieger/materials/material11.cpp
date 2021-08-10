@@ -318,7 +318,6 @@ sBool sMaterial11::Compile()
   sU32 *vs;
   sInt combinermask;
   sInt error;
-  sInt ps00_combine;
 
   sInt TFile[4];                  // sMCS_TEX -> d3d_texture
   sInt TCount;
@@ -326,11 +325,10 @@ sBool sMaterial11::Compile()
 
 // modify material
 
-  ps00_combine = sMCOA_NOP;
-
   switch(ShaderLevel)
   {
 #if !sPLAYER
+  sInt ps00_combine = sMCOA_NOP;
   case sPS_00:
     if(SpecialFlags & sMSF_BUMPDETAIL)
     {

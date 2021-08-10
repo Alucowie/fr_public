@@ -831,7 +831,7 @@ void __stdcall Exec_Effect_PartEmitter(KOp *op,KEnvironment *kenv,
   Particle *part;
   ParticleMem2 *mem2;
   sVector v,rv;
-  sInt max,slices;
+  sInt max;
   ParticleSystem *psys;
   sInt i,j;
 
@@ -844,7 +844,6 @@ void __stdcall Exec_Effect_PartEmitter(KOp *op,KEnvironment *kenv,
 
   i = (kenv->CurrentTime&0xffffff)*(rate/1000);
   j = ((kenv->CurrentTime-kenv->TimeDelta)&0xffffff)*(rate/1000);
-  slices = kenv->TimeDelta;
   max =  i-j;
   if(max>psys->Max-psys->Used)
     max = psys->Max-psys->Used;

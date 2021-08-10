@@ -276,10 +276,7 @@ void ExecSceneInput(KOp *parent,KEnvironment *kenv,sInt i)
 void ExecSceneInputs(KOp *parent,KEnvironment *kenv,sF32 *srt)
 {
   sInt i,max;
-  GenScene *scene;
   sMatrix mat;
-
-  scene = (GenScene *) parent->Cache;
 
   if(srt)
   {
@@ -1118,7 +1115,6 @@ void __stdcall Exec_Scene_Forward(KOp *op,KEnvironment *kenv,sF32 tresh)
 {
   sMatrix mat;//,save;
   sVector v;
-  sF32 f;
   ForwardMem *mem;
 
   //save = kenv->ExecMatrix;
@@ -1134,7 +1130,6 @@ void __stdcall Exec_Scene_Forward(KOp *op,KEnvironment *kenv,sF32 tresh)
 #pragma lekktor(on)
 
   v.Sub3(matrix.l,mem->oldpos);
-  f = v.UnitAbs3();
   mem->oldpos = matrix.l;
   mem->oldpos.AddScale3(v,-tresh);
 
@@ -1185,22 +1180,12 @@ void __stdcall Exec_Scene_Physic(KOp *op,KEnvironment *kenv,sInt flags,sF323 spe
   PhysicMem *mem;
   sVector speed;
   sVector scale;
-  KEvent *monsterevent;
   sMatrix m1;
 //  sInt i;
-  KKriegerCellDynamic *monstercell;
 
   speed.Init(speedf.x,speedf.y,speedf.z);
   scale.Init(scalef.x,scalef.y,scalef.z);
 
-  monsterevent = 0;
-  monstercell =0 ;
-  if(flags & 0x20)
-  {
-    monsterevent = kenv->CurrentEvent;
-    if(monsterevent && monsterevent->Monster==0)
-      monstercell = &kenv->Game->Player.HitCell;
-  }
   //save = kenv->ExecMatrix;
   //mat = save;
   mat = kenv->ExecStack.Top();
@@ -1310,9 +1295,6 @@ GenScene * __stdcall Init_Scene_ForceLights(GenScene *in,sInt mode,sInt sw)
 
 void __stdcall Exec_Scene_ForceLights(KOp *op,KEnvironment *kenv,sInt mode,sInt sw)
 {
-  sInt inc;
-
-  inc = (!mode || (kenv->Game && kenv->Game->Switches[sw])) ? 1 : 0;
   //kenv->ForceLights += inc;
   op->ExecInputs(kenv);
   //kenv->ForceLights -= inc;

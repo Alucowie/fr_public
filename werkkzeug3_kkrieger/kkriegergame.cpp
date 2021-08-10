@@ -1094,7 +1094,6 @@ void KKriegerGame::FireShot(KEnvironment *kenv,sInt weapon,KKriegerMonster *mons
 //  sVector v;
   sVector speed;
   sVector scale;
-  KKriegerCellDynamic *skipcell;
 
   
   sVERIFY(weapon>=0 && weapon<8);
@@ -1122,7 +1121,6 @@ void KKriegerGame::FireShot(KEnvironment *kenv,sInt weapon,KKriegerMonster *mons
 //    v.Init(info->px,info->py,info->pz);
 //    v.Rotate3(mat);
 //    mat.l.Add3(v);
-    skipcell = 0;
     shot->Who = KCRF_ISMONSTER;
     shot->Cell = monster->Collider.Cell;
   }
@@ -1137,7 +1135,6 @@ void KKriegerGame::FireShot(KEnvironment *kenv,sInt weapon,KKriegerMonster *mons
     mat.l.y += LastCamY+CamOffset;
     mat.l.z += PlayerPos.z;
 
-    skipcell = &kenv->Game->Player.HitCell;
     shot->Who = KCRF_ISPLAYER;
     shot->Cell = kenv->Game->PlayerCell;
   }
@@ -2614,13 +2611,11 @@ sBool KKriegerGame::CollideRay(
   KKriegerCollideInfo ci2;
   sInt count;
   sVector d;
-  sBool isnotplayer;
 
   GAMEPERF(CallFindFirstIntersect);
   list[0] = cadd;
   count = 1;
 
-  isnotplayer = !(ci.Flags&KCRF_ISPLAYER);
   d.Sub4(p1,p0);
 
 again:
@@ -2691,12 +2686,10 @@ sBool KKriegerGame::CollideRaySub(const sVector &d,const sVector &p1,const sVect
   KKriegerCell *cell;
   KKriegerCellAdd *cadd;
   KKriegerCellDynamic *dcell;
-  sInt isnotplayer;
   sBool hit0,hit1;
 
   GAMEPERF(CallFindSubIntersect);
 
-  isnotplayer = !(ci.Flags&KCRF_ISPLAYER);
   collided = 0;
   ci.Dist = (sF32) EPSILON;
   for(j=0;j<count;j++)
