@@ -26,7 +26,7 @@ struct sSystem_
 // init/exit/debug
 
   void Log(sChar *);                                      // print out debug string
-  sNORETURN void Abort(sChar *msg);                       // terminate now
+  sNORETURN void Abort(const sChar *msg);                 // terminate now
   void Tag();                                             // called by broker (in a direct hackish fashion)
 
 // console io

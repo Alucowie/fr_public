@@ -838,7 +838,7 @@ struct sSystem_
 // init/exit/debug
 
   void Log(sChar *);                                      // print out debug string
-  sNORETURN void Abort(sChar *msg);                       // terminate now
+  sNORETURN void Abort(const sChar *msg);                 // terminate now
   void Init(sU32 Flags,sInt xs=-1,sInt ys=-1);            // initialise system
   void Exit();                                            // terminate next frame
   void Tag();                                             // called by broker (in a direct hackish fashion)

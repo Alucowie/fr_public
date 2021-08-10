@@ -159,7 +159,7 @@ void sSystem_::Log(sChar *s)
 
 /****************************************************************************/
 
-sNORETURN void sSystem_::Abort(sChar *msg)
+sNORETURN void sSystem_::Abort(const sChar *msg)
 {
 #ifndef __linux__
   _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG)&~(_CRTDBG_LEAK_CHECK_DF|_CRTDBG_ALLOC_MEM_DF));

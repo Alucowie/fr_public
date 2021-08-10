@@ -2143,7 +2143,7 @@ void sSystem_::Tag()
 {
 }
 
-/*sNORETURN*/ void sSystem_::Abort(sChar *msg)
+/*sNORETURN*/ void sSystem_::Abort(const sChar *msg)
 {
 #if sINTRO
   if(DXD)
