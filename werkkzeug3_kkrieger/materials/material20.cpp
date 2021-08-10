@@ -8,6 +8,8 @@
 #include "rtmanager.hpp"
 #include "engine.hpp" // <-- wuarghl
 
+#if sLINK_MTRL20
+
 #include "material20_zfillvs.hpp"
 #include "material20_zfillps.hpp"
 #include "material20_texvs.hpp"
@@ -28,8 +30,6 @@
  - envi doesn't do detail bump
  - envi doesn't do bump tex transform
 */
-
-#if sLINK_MTRL20
 
 /****************************************************************************/
 
