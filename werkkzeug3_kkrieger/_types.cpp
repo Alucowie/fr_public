@@ -1464,7 +1464,7 @@ sBool sFormatString(sChar *d,sInt left,const sChar *s,const sChar **fp)
         if(c=='f')        // this is preliminary!!!!!!!
         {
 #if sINTRO || sMOBILE
-          string = sTXT("???");
+          string = (sChar*)sTXT("???");
 #else
           if(fval<0)
             field1++;
@@ -1495,7 +1495,7 @@ sBool sFormatString(sChar *d,sInt left,const sChar *s,const sChar **fp)
         else if(c=='e')
         {
 #if sINTRO || sMOBILE
-          string = sTXT("???");
+          string = (sChar*)sTXT("???");
 #else
           if(fval<0)
             field1++;
