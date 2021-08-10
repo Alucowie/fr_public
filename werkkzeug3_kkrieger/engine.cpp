@@ -1278,7 +1278,7 @@ void EngMesh::CalcBoundingBox(GenMesh *mesh,sInt mtrlId,sAABox &box)
   for(sInt i=0;i<mesh->Face.Count;i++)
   {
     sInt faceMtrl = mesh->Face[i].Material;
-    if(!faceMtrl || mtrlId != -1 && faceMtrl != mtrlId)
+    if(!faceMtrl || (mtrlId != -1 && faceMtrl != mtrlId))
       continue;
 
     sInt e,ee;
@@ -1855,7 +1855,7 @@ void EngMesh::CalcBoundingBox(GenMinMesh *mesh,sInt clusterId,sAABox &box)
   {
     GenMinFace *face = &mesh->Faces[i];
     sInt faceCluster = face->Cluster;
-    if(!faceCluster || clusterId != -1 && faceCluster != clusterId)
+    if(!faceCluster || (clusterId != -1 && faceCluster != clusterId))
       continue;
 
     for(sInt j=0;j<face->Count;j++)
@@ -2112,7 +2112,7 @@ void EngMesh::PrepareThickLinesJob(Job *job,GenMinMesh *mesh)
       if(adjFace < faceInd)
       {
         if(curFace->Cluster == job->MtrlId ||
-          adjFace != -1 && mesh->Faces[adjFace].Cluster == job->MtrlId)
+          (adjFace != -1 && mesh->Faces[adjFace].Cluster == job->MtrlId))
           edgeCount++;
       }
     }
@@ -2134,7 +2134,7 @@ void EngMesh::PrepareThickLinesJob(Job *job,GenMinMesh *mesh)
       if(adjFace < faceInd)
       {
         if(curFace->Cluster == job->MtrlId ||
-          adjFace != -1 && mesh->Faces[adjFace].Cluster == job->MtrlId)
+          (adjFace != -1 && mesh->Faces[adjFace].Cluster == job->MtrlId))
         {
           job->VertexBuffer[edgeCount*2+0] = curFace->Vertices[j];
           job->VertexBuffer[edgeCount*2+1] = curFace->Vertices[(j+1) % count];

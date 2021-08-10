@@ -553,7 +553,7 @@ extern "C" void __stdcall ronanCBTick()
 					for (fs=0; fs<NSYLS-1; fs++)
 					{
 						const syldef &s=syls[fs];
-						if (len2=mystrnicmp1(s.syl,w.ptr))
+						if ((len2 = mystrnicmp1(s.syl,w.ptr)))
 						{
 							len=len2;
 //							printf2("got %s\n",s.syl);

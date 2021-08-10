@@ -4055,7 +4055,7 @@ GenMesh * __stdcall Mesh_SelectRandom(GenMesh *mesh,sU32 dmask,sInt dmode,sU32 r
 
   if(CheckMesh(mesh)) return 0;
 
-	sSetRndSeed(seed+seed*31743^(seed<<23));
+	sSetRndSeed((seed+seed*31743)^(seed<<23));
 	
 	for(i=0;i<mesh->Edge.Count;i++)
 		mesh->Edge[i].Select=(sGetRnd()>>24)<=ratio;

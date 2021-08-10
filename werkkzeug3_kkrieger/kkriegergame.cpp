@@ -1174,8 +1174,8 @@ void KKriegerGame::OnTick(KEnvironment *kenv,sInt slices)
   sF32 f;
   KKriegerCollideInfo ci;
 
-  inOptions = Switches[KGS_GAME] == KGS_GAME_OPTIONS
-    || Switches[KGS_GAME] == KGS_GAME_INGAME && Switches[KGS_INGAME_MENU] == 1;
+  inOptions = (Switches[KGS_GAME] == KGS_GAME_OPTIONS)
+    || ((Switches[KGS_GAME] == KGS_GAME_INGAME) && (Switches[KGS_INGAME_MENU] == 1));
 
   if(WasInOptions && !inOptions)
     OnOptionsChanged();
