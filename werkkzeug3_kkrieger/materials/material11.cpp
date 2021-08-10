@@ -297,17 +297,17 @@ sBool sMaterial11::Compile()
   };
   static sU32 pssrc13[sMCS_MAX] =
   {
-    XSALL|X_R|0,  XSALL|X_C|0,  XSALL|X_C|1,           ~0,
-             ~0,           ~0,   XS_W|X_R|0,  XSALL|X_C|2,
-    XSALL|X_C|3,           ~0,           ~0,  XSALL|X_V|0,
-             ~0,
+    XSALL|X_R|0,  XSALL|X_C|0,  XSALL|X_C|1, 0xffffffff,
+    0xffffffff,   0xffffffff,   XS_W|X_R|0,  XSALL|X_C|2,
+    XSALL|X_C|3,  0xffffffff,   0xffffffff,  XSALL|X_V|0,
+    0xffffffff,
   };
   static sU32 psalpha13[16] =
   {
     XS_W|X_C|6, XS_Z|X_R|1, XS_W|X_R|0, XS_W|X_C|6,
     XS_W|X_T|0, XS_W|X_T|1, XS_W|X_T|2, XS_W|X_T|3,
     XS_W|X_C|0, XS_W|X_C|1, XS_W|X_C|2, XS_W|X_C|3,
-    XS_W|X_C|7, XS_Z|X_C|6,         ~0,         ~0,
+    XS_W|X_C|7, XS_Z|X_C|6, 0xffffffff, 0xffffffff,
   };
 
   sU32 *data;
