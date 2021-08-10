@@ -246,7 +246,7 @@ struct KInstanceMem               // used for instance-storage. derive from this
   KInstanceMem *Next;             // next instance mem
   KInstanceMem **DeleteChild;     // recurse to this child when DeleteChain(). 
   KInstanceMem **DeleteChild2;    // recurse to this child when DeleteChain(). 
-  void *DeleteArray;              // call delete[] on this when DeleteChain(). 
+  sVector *DeleteArray;           // call delete[] on this when DeleteChain().
   sBool Reset;                    // set true on first encounter, automatically reset
   void DeleteChain();             // delete a list of KInstanceMem, beginning with *this. can be called on 0-pointers
 };
