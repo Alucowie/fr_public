@@ -3231,7 +3231,16 @@ void Engine_::BuildPaintJobs()
           continue;
 
         sInt jobId = meshMat->JobIds[j];
+#ifdef __GNUC__
+#if defined(__x86_64__)
+        sS64 materialId = sS64(pass) >> 3; // FIXME
+#endif
+#if defined(__i386__)
         sInt materialId = sInt(pass) >> 3; // FIXME
+#endif
+#else
+        sInt materialId = sInt(pass) >> 3; // FIXME
+#endif
         sInt matrixId = mesh->Jobs[jobId].AnimMatrix;
 
         if(matrixId == -1 || animBase == -1)

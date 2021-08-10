@@ -430,7 +430,7 @@ void __stdcall Exec_Scene_Light(KOp *op,KEnvironment *kenv,sF323 r,sF323 t,sU32 
   light.Amplify = amplify;
   light.Range = range;
   light.Event = kenv->CurrentEvent;
-  light.Id = (sInt) op;
+  light.Id = (sDInt) op;
 
   Engine->AddLightJob(light);
 

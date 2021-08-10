@@ -188,7 +188,7 @@ sBool sAppHandler(sInt code,sDInt value)
     data = PtrTable[0];
 
 //#if !sINTRO
-    if(((sInt)data)==0x54525450)
+    if(((sDInt)data)==0x54525450)
     {
       data = sSystem->LoadFile(sSystem->GetCmdLine());
       if(data==0)
