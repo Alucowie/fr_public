@@ -2220,7 +2220,11 @@ GenBitmap * __stdcall Bitmap_Blur(GenBitmap *bm,sInt flags,sF32 sx,sF32 sy,sF32 
   __m64 pix1,pix2,mix1,mix2;
   __m64 amplo,amplos,amphi,aklo,akhi;
   __m64 ampclip,add;
+#ifdef __linux__
+  static const long long addc = 0x8000800080008000;
+#else
   static const __int64 addc = 0x8000800080008000;
+#endif
   sU16 *p,*q,*pp,*qq,*po,*qo;
   sInt ordercount;
   sInt amp,ampc,famp;
@@ -2265,7 +2269,11 @@ GenBitmap * __stdcall Bitmap_Blur(GenBitmap *bm,sInt flags,sF32 sx,sF32 sy,sF32 
     amplos = _mm_srli_pi16(amplo,1);
     amphi = _mm_set_pi16(amp>>16,amp>>16,amp>>16,amp>>16);
     ampclip = _mm_set_pi32(ampc,ampc);
+#ifdef __linux__
+    *((long long *) &add) = addc;
+#else
     *((__int64 *) &add) = addc;
+#endif
 
     do
     {
