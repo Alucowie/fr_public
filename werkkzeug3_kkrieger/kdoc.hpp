@@ -415,7 +415,11 @@ struct KOp                        // Operator
   sInt Changed;                   // cache is dirty
   sInt DataInvalid;               // this operator has been animated, please copy DataCopy to Data
   sInt CacheCount;                // on creation set to output-count, then reduced with each link
+#if sPLAYER
+  sDInt WheelSpeed;               // abuse
+#else
   sInt WheelSpeed;                // used only for spinning wheels in the gui...
+#endif
   KEvent *FirstEvent;             // list of active events for this operator
   void *InitHandler;              // the actual code
   void *ExecHandler;              // the actual code

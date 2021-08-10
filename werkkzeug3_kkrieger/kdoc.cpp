@@ -241,9 +241,9 @@ sInt KOp::Calc(KEnvironment *env,sInt flags)
 
 #pragma warning(disable : 4731)   // EPB CHANGED WARNING
 
-static sInt CallCode(sInt code,sInt *para,sInt count)
+static sDInt CallCode(sDInt code, sInt *para, sInt count)
 {
-  sInt result;
+  sDInt result;
 #ifdef __GNUC__
 #if defined(__x86_64__)
   asm (
@@ -325,7 +325,7 @@ static sInt CallCode(sInt code,sInt *para,sInt count)
 
 KObject *KOp::Call(KEnvironment *kenv)
 {
-  sU32 data[KK_MAXINPUT+128];
+  sDInt data[KK_MAXINPUT+128];
   sInt p,pNoPara;
   sInt i,max;
   KObject *o;
@@ -342,11 +342,11 @@ KObject *KOp::Call(KEnvironment *kenv)
 
   if(Convention&(OPC_KOP|OPC_ALTINIT))
   {
-    data[p++] = (sU32) this;
+    data[p++] = (sDInt) this;
   }
   if(Convention&OPC_KENV)
   {
-    data[p++] = (sU32) kenv;
+    data[p++] = (sDInt) kenv;
   }
 
   pNoPara = p;
@@ -364,7 +364,7 @@ KObject *KOp::Call(KEnvironment *kenv)
         error = 1;
       else
         o->AddRef();
-      data[p++] = (sU32) o;
+      data[p++] = (sDInt) o;
     }
     else
     {
@@ -379,14 +379,14 @@ KObject *KOp::Call(KEnvironment *kenv)
   {
     if(Convention & OPC_DONTCALLLINK)
     {
-      data[p++] = (sU32) Link[i];
+      data[p++] = (sDInt) Link[i];
     }
     else
     {
       o = (Link[i] ? Link[i]->Cache : 0);
       if(o)
         o->AddRef();
-      data[p++] = (sU32) o;
+      data[p++] = (sDInt) o;
     }
   }
 
@@ -400,13 +400,13 @@ KObject *KOp::Call(KEnvironment *kenv)
 
   max = OPC_GETSTRING(Convention);
   for(i=0;i<max;i++)
-    data[p++] = (sU32) GetString(i);
+    data[p++] = (sDInt) GetString(i);
 
 // splines
 
   max = OPC_GETSPLINE(Convention);
   for(i=0;i<max;i++)
-    data[p++] = (sU32) GetSpline(i);
+    data[p++] = (sDInt) GetSpline(i);
 
 // outputcount
 
@@ -423,7 +423,7 @@ KObject *KOp::Call(KEnvironment *kenv)
       if(Input[i] && Input[i]->Cache && p<KK_MAXINPUT+128)
       {
         Input[i]->Cache->AddRef();
-        data[p++] = (sU32) Input[i]->Cache;
+        data[p++] = (sDInt) Input[i]->Cache;
       }
       else
         error = 1;
@@ -455,14 +455,14 @@ KObject *KOp::Call(KEnvironment *kenv)
     if(Convention&OPC_ALTINIT)
       p = pNoPara;
 
-    result = (KObject *)CallCode((sInt)InitHandler,(sInt *)data,p);
+    result = (KObject *)CallCode((sDInt)InitHandler,(sInt *)data,p);
   }
 #else
   {
     if(Convention&OPC_ALTINIT)
       p = pNoPara;
 
-    result = (KObject *)CallCode((sInt)InitHandler,(sInt *)data,p);
+    result = (KObject *)CallCode((sDInt)InitHandler,(sInt *)data,p);
   }
 #endif
 
@@ -535,7 +535,7 @@ void KOp::ExecWithNewMem(KEnvironment *kenv,KInstanceMem **link)
 
 void KOp::Exec(KEnvironment *kenv)
 {
-  sU32 data[KK_MAXINPUT+128];
+  sDInt data[KK_MAXINPUT+128];
   sInt p;
   sInt i,max;
   sInt pops;
@@ -583,8 +583,8 @@ void KOp::Exec(KEnvironment *kenv)
 
 // parameter-case
 
-    data[p++] = (sU32) this;              // obligatorische parameter
-    data[p++] = (sU32) kenv;              
+    data[p++] = (sDInt) this;              // obligatorische parameter
+    data[p++] = (sDInt) kenv;
 
     max = OPC_GETDATA(Convention);        // normal parameters
     sCopyMem(data+p,GetAnimPtrU(0),max*sizeof(sU32));
@@ -592,22 +592,22 @@ void KOp::Exec(KEnvironment *kenv)
 
     max = OPC_GETSTRING(Convention);      // strings
     for(i=0;i<max;i++)
-      data[p++] = (sU32) GetString(i);
+      data[p++] = (sDInt) GetString(i);
 
     max = OPC_GETSPLINE(Convention);      // splines
     for(i=0;i<max;i++)
-      data[p++] = (sU32) GetSpline(i);
+      data[p++] = (sDInt) GetSpline(i);
 
     if(Convention&OPC_OUTPUTCOUNT)        // outputcount
       data[p++] = OutputCount;
 
-    CallCode((sInt)ExecHandler,(sInt *)data,p);   // call
+    CallCode((sDInt)ExecHandler,(sInt *)data,p);   // call
   }
 
 // end animation
 
   kenv->Pop(pops);
-  WheelSpeed = sMax(WheelSpeed,96);
+  WheelSpeed = sMax(WheelSpeed,96l);
 #if !sPLAYER
   CycleFlag = 0;
 #endif
@@ -1681,7 +1681,7 @@ void KDoc::Init(const sU8 *&dataPtr)
     op->Convention = cls->Convention;
     op->InitHandler = cls->InitHandler;
     op->ExecHandler = cls->ExecHandler;
-    op->WheelSpeed = (sInt) cls->Packing; // abuse, yes.
+    op->WheelSpeed = (sDInt) cls->Packing; // abuse, yes.
     op->OpId = i;
     op->AnimFlag = sTRUE; // first, assume that ops are all animated
 
