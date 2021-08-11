@@ -2242,7 +2242,7 @@ void sVerifyFalse(const sChar *file,sInt line)
 
 extern sInt sFatality;
 #ifndef __linux__
-extern "C" void __stdcall OutputDebugStringA(char *string);
+extern "C" void __stdcall OutputDebugStringA(const char *string);
 extern "C" int __stdcall wvsprintfA(char *buffer,const char *fmt,va_list args);
 #else
 #define OutputDebugStringA(string) puts(string)
