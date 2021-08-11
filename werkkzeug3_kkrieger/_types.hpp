@@ -86,6 +86,9 @@
 #define _MFC_OVERRIDES_NEW
 void *  __cdecl operator new(unsigned int);
 void *  __cdecl operator new(unsigned int,const char *,int);
+#ifdef __MINGW32__
+void *  __cdecl operator new[](unsigned int,const char *,int);
+#endif
 inline void __cdecl operator delete(void *p, const char *, int s) { ::operator delete(p); }
 #define new new(__FILE__,__LINE__)
 #endif

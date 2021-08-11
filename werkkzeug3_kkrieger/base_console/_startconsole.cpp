@@ -32,6 +32,16 @@ void * __cdecl operator new(unsigned int size,const char *file,int line)
   return p;
 }
 
+#ifdef __MINGW32__
+void * __cdecl operator new[](unsigned int size,const char *file,int line)
+{
+  void *p;
+  p = _malloc_dbg(size,_NORMAL_BLOCK,file,line);
+  MemoryUsedCount+=_msize(p);
+  return p;
+}
+#endif
+
 void operator delete(void *p)
 {
 	if(p)
