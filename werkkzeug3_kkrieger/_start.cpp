@@ -1928,7 +1928,7 @@ void sSystem_::InitScreens()
 {
   HRESULT hr;
   D3DPRESENT_PARAMETERS d3dpp;
-  sInt i;
+  sU32 i;
   sU32 create;
   sU16 *iblock;
   D3DCAPS9 caps;
@@ -3095,7 +3095,7 @@ sInt sSystem_::GeoAdd(sInt fvf,sInt prim)
   sInt i;
   sGeoHandle *gh;
 
-  sVERIFY(fvf>=1 && fvf<FVFMax);
+  sVERIFY(fvf>=1 && (sU32)fvf<FVFMax);
   for(i=1;i<MAX_GEOHANDLE;i++)
   {
     gh = &GeoHandle[i];
@@ -3174,7 +3174,7 @@ sInt sSystem_::GeoDraw(sInt &handle)
     return update;
 
 // set up buffers
-  if(gh->FVF != LastDecl)
+  if(gh->FVF != (sU32)LastDecl)
   {
     DXDev->SetVertexDeclaration(FVFTable[gh->FVF].Decl);
     LastDecl = gh->FVF;
@@ -5007,7 +5007,7 @@ sInt sSystem_::SampleAdd(sS16 *data, sInt size, sInt buffers, sInt handle, bool 
 
     hr = dsb->Lock(0,0,(void **)&ptr,&len,0,0,DSBLOCK_ENTIREBUFFER);
     if(FAILED(hr)) return sINVALID;
-    sVERIFY(len==size*format.nBlockAlign);
+    sVERIFY(len==(sU32)size*format.nBlockAlign);
 
     if(!is3d) // we can upload stereo samples
       sCopyMem(ptr,data,size*format.nBlockAlign);
