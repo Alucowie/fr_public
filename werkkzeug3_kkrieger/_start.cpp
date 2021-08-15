@@ -3565,7 +3565,7 @@ void sSystem_::UpdateTexture(sInt handle,sU16 *source,sInt miptresh)
   sInt xs,ys,level;
   sInt mipdir;
   sInt filter;
-  sInt alpha;
+//  sInt alpha;
 
   sInt x,y;
   sInt bpr,oxs;
@@ -3574,7 +3574,7 @@ void sSystem_::UpdateTexture(sInt handle,sU16 *source,sInt miptresh)
 //  sU8 *d8;
 
   mipdir = miptresh & 16;
-  alpha = miptresh & 32;
+//  alpha = miptresh & 32;
   miptresh = miptresh & 15;
  
   tex = &Textures[handle];
@@ -4811,7 +4811,7 @@ unsigned long __stdcall ThreadCode(void *)
   DWORD count1,count2;
   void *pos1,*pos2;
   const sInt SAMPLESIZE = 4;
-  sInt size,pplay;
+  sInt size;
 
   while(DXSRun==0)
   {
@@ -4821,7 +4821,6 @@ unsigned long __stdcall ThreadCode(void *)
     hr = DXSBuffer->GetCurrentPosition((DWORD*)&play,(DWORD*)&dummy);
     if(!FAILED(hr))
     {
-      pplay = play;
       play = play/SAMPLESIZE;
       DXSReadOffset = play;
       DXSTime = timeGetTime();
@@ -4886,8 +4885,6 @@ unsigned long __stdcall ThreadCode(void *)
 
 static void DSNullHandler(sS16 *data,sInt samples,void *user)
 {
-  static sInt p0,p1;
-
   sSetMem4((sU32 *)data,0x00000000,samples);
 }
 
@@ -5090,7 +5087,6 @@ sInt sSystem_::SamplePlay(sInt handle,sF32 volume,sF32 pan,sInt freq)
 {
   sSample *sam;
   sSampleBuffer *buf;
-  HRESULT hr;
   sInt d3dvol,d3dpan;
 
   sVERIFY(handle>=0 && handle<sMAXSAMPLEHANDLE);
@@ -5108,7 +5104,7 @@ sInt sSystem_::SamplePlay(sInt handle,sF32 volume,sF32 pan,sInt freq)
     buf->Buffer->SetVolume(d3dvol);
     if(!sam->Is3D)
       buf->Buffer->SetPan(d3dpan);
-    hr = buf->Buffer->Play(0,0,0);
+    buf->Buffer->Play(0,0,0);
 
     buf->PlayTime = SoundTime;
 
@@ -5921,8 +5917,6 @@ sSimpleMaterial::sSimpleMaterial(sInt tex,sU32 flags,sU32 flags2,sU32 color)
     0x00000001, 0xd00f0000, 0x90e40001,                 // mov oD0,v1
     0x0000ffff,                                         // end
   };
-
-  sInt blendMode = flags & sMBF_BLENDMASK;
 
   // zbias calc
   sF32 zBias = 0.0f;
