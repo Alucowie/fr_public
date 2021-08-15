@@ -9,6 +9,7 @@
 #include "engine.hpp"
 #include "genoverlay.hpp"
 #include "rtmanager.hpp"
+#include "resource.h"
 
 #define WAITFORKEY  1
 
@@ -204,7 +205,7 @@ bool sAppHandler(sInt code, sDInt value)
     {
       sChar *name = 0;
       if(data[0]&1) name = (sChar *)(data+4);
-      return ConfigDialog(101,name) == 1;
+      return ConfigDialog(IDD_DIALOG1, name) == 1;
     }
 #endif
     break;

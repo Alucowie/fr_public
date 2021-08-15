@@ -1,4 +1,4 @@
-parentinc = include_directories('..', '../materials')
+parentinc = include_directories('..', '../materials', '../player_demo/')
 
 if host_machine.system() == 'windows'
 windows = import('windows')
