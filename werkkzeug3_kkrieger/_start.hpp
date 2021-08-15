@@ -447,7 +447,7 @@ public:
   __forceinline sInt GetAdvance() { return Advance; }
   __forceinline sInt GetBaseline() { return Baseline; }
 
-  void Init(sChar *name,sInt height,sInt widht=0,sInt style=0);
+  void Init(const sChar *name, sInt height, sInt widht=0, sInt style=0);
   sInt GetWidth(sChar *,sInt len=-1);
   void Print(sBitmap *,sChar *,sInt x,sInt y,sU32 color=0xffffffff,sInt len=-1);
   bool Prepare(sBitmap *, sChar *, sHostFontLetter *);

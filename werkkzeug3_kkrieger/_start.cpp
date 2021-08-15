@@ -6185,7 +6185,7 @@ void sHostFont::End(sBitmap *bm)
 /****************************************************************************/
 /****************************************************************************/
 
-void sHostFont::Init(sChar *name,sInt height,sInt width,sInt style)
+void sHostFont::Init(const sChar *name, sInt height, sInt width, sInt style)
 {
   LOGFONT lf;
   TEXTMETRIC met;
