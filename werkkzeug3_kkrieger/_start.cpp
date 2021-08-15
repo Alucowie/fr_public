@@ -9,7 +9,9 @@
 #endif
 
 #define WINVER 0x500
+#ifndef __MINGW32__
 #define _WIN32_WINNT 0x0500
+#endif
 #define DIRECTINPUT_VERSION 0x0800
 #define DIRECTSOUND_VERSION 0x0800
 
