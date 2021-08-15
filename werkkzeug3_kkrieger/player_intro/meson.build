@@ -1,5 +1,12 @@
 parentinc = include_directories('..', '../materials')
 
+if host_machine.system() == 'windows'
+windows = import('windows')
+resource = windows.compile_resources('../player_demo/demo_resource.rc', args : ['-DINTRO'])
+else
+resource = []
+endif
+
 generators = [
   '../genbitmap.cpp',
   '../genblobspline.cpp',
@@ -34,7 +41,8 @@ src = [
   '../kdoc.cpp',
   'intro_oplist.cpp',
   '../mainplayer.cpp',
+  '../player_demo/resource.h',
   effect_jpegps_hpp,
-  effect_jpegvs_hpp] + generators + materials + music + system
+  effect_jpegvs_hpp] + generators + materials + music + system + resource
 
 playerintro = executable('player_intro', src, include_directories : parentinc, cpp_pch : '../player_intro/intro_config.hpp', cpp_args : ['-fpermissive'], link_args : cpp_winlibs, win_subsystem : 'windows')
