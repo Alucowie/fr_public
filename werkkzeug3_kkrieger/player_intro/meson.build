@@ -36,4 +36,5 @@ src = [
   '../mainplayer.cpp',
   effect_jpegps_hpp,
   effect_jpegvs_hpp] + generators + materials + music + system
-playerintro = executable('player_intro', src, include_directories : parentinc, cpp_pch : '../player_intro/intro_config.hpp', cpp_args : ['-fpermissive'])
+
+playerintro = executable('player_intro', src, include_directories : parentinc, cpp_pch : '../player_intro/intro_config.hpp', cpp_args : ['-fpermissive'], link_args : cpp_winlibs, win_subsystem : 'windows')

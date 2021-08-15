@@ -8,12 +8,15 @@ add_project_arguments('-msse', language : 'cpp')
 
 nasm = find_program('nasm')
 
+if host_machine.system() == 'windows'
 viruz2a = custom_target('_viruz2a.obj',
                         input : '_viruz2a.asm',
                         output : '_viruz2a.obj',
                         command : [nasm, '-f', 'win32',
                                    '-o', '@OUTPUT@',
                                    '@INPUT@'])
+cpp_winlibs = ['-lwinmm', '-ldxguid' , '-ldinput']
+endif
 
 subdir('base_console')
 subdir('shadercompile')
