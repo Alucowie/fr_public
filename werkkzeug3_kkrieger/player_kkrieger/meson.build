@@ -23,7 +23,7 @@ music = [
 
 system = [
   '../_lekktor.cpp',
-  '../_start_opengl.cpp',
+  '../' + start,
   '../_types.cpp']
 
 src = [
@@ -32,4 +32,5 @@ src = [
   'kkrieger_oplist.cpp',
   '../kkriegergame.cpp',
   '../mainplayer.cpp'] + generators + materials + music + system
-playerkkrieger = executable('player_kkrieger', src, include_directories : parentinc, cpp_pch : '../player_kkrieger/kkrieger_config.hpp', cpp_args : ['-DKKRIEGER', '-fpermissive'])
+
+playerkkrieger = executable('player_kkrieger', src, include_directories : parentinc, cpp_pch : '../player_kkrieger/kkrieger_config.hpp', cpp_args : ['-DKKRIEGER', '-fpermissive'], link_args : cpp_winlibs, win_subsystem : 'windows')

@@ -15,6 +15,7 @@ viruz2a = custom_target('_viruz2a.obj',
                         command : [nasm, '-f', 'win32',
                                    '-o', '@OUTPUT@',
                                    '@INPUT@'])
+start = '_start.cpp'
 cpp_winlibs = ['-lwinmm', '-ldxguid' , '-ldinput']
 endif
 if host_machine.system() == 'linux'
@@ -24,6 +25,7 @@ viruz2a = custom_target('_viruz2a_64.obj',
                         command : [nasm, '-f', 'elf64',
                                    '-o', '@OUTPUT@',
                                    '@INPUT@'])
+start = '_start_opengl.cpp'
 cpp_winlibs = []
 endif
 
