@@ -507,7 +507,7 @@ typedef void (*sSoundHandler)(sS16 *steriobuffer,sInt samples,void *user);
 
 struct sGeoBuffer                 // a vertex or indexbuffer
 {
-  bool Type;                      // 0 = unused, 1 = index, 2 = vertex
+  sInt Type;                      // 0 = unused, 1 = index, 2 = vertex
   sInt Size;                      // Size of the buffer in bytes
   sInt Used;                      // first free byte
   sInt UserCount;                 // counts active allocations. increased with alloc, decreased with free. if decreased to zero, the buffer is assumed to be completly free'ed and Used is reset
