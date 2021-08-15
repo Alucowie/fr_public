@@ -99,10 +99,12 @@ HWND MsgWin;
 
 sSystem_ *sSystem;
 
+#if !sINTRO
 static sU64 sPerfFrame;
 static sF64 sPerfKalibFactor = 1.0f/1000;
 static sU64 sPerfKalibRDTSC;
 static sU64 sPerfKalibQuery;
+#endif
 
 // dies sollten meistens konstanten sein, damit ein paar if's wegoptimieren
 // (auch ohne lekktor)
@@ -2358,7 +2360,10 @@ void sSystem_::WaitForKey()
 void sSystem_::Render()
 {
   static sInt LastTime=-1;
-  sInt time,ticks;
+  sInt time;
+#if !sINTRO
+  sInt ticks = 0;
+#endif
   HRESULT hr;
 
   LastCamera.Init();
@@ -2383,7 +2388,6 @@ void sSystem_::Render()
 #pragma lekktor(on)
 
   time = sSystem->GetTime();
-  ticks = 0;
   if(LastTime==-1)
     LastTime = time;
 
@@ -6662,6 +6666,7 @@ void sSystem_::PrintShader(const sU32 *data)
 
 /****************************************************************************/
 
+#if !sINTRO
 // Compare two state lists.
 static bool checkStatesEqual(const sU32 *st1, const sU32 *st2)
 {
@@ -6685,6 +6690,7 @@ static sInt checkShadersEqual(const sU32 *sh1,const sU32 *sh2)
 
   return sh1[i] == sh2[i] ? i + 1 : 0;
 }
+#endif
 
 sInt sSystem_::MtrlAddSetup(const sU32 *states,const sU32 *vs,const sU32 *ps)
 {
