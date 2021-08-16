@@ -6,5 +6,30 @@ add_project_arguments('-D_DEBUG', language : 'cpp')
 add_project_arguments('-mmmx', language : 'cpp')
 add_project_arguments('-msse', language : 'cpp')
 
+nasm = find_program('nasm')
+
+viruz2a = custom_target('_viruz2a.obj',
+                        input : '_viruz2a.asm',
+                        output : '_viruz2a.obj',
+                        command : [nasm, '-f', 'win32',
+                                   '-o', '@OUTPUT@',
+                                   '@INPUT@'])
+
 subdir('base_console')
 subdir('shadercompile')
+
+effect_jpegps_hpp = custom_target(
+  'effect_jpegps.hpp',
+  output : 'effect_jpegps.hpp',
+  input : 'werkkzeug3/effect_jpeg.psh',
+  command : [shadercompile, '@INPUT@', '--out-header', '@OUTPUT@'],
+  )
+
+effect_jpegvs_hpp = custom_target(
+  'effect_jpegvs.hpp',
+  output : 'effect_jpegvs.hpp',
+  input : 'werkkzeug3/effect_jpeg.vsh',
+  command : [shadercompile, '@INPUT@', '--out-header', '@OUTPUT@'],
+  )
+
+subdir('player_intro')
