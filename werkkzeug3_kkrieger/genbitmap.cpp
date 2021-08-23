@@ -159,6 +159,38 @@ void Fade64(sU64 &r,sU64 &c0,sU64 &c1,sInt fade)
   static const sU64 add0 = 0x0000800100000000;
 
 #ifdef __GNUC__
+#if defined(__x86_64__)
+  asm (
+    "lea       %1, %%rax\n\t"
+    "movq      (%%rax), %%mm2\n\t"
+    "lea       %2, %%rax\n\t"
+    "movq      (%%rax), %%mm3\n\t"
+
+    "movd      %3, %%mm0\n\t"
+    "punpckldq %%mm0, %%mm0\n\t"
+    "psrad     $1, %%mm0\n\t"
+    "pxor      %4, %%mm0\n\t"
+    "paddd     %5, %%mm0\n\t"
+    "packssdw  %%mm0, %%mm0;\n\t"
+    "punpcklwd %%mm0, %%mm0;\n\t"
+    "movq      %%mm0, %%mm1;\n\t"
+    "punpcklwd %%mm0, %%mm0;\n\t"
+    "punpckhwd %%mm1, %%mm1;\n\t"
+
+    "lea       %0, %%rax\n\t"
+    "pmulhw    %%mm0, %%mm3\n\t"
+    "pmulhw    %%mm1, %%mm2\n\t"
+    "paddw     %%mm3, %%mm2\n\t"
+    "psllw     $1, %%mm2\n\t"
+    "movq      %%mm2, (%%rax)\n\t"
+
+    "emms\n\t"
+    :
+    : "m" (&r), "m" (&c0), "m" (&c1), "m" (fade),
+      "m" (xor0), "m" (add0)
+    : "rax"
+  );
+#endif
 #if defined(__i386__)
   asm (
     "mov       %1, %%eax\n\t"
@@ -225,6 +257,31 @@ void Fade64(sU64 &r,sU64 &c0,sU64 &c1,sInt fade)
 void AddScale64(sU64 &r,sU64 &c0,sU64 &c1,sInt fade)
 {
 #ifdef __GNUC__
+#if defined(__x86_64__)
+  asm (
+    "mov       %1, %%rax\n\t"
+    "movq      (%%rax), %%mm2\n\t"
+    "mov       %2, %%rax\n\t"
+    "movq      (%%rax), %%mm3\n\t"
+
+    "movd      %3, %%mm0\n\t"
+    "psrad     $1, %%mm0\n\t"
+    "packssdw  %%mm0, %%mm0\n\t"
+    "punpcklwd %%mm0, %%mm0\n\t"
+    "punpcklwd %%mm0, %%mm0\n\t"
+
+    "mov       %0, %%rax\n\t"
+    "pmulhw    %%mm0, %%mm3\n\t"
+    "psllw     $1, %%mm3\n\t"
+    "paddsw    %%mm3, %%mm2\n\t"
+    "movq      %%mm2, (%%rax)\n\t"
+
+    "emms\n\t"
+    :
+    : "m" (&r), "m" (&c0), "m" (&c1), "m" (fade)
+    : "rax"
+  );
+#endif
 #if defined(__i386__)
   asm (
     "mov       %1, %%eax\n\t"
@@ -292,6 +349,134 @@ void BilinearFilter(BilinearContext *ctx,sU64 *r,sInt u,sInt v)
 #ifdef __GNUC__
 #define DECLARE_STRUCT_OFFSET(Type, Member)     \
       [Member] "i" (offsetof(Type, Member))
+#if defined(__x86_64__)
+  asm (
+    "mov       %4, %%rsi\n\t"
+    "mov       %c[Src](%%rsi), %%rdi\n\t"
+
+    "movd      %1, %%mm1\n\t"
+
+    // calc s0
+    //"lea       -0x8000000000000000(%%rax), %%rbx\n\t"
+    "movabsq   0x8000000000000000, %%rax\n\t"
+    "mov       %%rax, %%rbx\n\t"
+    "movsxd    %1, %%rax\n\t"
+    "sub       %%rax, %%rbx\n\t"
+    "sar       $16, %%rax\n\t"
+    "sar       $31, %%rbx\n\t"
+    "mov       %%rax, %%rdx\n\t"
+    "mov       %c[XShift](%%rsi), %%rcx\n\t"
+
+    "and       %c[YAm](%%rsi), %%rax\n\t"
+    "and       %c[YSize1](%%rsi), %%rbx\n\t"
+    "cmp       %c[YSize1](%%rsi), %%rax\n\t"
+    "jbe       ok1\n\t"
+    "mov       %%rbx, %%rax\n\t"
+
+"ok1:\n\t"
+    "shl       %%cl, %%rax\n\t"
+    "add       %%rax, %%rdi\n\t"
+
+    "movd      %0, %%mm0\n\t"
+
+    // calc s1
+    //"lea       0x7fffffffffffffff(%%rdx), %%rbx\n\t"
+    "movabsq   0x7fffffffffffffff, %%rax\n\t"
+    "mov       %%rax, %%rbx\n\t"
+    "lea       1(%%rdx), %%rax\n\t"
+    "add       %%rdx, %%rbx\n\t"
+    "and       %c[YAm](%%rsi), %%rax;\n\t"
+    "sar       $31, %%rbx\n\t"
+    "and       %c[YSize1](%%rsi), %%rbx\n\t"
+    "cmp       %c[YSize1](%%rsi), %%rax\n\t"
+    "jbe       ok2\n\t"
+    "mov       %%rbx, %%rax\n\t"
+
+"ok2:\n\t"
+    "shl       %%cl, %%rax\n\t"
+    "add       %c[Src](%%rsi), %%rax\n\t"
+    "mov       %%rax, %%rcx\n\t"
+
+    // u+0
+    //"lea       0x8000000000000000(%%rax), %%rbx\n\t"
+    "movabsq   0x8000000000000000, %%rax\n\t"
+    "mov       %%rax, %%rbx\n\t"
+    "movsxd    %0, %%rax\n\t"
+    "sub       %%rax, %%rbx\n\t"
+    "sar       $13, %%rax\n\t"
+    "sar       $31, %%rbx\n\t"
+    "mov       %%rax, %%rdx\n\t"
+
+    "and       %c[XAm](%%rsi), %%rax\n\t"
+    "and       %c[XSize1](%%rsi), %%rbx\n\t"
+
+    "cmp       %c[XSize1](%%rsi), %%rax\n\t"
+    "jbe       ok3\n\t"
+    "mov       %%rbx, %%rax\n\t"
+
+"ok3:\n\t"
+    "movq      (%%rdi, %%rax), %%mm2\n\t"
+    "movq      (%%rcx, %%rax), %%mm4\n\t"
+
+    // u+1
+    //"lea       0x7ffffffffffffff8(%%rdx), %%rbx\n\t"
+    "movabsq   0x7ffffffffffffff8, %%rax\n\t"
+    "mov       %%rax, %%rbx\n\t"
+    "lea       8(%%rdx), %%rax\n\t"
+    "add       %%rdx, %%rbx\n\t"
+    "and       %c[XAm](%%rsi), %%rax\n\t"
+    "sar       $31, %%rbx\n\t"
+    "and       %c[XSize1](%%rsi), %%rbx\n\t"
+    "cmp       %c[XSize1](%%rsi), %%rax\n\t"
+    "jbe       ok4\n\t"
+    "mov       %%rbx, %%rax\n\t"
+
+"ok4:\n\t"
+    "movq      (%%rdi, %%rax), %%mm3\n\t"
+    "movq      (%%rcx, %%rax), %%mm5\n\t"
+
+    // actual sample
+    "movq      %2, %%mm6\n\t"
+    "punpcklwd %%mm0, %%mm0\n\t"
+    "punpcklwd %%mm1, %%mm1\n\t"
+    "mov       %3, %%rax\n\t"
+    "punpcklwd %%mm0, %%mm0\n\t"
+    "punpcklwd %%mm1, %%mm1\n\t"
+    "psrlw     $1, %%mm0\n\t"
+    "psrlw     $1, %%mm1\n\t"
+
+    // horiz
+    "psubw     %%mm2, %%mm3\n\t"
+    "psubw     %%mm4, %%mm5\n\t"
+    "pmulhw    %%mm0, %%mm3\n\t"
+    "pmulhw    %%mm0, %%mm5\n\t"
+    "psllw     $1, %%mm3\n\t"
+    "psllw     $1, %%mm5\n\t"
+    "paddw     %%mm3, %%mm2\n\t"
+    "paddw     %%mm5, %%mm4\n\t"
+
+    // vert+write
+    "psubw     %%mm2, %%mm4\n\t"
+    "paddw     %%mm6, %%mm2\n\t"
+    "pmulhw    %%mm1, %%mm4\n\t"
+    "psllw     $1, %%mm4\n\t"
+    "paddw     %%mm4, %%mm2\n\t"
+    "psubusw   %%mm6, %%mm2\n\t"
+    "movntq    %%mm2, (%%rax)\n\t"
+
+    "emms\n\t"
+    :
+    : "m" (u), "m" (v),
+      "m" (adjust), "m" (r),
+      "m" (ctx),
+      DECLARE_STRUCT_OFFSET(BilinearContext, Src),
+      DECLARE_STRUCT_OFFSET(BilinearContext, XShift),
+      DECLARE_STRUCT_OFFSET(BilinearContext, YAm),
+      DECLARE_STRUCT_OFFSET(BilinearContext, YSize1),
+      DECLARE_STRUCT_OFFSET(BilinearContext, XSize1),
+      DECLARE_STRUCT_OFFSET(BilinearContext, XAm)
+  );
+#endif
 #if defined(__i386__)
   asm (
     "mov       %4, %%esi\n\t"
@@ -575,6 +760,342 @@ void __stdcall Bitmap_Inner(sU64 *d,sU64 *s,sInt count,sInt mode,sU64 *x=0)
   static const sU64 mask1 = 0x8000800080008000;
 
 #ifdef __GNUC__
+#if defined(__x86_64__)
+  asm (
+    "emms\n\t"
+
+    "mov       %0, %%rsi\n\t"
+    "mov       %1, %%rdi\n\t"
+    "mov       %2, %%rbx\n\t"
+    "movsxd    %3, %%rcx\n\t"
+    "mov       %4, %%edx\n\t"
+
+    "pcmpeqb   %%mm3, %%mm3\n\t"
+	"psrlw	   $1, %%mm3\n\t"          // mm3 = 0x7fff7fff7fff7fff
+    "pcmpeqb   %%mm4, %%mm4\n\t"
+    "psrlq	   $16, %%mm4\n\t"         // mm4 = 0x00007fff7fff7fff
+    "pcmpeqb   %%mm5, %%mm5\n\t"
+    "pxor	   %%mm4, %%mm5\n\t"       // mm5 = 0x7fff000000000000
+    "psrlw     $1, %%mm4\n\t"
+    "psrlw     $1, %%mm5\n\t"
+    "movq      (%%rsi), %%mm2\n\t"     // mm2 = data[0]
+    "pcmpeqb   %%mm7, %%mm7\n\t"
+	"psrlw	   $2, %%mm7\n\t"          // mm7 = 0x3fff3fff3fff3fff
+    "pxor      %%mm6, %%mm6\n\t"       // mm6 = 0x0000000000000000
+
+    "shl       $3, %%rcx\n\t"          // rcx = number of bytes
+    "add       %%rcx, %%rsi\n\t"       // rsi = end of source
+    "add       %%rcx, %%rdi\n\t"       // rdi = end of dest
+    "add       %%rcx, %%rbx\n\t"       // rbx = end of source2
+    "neg       %%rcx\n\t"
+
+    "lea       loop0(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop1(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop2(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop3(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop4(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop5(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop6(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop7(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop8(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop9(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loopa(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loopb(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loopc(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loopd(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop0e(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop0f(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop10(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop11(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop12(%%rip), %%rax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "movq      8(%%rsi, %%rcx), %%mm7\n\t"             // mm7 = data[1]
+    "psubsw    %%mm2, %%mm7\n\t"
+    "pxor      %%mm1, %%mm1\n\t"
+    "lea       loop13(%%rip), %%rax\n\t"
+
+"loop_start:\n\t"
+    "jmp       *%%rax\n\t"
+"loop0:\n\t"                        // add
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+    "paddsw    (%%rsi, %%rcx), %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop1:\n\t"                        // sub
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+    "psubusw   (%%rsi, %%rcx), %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop2:\n\t"                        // mul
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+    "pmulhw    (%%rsi, %%rcx), %%mm0\n\t"
+	"psllw	   $1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop3:\n\t"                        // diff
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+    "psubw     (%%rsi, %%rcx), %%mm0\n\t"
+    "paddw     %%mm3, %%mm0\n\t"
+    "psrlw     $1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop4:\n\t"                        // alpha
+    "movq      (%%rsi, %%rcx), %%mm0\n\t"
+    "movq      (%%rbx, %%rcx), %%mm1\n\t"
+	"movq	   %%mm0, %%mm6\n\t"
+	"movq	   %%mm0, %%mm7\n\t"
+
+	"psrlq	   $16, %%mm6\n\t"
+	"psrlq	   $32, %%mm7\n\t"
+	"paddw	   %%mm6, %%mm0\n\t"
+	"paddw	   %%mm6, %%mm7\n\t"
+	"psrlw	   $1, %%mm0\n\t"
+	"psrlw	   $1, %%mm7\n\t"
+	"paddw	   %%mm7, %%mm0\n\t"
+	"pand	   %%mm4, %%mm1\n\t"
+	"psllq	   $47, %%mm0\n\t"
+	"pand	   %%mm5, %%mm0\n\t"
+	"por	   %%mm1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop5:\n\t"                      // mul color
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+	"pmulhw	   %%mm2, %%mm0\n\t"
+	"psllw	   $1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop6:\n\t"                      // add color
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+    "paddsw    %%mm2, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop7:\n\t"                      // sub color
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+    "psubusw   %%mm2, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop8:\n\t"                      // gray color
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+	"movq	   %%mm0, %%mm6\n\t"
+	"movq	   %%mm0, %%mm7\n\t"
+
+	"psrlq	   $16, %%mm6\n\t"
+	"psrlq	   $32, %%mm7\n\t"
+	"paddw	   %%mm6, %%mm0\n\t"
+	"paddw	   %%mm7, %%mm6\n\t"
+	"psrlw	   $1, %%mm0\n\t"
+	"psrlw	   $1, %%mm7\n\t"
+	"paddw	   %%mm7, %%mm0\n\t"
+	"psrlw	   $1, %%mm0\n\t"
+
+	"punpcklwd %%mm0, %%mm0\n\t"
+	"punpcklwd %%mm0, %%mm0\n\t"
+	"por	   %%mm5, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop9:\n\t"                      // invert color
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+    "pxor      %%mm3, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loopa:\n\t"                      // scale color
+	"movq	   (%%rbx, %%rcx), %%mm0\n\t"
+	"movq	   %%mm0, %%mm1\n\t"
+	"pmullw	   %%mm2, %%mm0\n\t"
+	"pmulhw	   %%mm2, %%mm1\n\t"
+	"movq	   %%mm0, %%mm6\n\t"
+	"punpcklwd %%mm1, %%mm0\n\t"
+	"punpckhwd %%mm1, %%mm6\n\t"
+	"psrld	   $11, %%mm0\n\t"
+	"psrld	   $11, %%mm6\n\t"
+	"packssdw  %%mm6, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loopb:\n\t"                      // merge
+    "movq      (%%rdi, %%rcx), %%mm0\n\t"
+    "movq      (%%rsi, %%rcx), %%mm4\n\t"
+    "movq      (%%rbx, %%rcx), %%mm5\n\t"
+    "movq      %%mm3, %%mm1\n\t"
+    "psubsw    %%mm0, %%mm1\n\t"
+    "pmulhw    %%mm4, %%mm0\n\t"
+    "pmulhw    %%mm5, %%mm1\n\t"
+    "paddsw    %%mm1, %%mm0\n\t"
+    "psllw     $1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loopc:\n\t"                      // brigtness
+    "movq      (%%rsi, %%rcx), %%mm0\n\t"
+    "movq      (%%rbx, %%rcx), %%mm1\n\t"
+    "movq      %%mm0, %%mm2\n\t"
+    "pcmpgtw   %%mm7, %%mm2\n\t"
+    "psrlw     $1, %%mm2\n\t"
+
+    "pxor      %%mm2, %%mm0\n\t"
+    "pxor      %%mm2, %%mm1\n\t"
+	"pmulhw	   %%mm1, %%mm0\n\t"
+	"psllw	   $2, %%mm0\n\t"
+    "pxor      %%mm2, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+
+"loopd:\n\t"                        // subr
+    "movq      (%%rsi, %%rcx), %%mm0\n\t"
+    "psubusw   (%%rbx, %%rcx), %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop0e:\n\t"                      // mulmerge
+    "movq      (%%rdi, %%rcx), %%mm0\n\t"
+    "movq      (%%rsi, %%rcx), %%mm4\n\t"
+    "movq      (%%rbx, %%rcx), %%mm5\n\t"
+    "movq      %%mm3, %%mm1\n\t"
+    "pmulhw    %%mm5, %%mm4\n\t"
+    "psllw     $1, %%mm4\n\t"
+    "psubsw    %%mm0, %%mm1\n\t"
+    "pmulhw    %%mm4, %%mm0\n\t"
+    "pmulhw    %%mm5, %%mm1\n\t"
+    "paddsw    %%mm1, %%mm0\n\t"
+    "psllw     $1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop0f:\n\t"                     // sharpen
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+    "movq      %%mm0, %%mm3\n\t"
+    "psubusw   (%%rdi, %%rcx), %%mm0\n\t"
+
+	"movq	   %%mm0, %%mm1\n\t"
+	"pmullw	   %%mm2, %%mm0\n\t"
+	"pmulhw	   %%mm2, %%mm1\n\t"
+
+    "movq	   %%mm0, %%mm7\n\t"
+	"punpcklwd %%mm1, %%mm0\n\t"
+	"punpckhwd %%mm1, %%mm7\n\t"
+	"psrad	   $11, %%mm0\n\t"
+	"psrad	   $11, %%mm7\n\t"
+	"packssdw  %%mm7, %%mm0\n\t"
+
+    "paddsw    %%mm3, %%mm0\n\t"
+    "pmaxsw    %%mm6, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop10:\n\t"                      // hardlight
+    "movq      (%%rsi, %%rcx), %%mm1\n\t"
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+    "psllw     $1, %%mm1\n\t"
+    "movq      %%mm1, %%mm2\n\t"
+    "pand      %%mm3, %%mm1\n\t"
+    "psraw     $15, %%mm2\n\t"
+    "movq      %%mm0, %%mm4\n\t"
+    "pmulhw    %%mm1, %%mm0\n\t"
+    "psllw     $1, %%mm0\n\t"
+    "paddw     %%mm4, %%mm1\n\t"
+    "pxor      %%mm2, %%mm0\n\t"
+    "pand      %%mm2, %%mm1\n\t"
+    "paddw     %%mm1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop11:\n\t"                      // over
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+    "movq      (%%rsi, %%rcx), %%mm1\n\t"
+    "movq      %%mm1, %%mm2\n\t"
+    "psubsw    %%mm0, %%mm1\n\t"
+    "punpckhwd %%mm2, %%mm2\n\t"
+    "punpckhwd %%mm2, %%mm2\n\t"
+    "pmulhw    %%mm2, %%mm1\n\t"
+    "psllw     $1, %%mm1\n\t"
+    "paddsw    %%mm1, %%mm0\n\t"
+    "pmaxsw    %%mm6, %%mm0\n\t"
+//    "paddw     [mask1], %%mm0\n\t"
+//    "psubsw    [mask1], %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop12:\n\t"                      // addsmooth (screen)
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+    "movq      (%%rsi, %%rcx), %%mm1\n\t"
+    "pxor      %%mm3, %%mm0\n\t"
+    "pxor      %%mm3, %%mm1\n\t"
+    "pmulhw    %%mm1, %%mm0\n\t"
+    "psllw     $1, %%mm0\n\t"
+    "pxor      %%mm3, %%mm0\n\t"
+
+    "jmp       loopo;\n\t"
+
+"loop13:\n\t"                      // color range
+    "movq      (%%rbx, %%rcx), %%mm0\n\t"
+    "pmulhw    %%mm7, %%mm0\n\t"
+    "psllw     $1, %%mm0\n\t"
+    "paddsw    %%mm2, %%mm0\n\t"
+    "pmaxsw    %%mm1, %%mm0\n\t"
+//    "paddw     %%mm6, %%mm0\n\t"
+//    "psubusw   %%mm6, %%mm0\n\t"
+
+"loopo:\n\t"
+    "movq      %%mm0, (%%rdi, %%rcx)\n\t"
+    "add       $8, %%rcx\n\t"
+    "je        ende\n\t"
+    "jmp       *%%rax\n\t"
+
+"ende:\n\t"
+    "emms\n\t"
+    :
+    : "m" (s), "m" (d), "m" (x), "m" (count), "m" (mode)
+  );
+#endif
 #if defined(__i386__)
   asm (
     "emms\n\t"

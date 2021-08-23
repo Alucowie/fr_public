@@ -245,6 +245,30 @@ static sInt CallCode(sInt code,sInt *para,sInt count)
 {
   sInt result;
 #ifdef __GNUC__
+#if defined(__x86_64__)
+  asm (
+    "mov %1, %%rax\n\t"
+    "mov %2, %%rsi\n\t"
+    "movsxd %3, %%rcx\n\t"
+    "push %%rbp\n\t"
+    "mov %%rsp, %%rbp\n\t"
+    "sub %%rcx, %%rsp\n\t"
+    "sub %%rcx, %%rsp\n\t"
+    "sub %%rcx, %%rsp\n\t"
+    "sub %%rcx, %%rsp\n\t"
+    "mov %%rsp, %%rdi\n\t"
+    "rep movsd\n\t"
+
+    "call *%%rax\n\t"
+
+    "mov %%rbp, %%rsp\n\t"
+    "pop %%rbp\n\t"
+    "mov %%rax, %0\n\t"
+    : "=m" (result)
+    : "m" (code), "m" (para), "m" (count)
+    : "rax", "rsi", "rcx", "rdi"
+  );
+#endif
 #if defined(__i386__)
   asm (
     "mov %1, %%eax\n\t"

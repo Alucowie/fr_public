@@ -711,6 +711,25 @@ namespace
 	{
 		// performs 64bit (nexttime-time)*usecs/td2 and a 32.32bit addition to smpldelta:smplrem
 #ifdef __GNUC__
+#if defined(__x86_64__)
+		asm (
+			"mov %2, %%eax\n\t"
+			"sub %3, %%eax\n\t"
+			"mov %4, %%ebx\n\t"
+			"mul %%ebx\n\t"
+			"mov %5, %%ebx\n\t"
+			"div %%ebx\n\t"
+			"mov %0, %%rcx\n\t"
+			"add %%edx, (%%rcx)\n\t"
+			"adc $0, %%eax\n\t"
+			"mov %1, %%rcx\n\t"
+			"mov %%eax, (%%rcx)\n\t"
+            : "+m" (smplrem), "+m" (smpldelta)
+            : "m" (nexttime), "m" (time), "m" (usecs),
+              "m" (td2)
+            : "rax", "rbx", "rcx", "rdx"
+		);
+#endif
 #if defined(__i386__)
 		asm (
 			"mov %2, %%eax\n\t"
@@ -1040,6 +1059,20 @@ void CV2MPlayer::Play(sU32 a_time)
 	m_base.valid=sFALSE;
 	sU32 destsmpl, cursmpl=0;
 #ifdef __GNUC__
+#if defined(__x86_64__)
+	asm (
+		"movsxd %1, %%rax\n\t"
+		"movsxd %2, %%rbx\n\t"
+		"imul %%rbx\n\t"
+		"movsxd %3, %%rbx\n\t"
+		"idiv %%rbx\n\t"
+		"movl %%eax, %0\n\t"
+        : "=m" (destsmpl)
+        : "m" (a_time), "m" (m_samplerate),
+          "m" (m_tpc)
+        : "rax", "rbx"
+	);
+#endif
 #if defined(__i386__)
 	asm (
 		"mov  %1, %%eax\n\t"
@@ -1099,6 +1132,20 @@ void CV2MPlayer::Stop(sU32 a_fadetime)
 	{
 		sU32 ftsmpls;
 #ifdef __GNUC__
+#if defined(__x86_64__)
+		asm (
+			"movsxd %1, %%rax\n\t"
+			"movsxd %2, %%rbx\n\t"
+			"imul %%rbx\n\t"
+			"movsxd %3, %%rbx\n\t"
+			"idiv %%rbx\n\t"
+			"movl %%eax, %0\n\t"
+            : "=m" (ftsmpls)
+            : "m" (a_fadetime), "m" (m_samplerate),
+              "m" (m_tpc)
+            : "rax", "rbx"
+		);
+#endif
 #if defined(__i386__)
 		asm (
 			"mov  %1, %%eax\n\t"
@@ -1167,6 +1214,18 @@ sBool CV2MPlayer::Render(sF32 *a_buffer, sU32 a_len)
 	else if (m_state.state==PlayerState::OFF || !m_base.valid)
 	{
 #ifdef __GNUC__
+#if defined(__x86_64__)
+		asm (
+			"mov %0, %%rdi\n\t"
+			"mov %1, %%ecx\n\t"
+			"shl $1, %%ecx\n\t"
+			"xor %%eax, %%eax\n\t"
+			"rep stosl\n\t"
+            : "+m" (a_buffer)
+            : "m" (a_len)
+            : "rax", "rdi", "rcx"
+		);
+#endif
 #if defined(__i386__)
 		asm (
 			"mov %0, %%edi\n\t"
