@@ -19,6 +19,9 @@
 //#include "xmmintrin.h"
 #endif
 #endif
+#ifdef __MINGW32__
+#include <corecrt.h>
+#endif
 
 #ifndef _WIN32_WCE
 //#include "xmmintrin.h"
