@@ -278,6 +278,9 @@ typedef const void*               sCPtr;    // not so usefull, don't use
 
 /****************************************************************************/
 
+#ifdef __linux__
+#define __forceinline __attribute__((__always_inline__)) inline
+#endif
 template <class Type> __forceinline Type sMin(Type a,Type b)            {return (a<b) ? a : b;}
 template <class Type> __forceinline Type sMax(Type a,Type b)            {return (a>b) ? a : b;}
 template <class Type> __forceinline Type sSign(Type a)                  {return (a==0) ? 0 : (a>0) ? 1 : -1;}
