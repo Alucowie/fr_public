@@ -54,6 +54,28 @@ sU32 sGetRnd()
   ebx = (ebx<< 6)&0xffff0000;
   i = eax|ebx;
 #else
+#ifdef __GNUC__
+  asm (
+    "mov %1, %%eax\n\t"
+
+    "imul $0x343fd, %%eax, %%eax\n\t"
+    "add $0x269ec3, %%eax\n\t"
+    "mov %%eax, %%ebx\n\t"
+
+    "imul $0x343fd, %%eax, %%eax\n\t"
+    "add $0x269ec3, %%eax\n\t"
+
+    "mov %%eax, %1\n\t"
+
+    "sar $10, %%eax\n\t"
+    "and $0x0000ffff, %%eax\n\t"
+    "shl $6, %%ebx\n\t"
+    "and $0xffff0000, %%ebx\n\t"
+    "or %%ebx, %%eax\n\t"
+    "mov %%eax, %0\n\t"
+    : "=m" (i), "+m" (sRandomSeed)
+  );
+#else
   __asm
   {
     mov eax,sRandomSeed
@@ -74,6 +96,7 @@ sU32 sGetRnd()
     or eax,ebx
     mov i,eax
   }
+#endif
 #endif
   return i;
 }
@@ -332,6 +355,37 @@ sF32 sRangeF32(sF32 a,sF32 b,sF32 c)
 
 sF64 sFACos(sF64 f)
 {
+#ifdef __GNUC__
+  asm (
+    "fldl    %0\n\t"
+    "fld1\n\t"
+    "fchs\n\t"
+    "fcomp   %%st(1)\n\t"
+    "fstsw   %%ax\n\t"
+    "je      suckt\n\t"
+
+    "fld     %%st\n\t"
+    "fld1\n\t"
+    "fsubp   %%st, %%st(1)\n\t"
+    "fxch    %%st(1)\n\t"
+    "fld1\n\t"
+    "faddp   %%st, %%st(1)\n\t"
+    "fdivrp  %%st, %%st(1)\n\t"
+    "fsqrt\n\t"
+    "fld1\n\t"
+    "jmp     endcos\n\t"
+
+"suckt:\n\t"
+    "fld1\n\t"
+    "fldz\n\t"
+
+"endcos:\n\t"
+    "fpatan\n\t"
+    "fadd    %%st, %%st\n\t"
+    "fstpl   %0\n\t"
+    : "+m" (f)
+  );
+#else
   __asm
   {
     fld     qword ptr [f];
@@ -361,12 +415,25 @@ end:
     fadd    st, st;
     fstp    qword ptr [f];
   }
+#endif
 
   return f;
 }
 
 sF64 sFMod(sF64 a,sF64 b)
 {
+#ifdef __GNUC__
+  asm (
+    "fldl  %1\n\t"
+    "fldl  %0\n\t"
+    "fprem\n\t"
+
+    "fstp  %%st(1)\n\t"
+    "fstpl %0\n\t"
+    : "+m" (a)
+    : "m" (b)
+  );
+#else
   __asm
   {
     fld   qword ptr [b];
@@ -376,6 +443,7 @@ sF64 sFMod(sF64 a,sF64 b)
     fstp  st(1);
     fstp  qword ptr [a];
   }
+#endif
 
   return a;
 }
@@ -383,6 +451,62 @@ sF64 sFMod(sF64 a,sF64 b)
 sF64 sFPow(sF64 a,sF64 b)
 {
   // faster pow based on code by agner fog
+#ifdef __GNUC__
+  sF64 r;
+#if defined(__i386__)
+  asm (
+    "fldl  %2\n\t"
+    "fldl  %1\n\t"
+
+    "ftst\n\t"
+    "fstsw %%ax\n\t"
+    "sahf\n\t"
+    "jz    zero\n\t"
+
+    "fyl2x\n\t"
+    "fistl %1\n\t"
+    "sub   $12, %%esp\n\t"
+    "movl  $0, (%%esp)\n\t"
+    "movl  $0x80000000, 4(%%esp)\n\t"
+    "fisubl %1\n\t"
+    "mov   %1, %%eax\n\t"
+    "add   $0x3fff, %%eax\n\t"
+    "mov   %%eax, 8(%%esp)\n\t"
+    "jle   underflow\n\t"
+    "cmp   $0x8000, %%eax\n\t"
+    "jge   overflow\n\t"
+    "f2xm1\n\t"
+    "fld1\n\t"
+    "faddp\n\t"
+    "fldt  (%%esp)\n\t"
+    "add   $12, %%esp\n\t"
+    "fmulp\n\t"
+    "jmp   endpow\n\t"
+
+"underflow:\n\t"
+    "fstp  %%st\n\t"
+    "fldz\n\t"
+    "add   $12, %%esp\n\t"
+    "jmp   endpow\n\t"
+
+"overflow:\n\t"
+    "push  $0x7f800000\n\t"
+    "fstp  %%st\n\t"
+    "flds  (%%esp)\n\t"
+    "add   $16, %%esp\n\t"
+    "jmp   endpow\n\t"
+
+"zero:\n\t"
+    "fstp  %%st(1)\n\t"
+
+"endpow:\n\t"
+    : "=t" (r)
+    : "m" (a),"m" (b)
+  );
+#endif
+
+  return r;
+#else
   __asm
   {
     fld   qword ptr [b];
@@ -431,6 +555,7 @@ zero:
 
 end:
   }
+#endif
 }
 
 /*sF64 sFPow(sF64 a,sF64 b)
@@ -464,6 +589,24 @@ zero:
 
 sF64 sFExp(sF64 f)
 {
+#ifdef __GNUC__
+	asm (
+		"fldl   %0\n\t"
+		"fldl2e\n\t"
+		"fmulp	%%st, %%st(1)\n\t"
+
+		"fld1\n\t"
+		"fld    %%st(1)\n\t"
+		"fprem\n\t"
+		"f2xm1\n\t"
+		"faddp	%%st, %%st(1)\n\t"
+		"fscale\n\t"
+
+        "fstp   %%st(1)\n\t"
+		"fstpl  %0\n\t"
+        : "+m" (f)
+	);
+#else
 	__asm
 	{
 		fld		qword ptr [f];
@@ -480,6 +623,7 @@ sF64 sFExp(sF64 f)
     fstp  st(1);
 		fstp	qword ptr [f];
 	}
+#endif
 
 	return f;
 }
@@ -616,6 +760,53 @@ void sCopyMemFast(void *d,const void *s,sInt c)
 #if !sINTRO && !sMOBILE
   if(sSystem->CpuMask & sCPU_MMX2)
   {
+#ifdef __GNUC__
+#if defined(__i386__)
+    asm (
+      "mov     %0, %%esi\n\t"
+      "mov     %1, %%edi\n\t"
+      "mov     %2, %%ecx\n\t"
+      "shr     $6, %%ecx\n\t"
+      "jz      tail\n\t"
+
+"copy:\n\t"
+      "movq    (%%esi), %%mm0\n\t"
+      "movq    8(%%esi), %%mm1\n\t"
+      "movq    16(%%esi), %%mm2\n\t"
+      "movq    24(%%esi), %%mm3\n\t"
+      "movq    32(%%esi), %%mm4\n\t"
+      "movq    40(%%esi), %%mm5\n\t"
+      "movq    48(%%esi), %%mm6\n\t"
+      "movq    56(%%esi), %%mm7\n\t"
+
+      "movntq  %%mm0, (%%edi)\n\t"
+      "movntq  %%mm1, 8(%%edi)\n\t"
+      "movntq  %%mm2, 16(%%edi)\n\t"
+      "movntq  %%mm3, 24(%%edi)\n\t"
+      "movntq  %%mm4, 32(%%edi)\n\t"
+      "movntq  %%mm5, 40(%%edi)\n\t"
+      "movntq  %%mm6, 48(%%edi)\n\t"
+      "movntq  %%mm7, 56(%%edi)\n\t"
+
+      "add     $64, %%esi\n\t"
+      "add     $64, %%edi\n\t"
+      "decl    %%ecx\n\t"
+      "jnz     copy\n\t"
+
+      "emms\n\t"
+
+"tail:\n\t"
+      "mov     %2, %%ecx\n\t"
+      "and     $63, %%ecx\n\t"
+      "jz      endcopy\n\t"
+      "rep     movsb\n\t"
+
+"endcopy:\n\t"
+    :
+    : "m" (s), "m" (d), "m" (c)
+    );
+#endif
+#else
     __asm
     {
       mov     esi, [s];
@@ -658,6 +849,7 @@ tail:
 
 end:
     }
+#endif
   }
   else
 #endif

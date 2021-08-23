@@ -413,6 +413,141 @@ sInt sQuadraticRoots(const sF32 *coeffs,sF32 *roots);
 
 #if !sMOBILE
 
+#ifdef __GNUC__
+__forceinline void sFloatFix()
+{
+    int ffix = 0x103f; // round to nearest even + single precision
+    asm (
+        "fclex\n\t"
+        "fldcw %0\n\t"
+        : : "m" (ffix)
+	);
+}
+
+__forceinline void sFloatDouble()
+{
+    int ftod = 0x123f; // round to nearest even + double precision
+    asm (
+        "fclex\n\t"
+        "fldcw %0\n\t"
+        : : "m" (ftod)
+    );
+}
+
+__forceinline void sFloatDen1()
+{
+    int den1 = 0x141f;
+    asm (
+        "fclex\n\t"
+        "fldcw %0\n\t"
+        : : "m" (den1)
+    );
+}
+__forceinline void sFloatDen0()
+{
+    int den0 = 0x143f;
+    asm (
+        "fclex\n\t"
+        "fldcw %0\n\t"
+        : : "m" (den0)
+	);
+}
+
+__forceinline sInt sFtol (const float f)
+{
+    sInt ret;
+    asm (
+        "fistl %0\n\t"
+        : "=m" (ret)
+        : "t" (f)
+    );
+    return ret;
+}
+
+__forceinline sF32 sFRound (const float f)
+{
+    sF32 ret;
+    asm (
+        "frndint\n\t"
+        : "=t" (ret)
+        : "0" (f)
+    );
+    return ret;
+}
+
+__forceinline void sFSinCos(const float x,sF32 &sine,sF32 &cosine)
+{
+    asm (
+        "fsincos\n\t"
+        : "=t" (cosine), "=u" (sine)
+        : "0" (x)
+    );
+}
+
+__forceinline sInt sMulDiv(sInt var_a,sInt var_b,sInt var_c)
+{
+    sInt ret;
+    asm (
+        "imul %2\n\t"
+        "idiv %3\n\t"
+        : "=a" (ret)
+        : "a" (var_a), "r" (var_b), "r" (var_c)
+    );
+    return ret;
+}
+
+__forceinline sInt sMulShift(sInt var_a,sInt var_b)
+{
+    sInt ret;
+    asm (
+        "imul %2\n\t"
+        "shrd $16, %%eax, %%edx\n\t"
+        : "=a" (ret)
+        : "a" (var_a), "r" (var_b)
+    );
+    return ret;
+}
+
+__forceinline sInt sMulShift30(sInt var_a,sInt var_b)
+{
+    sInt ret;
+    asm (
+        "imul %2\n\t"
+        "shrd $30, %%eax, %%edx\n\t"
+        : "=a" (ret)
+        : "a" (var_a), "r" (var_b)
+    );
+    return ret;
+}
+
+__forceinline sInt sDivShift(sInt var_a,sInt var_b)
+{
+    sInt ret;
+    asm (
+        "mov %%eax, %%edx\n\t"
+        "shl $16, %%eax\n\t"
+        "sar $16, %%edx\n\t"
+        "idiv %2\n\t"
+        : "=a" (ret)
+        : "a" (var_a), "r" (var_b)
+    );
+    return ret;
+}
+
+__forceinline sInt sDivShift30(sInt var_a,sInt var_b)
+{
+    sInt ret;
+    asm (
+        "mov %%eax, %%edx\n\t"
+        "shl $30, %%eax\n\t"
+        "sar $2, %%edx\n\t"
+        "idiv %2\n\t"
+        : "=a" (ret)
+        : "a" (var_a), "r" (var_b)
+    );
+    return ret;
+}
+#else
 #pragma warning (disable : 4035) 
 
 __forceinline void sFloatFix()
@@ -544,6 +679,7 @@ __forceinline sInt sDivShift30(sInt var_a,sInt var_b)
     idiv var_b
   }
 }
+#endif
 
 sBool sNormalFloat(sF32 value);
 
@@ -1959,7 +2095,20 @@ class sTickTimer
   sU64 Total;
   sU64 LastStart;
 
+#ifdef __GNUC__
+  static sU64 Tick()                  { sU64 tick;
+
+                                        asm volatile ( "rdtsc\n\t"    // Returns the time in EDX:EAX.
+                                        "shl $32, %%rdx\n\t"  // Shift the upper bits left.
+                                        "or %%rdx, %0"        // 'Or' in the lower bits.
+                                        : "=a" (tick)
+                                        :
+                                        : "rdx");
+                                        return tick;
+                                      }
+#else
   static sU64 Tick()                  { __asm { rdtsc } }
+#endif
 
 public:
   sTickTimer()                        { Reset(); }
