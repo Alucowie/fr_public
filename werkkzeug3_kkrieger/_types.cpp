@@ -453,6 +453,57 @@ sF64 sFPow(sF64 a,sF64 b)
   // faster pow based on code by agner fog
 #ifdef __GNUC__
   sF64 r;
+#if defined(__x86_64__)
+  asm (
+    "fldl  %2\n\t"
+    "fldl  %1\n\t"
+
+    "ftst\n\t"
+    "fstsw %%ax\n\t"
+    "sahf\n\t"
+    "jz    zero\n\t"
+
+    "fyl2x\n\t"
+    "fistl %1\n\t"
+    "sub   $16, %%rsp\n\t"
+    "movl  $0, (%%rsp)\n\t"
+    "movl  $0x80000000, 4(%%rsp)\n\t"
+    "fisubl %1\n\t"
+    "mov   %1, %%rax\n\t"
+    "add   $0x3fff, %%rax\n\t"
+    "movq  %%rax, 8(%%rsp)\n\t"
+    "jle   underflow\n\t"
+    "cmp   $0x8000, %%rax\n\t"
+    "jge   overflow\n\t"
+    "f2xm1\n\t"
+    "fld1\n\t"
+    "faddp\n\t"
+    "fldt  (%%rsp)\n\t"
+    "add   $16, %%rsp\n\t"
+    "fmulp\n\t"
+    "jmp   endpow\n\t"
+
+"underflow:\n\t"
+    "fstp  %%st\n\t"
+    "fldz\n\t"
+    "add   $16, %%rsp\n\t"
+    "jmp   endpow\n\t"
+
+"overflow:\n\t"
+    "push  $0x7f800000\n\t"
+    "fstp  %%st\n\t"
+    "flds  (%%rsp)\n\t"
+    "add   $20, %%rsp\n\t"
+    "jmp   endpow\n\t"
+
+"zero:\n\t"
+    "fstp  %%st(1)\n\t"
+
+"endpow:\n\t"
+    : "=t" (r)
+    : "m" (a), "m" (b)
+  );
+#endif
 #if defined(__i386__)
   asm (
     "fldl  %2\n\t"
@@ -761,6 +812,51 @@ void sCopyMemFast(void *d,const void *s,sInt c)
   if(sSystem->CpuMask & sCPU_MMX2)
   {
 #ifdef __GNUC__
+#if defined(__x86_64__)
+    asm (
+      "mov     %0, %%rsi\n\t"
+      "mov     %1, %%rdi\n\t"
+      "mov     %2, %%ecx\n\t"
+      "shr     $6, %%ecx\n\t"
+      "jz      tail\n\t"
+
+"copy:\n\t"
+      "movq    (%%rsi), %%mm0\n\t"
+      "movq    8(%%rsi), %%mm1\n\t"
+      "movq    16(%%rsi), %%mm2\n\t"
+      "movq    24(%%rsi), %%mm3\n\t"
+      "movq    32(%%rsi), %%mm4\n\t"
+      "movq    40(%%rsi), %%mm5\n\t"
+      "movq    48(%%rsi), %%mm6\n\t"
+      "movq    56(%%rsi), %%mm7\n\t"
+
+      "movntq  %%mm0, (%%rdi)\n\t"
+      "movntq  %%mm1, 8(%%rdi)\n\t"
+      "movntq  %%mm2, 16(%%rdi)\n\t"
+      "movntq  %%mm3, 24(%%rdi)\n\t"
+      "movntq  %%mm4, 32(%%rdi)\n\t"
+      "movntq  %%mm5, 40(%%rdi)\n\t"
+      "movntq  %%mm6, 48(%%rdi)\n\t"
+      "movntq  %%mm7, 56(%%rdi)\n\t"
+
+      "add     $64, %%rsi\n\t"
+      "add     $64, %%rdi\n\t"
+      "decl    %%ecx\n\t"
+      "jnz     copy\n\t"
+
+      "emms\n\t"
+
+"tail:\n\t"
+      "mov     %2, %%ecx\n\t"
+      "and     $63, %%ecx\n\t"
+      "jz      endcopy\n\t"
+      "rep     movsb\n\t"
+
+"endcopy:\n\t"
+    :
+    : "m" (s), "m" (d), "m" (c)
+    );
+#endif
 #if defined(__i386__)
     asm (
       "mov     %0, %%esi\n\t"
