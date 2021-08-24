@@ -244,6 +244,32 @@ sInt KOp::Calc(KEnvironment *env,sInt flags)
 static sInt CallCode(sInt code,sInt *para,sInt count)
 {
   sInt result;
+#ifdef __GNUC__
+#if defined(__i386__)
+  asm (
+    "mov %1, %%eax\n\t"
+    "mov %2, %%esi\n\t"
+    "mov %3, %%ecx\n\t"
+    "push %%ebp\n\t"
+    "mov %%esp, %%ebp\n\t"
+    "sub %%ecx, %%esp\n\t"
+    "sub %%ecx, %%esp\n\t"
+    "sub %%ecx, %%esp\n\t"
+    "sub %%ecx, %%esp\n\t"
+    "mov %%esp, %%edi\n\t"
+    "rep movsd\n\t"
+
+    "call *%%eax\n\t"
+
+    "mov %%ebp, %%esp\n\t"
+    "pop %%ebp\n\t"
+    "mov %%eax, %0\n\t"
+    : "=m" (result)
+    : "m" (code), "m" (para), "m" (count)
+    : "eax", "esi", "ecx", "edi"
+  );
+#endif
+#else
   __asm
   {
     mov eax,code
@@ -264,6 +290,7 @@ static sInt CallCode(sInt code,sInt *para,sInt count)
     pop ebp
     mov result,eax
   }
+#endif
 
   return result; 
 }

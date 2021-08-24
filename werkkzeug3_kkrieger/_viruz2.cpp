@@ -710,6 +710,27 @@ namespace
   //////////////////////////////////////////////////////////////////////////////////////////////////////
 	{
 		// performs 64bit (nexttime-time)*usecs/td2 and a 32.32bit addition to smpldelta:smplrem
+#ifdef __GNUC__
+#if defined(__i386__)
+		asm (
+			"mov %2, %%eax\n\t"
+			"sub %3, %%eax\n\t"
+			"mov %4, %%ebx\n\t"
+			"mul %%ebx\n\t"
+			"mov %5, %%ebx\n\t"
+			"div %%ebx\n\t"
+			"mov %0, %%ecx\n\t"
+			"add %%edx, (%%ecx)\n\t"
+			"adc $0, %%eax\n\t"
+			"mov %1, %%ecx\n\t"
+			"mov %%eax, (%%ecx)\n\t"
+            : "+m" (smplrem), "+m" (smpldelta)
+            : "m" (nexttime), "m" (time), "m" (usecs),
+              "m" (td2)
+            : "eax", "ebx", "ecx", "edx"
+		);
+#endif
+#else
 		__asm {
 			mov eax, [nexttime]
 			sub eax, [time]
@@ -723,6 +744,7 @@ namespace
 			mov ecx, [smpldelta]
 			mov [ecx], eax
 		}
+#endif
 	}
 }
 
@@ -1017,6 +1039,22 @@ void CV2MPlayer::Play(sU32 a_time)
 
 	m_base.valid=sFALSE;
 	sU32 destsmpl, cursmpl=0;
+#ifdef __GNUC__
+#if defined(__i386__)
+	asm (
+		"mov  %1, %%eax\n\t"
+		"mov  %2, %%ebx\n\t"
+		"imul %%ebx\n\t"
+		"mov  %3, %%ebx\n\t"
+		"idiv %%ebx\n\t"
+		"mov  %%eax, %0\n\t"
+        : "=m" (destsmpl)
+        : "m" (a_time), "m" (m_samplerate),
+          "m" (m_tpc)
+        : "eax", "ebx"
+	);
+#endif
+#else
 	__asm
 	{
 		mov  ecx, this
@@ -1027,6 +1065,7 @@ void CV2MPlayer::Play(sU32 a_time)
 		idiv ebx
 		mov  [destsmpl], eax
 	}
+#endif
 
 	m_state.state=PlayerState::PLAYING;
 	m_state.smpldelta=0;
@@ -1059,6 +1098,22 @@ void CV2MPlayer::Stop(sU32 a_fadetime)
 	if (a_fadetime)
 	{
 		sU32 ftsmpls;
+#ifdef __GNUC__
+#if defined(__i386__)
+		asm (
+			"mov  %1, %%eax\n\t"
+			"mov  %2, %%ebx\n\t"
+			"imul %%ebx\n\t"
+			"mov  %3, %%ebx\n\t"
+			"idiv %%ebx\n\t"
+			"mov  %%eax, %0\n\t"
+            : "=m" (ftsmpls)
+            : "m" (a_fadetime), "m" (m_samplerate),
+              "m" (m_tpc)
+            : "eax", "ebx"
+		);
+#endif
+#else
 		__asm
 		{
 			mov  ecx, this
@@ -1069,6 +1124,7 @@ void CV2MPlayer::Stop(sU32 a_fadetime)
 			idiv ebx
 			mov  [ftsmpls], eax
 		}
+#endif
 		m_fadedelta=m_fadeval/ftsmpls;
 	}
 	else
@@ -1110,6 +1166,20 @@ sBool CV2MPlayer::Render(sF32 *a_buffer, sU32 a_len)
 	}
 	else if (m_state.state==PlayerState::OFF || !m_base.valid)
 	{
+#ifdef __GNUC__
+#if defined(__i386__)
+		asm (
+			"mov %0, %%edi\n\t"
+			"mov %1, %%ecx\n\t"
+			"shl $1, %%ecx\n\t"
+			"xor %%eax, %%eax\n\t"
+			"rep stosl\n\t"
+            : "+m" (a_buffer)
+            : "m" (a_len)
+            : "eax", "edi", "ecx"
+		);
+#endif
+#else
 		__asm {
 			mov edi, [a_buffer]
 			mov ecx, [a_len]
@@ -1117,6 +1187,7 @@ sBool CV2MPlayer::Render(sF32 *a_buffer, sU32 a_len)
 			xor eax, eax
 			rep stosd
 		}
+#endif
 	}
 	else
 	{

@@ -5,6 +5,9 @@
 #include "_start.hpp"
 #include "mmintrin.h"
 #include "xmmintrin.h"
+#ifdef __MINGW32__
+#include <cstddef>
+#endif
 
 #define SCRIPTVERIFY(x) {if(!(x)) return 0;}
 #define SCRIPTVERIFYVOID(x) {return 0; }
@@ -155,6 +158,40 @@ void Fade64(sU64 &r,sU64 &c0,sU64 &c1,sInt fade)
   static const sU64 xor0 = 0xffffffff00000000;
   static const sU64 add0 = 0x0000800100000000;
 
+#ifdef __GNUC__
+#if defined(__i386__)
+  asm (
+    "mov       %1, %%eax\n\t"
+    "movq      (%%eax), %%mm2\n\t"
+    "mov       %2, %%eax\n\t"
+    "movq      (%%eax), %%mm3\n\t"
+
+    "movd      %3, %%mm0\n\t"
+    "punpckldq %%mm0, %%mm0\n\t"
+    "psrad     $1, %%mm0\n\t"
+    "pxor      %4, %%mm0\n\t"
+    "paddd     %5, %%mm0\n\t"
+    "packssdw  %%mm0, %%mm0;\n\t"
+    "punpcklwd %%mm0, %%mm0;\n\t"
+    "movq      %%mm0, %%mm1;\n\t"
+    "punpcklwd %%mm0, %%mm0;\n\t"
+    "punpckhwd %%mm1, %%mm1;\n\t"
+
+    "mov       %0, %%eax\n\t"
+    "pmulhw    %%mm0, %%mm3\n\t"
+    "pmulhw    %%mm1, %%mm2\n\t"
+    "paddw     %%mm3, %%mm2\n\t"
+    "psllw     $1, %%mm2\n\t"
+    "movq      %%mm2, (%%eax)\n\t"
+
+    "emms\n\t"
+    :
+    : "m" (&r), "m" (&c0), "m" (&c1), "m" (fade),
+      "m" (xor0), "m" (add0)
+    : "eax"
+  );
+#endif
+#else
   __asm
   {
     mov       eax, [c0];
@@ -182,10 +219,38 @@ void Fade64(sU64 &r,sU64 &c0,sU64 &c1,sInt fade)
 
     emms;
   }
+#endif
 }
 
 void AddScale64(sU64 &r,sU64 &c0,sU64 &c1,sInt fade)
 {
+#ifdef __GNUC__
+#if defined(__i386__)
+  asm (
+    "mov       %1, %%eax\n\t"
+    "movq      (%%eax), %%mm2\n\t"
+    "mov       %2, %%eax\n\t"
+    "movq      (%%eax), %%mm3\n\t"
+
+    "movd      %3, %%mm0\n\t"
+    "psrad     $1, %%mm0\n\t"
+    "packssdw  %%mm0, %%mm0\n\t"
+    "punpcklwd %%mm0, %%mm0\n\t"
+    "punpcklwd %%mm0, %%mm0\n\t"
+
+    "mov       %0, %%eax\n\t"
+    "pmulhw    %%mm0, %%mm3\n\t"
+    "psllw     $1, %%mm3\n\t"
+    "paddsw    %%mm3, %%mm2\n\t"
+    "movq      %%mm2, (%%eax)\n\t"
+
+    "emms\n\t"
+    :
+    : "m" (&r), "m" (&c0), "m" (&c1), "m" (fade)
+    : "eax"
+  );
+#endif
+#else
   __asm
   {
     mov       eax, [c0];
@@ -207,6 +272,7 @@ void AddScale64(sU64 &r,sU64 &c0,sU64 &c1,sInt fade)
 
     emms;
   }
+#endif
 }
 
 void BilinearSetup(BilinearContext *ctx,sU64 *src,sInt w,sInt h,sInt b)
@@ -222,7 +288,127 @@ void BilinearSetup(BilinearContext *ctx,sU64 *src,sInt w,sInt h,sInt b)
 void BilinearFilter(BilinearContext *ctx,sU64 *r,sInt u,sInt v)
 {
   static const sU64 adjust = 0x8000800080008000;
-  
+
+#ifdef __GNUC__
+#define DECLARE_STRUCT_OFFSET(Type, Member)     \
+      [Member] "i" (offsetof(Type, Member))
+#if defined(__i386__)
+  asm (
+    "mov       %4, %%esi\n\t"
+    "mov       %c[Src](%%esi), %%edi\n\t"
+
+    "movd      %1, %%mm1\n\t"
+
+    // calc s0
+    "mov       %1, %%eax\n\t"
+    "lea       -0x80000000(%%eax), %%ebx\n\t"
+    "sar       $16, %%eax\n\t"
+    "sar       $31, %%ebx\n\t"
+    "mov       %%eax, %%edx\n\t"
+    "mov       %c[XShift](%%esi), %%ecx\n\t"
+
+    "and       %c[YAm](%%esi), %%eax\n\t"
+    "and       %c[YSize1](%%esi), %%ebx\n\t"
+    "cmp       %c[YSize1](%%esi), %%eax\n\t"
+    "jbe       ok1\n\t"
+    "mov       %%ebx, %%eax\n\t"
+
+"ok1:\n\t"
+    "shl       %%cl, %%eax\n\t"
+    "add       %%eax, %%edi\n\t"
+
+    "movd      %0, %%mm0\n\t"
+
+    // calc s1
+    "lea       1(%%edx), %%eax\n\t"
+    "lea       0x7fffffff(%%edx), %%ebx\n\t"
+    "and       %c[YAm](%%esi), %%eax;\n\t"
+    "sar       $31, %%ebx\n\t"
+    "and       %c[YSize1](%%esi), %%ebx\n\t"
+    "cmp       %c[YSize1](%%esi), %%eax\n\t"
+    "jbe       ok2\n\t"
+    "mov       %%ebx, %%eax\n\t"
+
+"ok2:\n\t"
+    "shl       %%cl, %%eax\n\t"
+    "add       %c[Src](%%esi), %%eax\n\t"
+    "mov       %%eax, %%ecx\n\t"
+
+    // u+0
+    "mov       %0, %%eax\n\t"
+    "lea       0x80000000(%%eax), %%ebx\n\t"
+    "sar       $13, %%eax\n\t"
+    "sar       $31, %%ebx\n\t"
+    "mov       %%eax, %%edx\n\t"
+
+    "and       %c[XAm](%%esi), %%eax\n\t"
+    "and       %c[XSize1](%%esi), %%ebx\n\t"
+
+    "cmp       %c[XSize1](%%esi), %%eax\n\t"
+    "jbe       ok3\n\t"
+    "mov       %%ebx, %%eax\n\t"
+
+"ok3:\n\t"
+    "movq      (%%edi, %%eax), %%mm2\n\t"
+    "movq      (%%ecx, %%eax), %%mm4\n\t"
+
+    // u+1
+    "lea       8(%%edx), %%eax\n\t"
+    "lea       0x7ffffff8(%%edx), %%ebx\n\t"
+    "and       %c[XAm](%%esi), %%eax\n\t"
+    "sar       $31, %%ebx\n\t"
+    "and       %c[XSize1](%%esi), %%ebx\n\t"
+    "cmp       %c[XSize1](%%esi), %%eax\n\t"
+    "jbe       ok4\n\t"
+    "mov       %%ebx, %%eax\n\t"
+
+"ok4:\n\t"
+    "movq      (%%edi, %%eax), %%mm3\n\t"
+    "movq      (%%ecx, %%eax), %%mm5\n\t"
+
+    // actual sample
+    "movq      (%2), %%mm6\n\t"
+    "punpcklwd %%mm0, %%mm0\n\t"
+    "punpcklwd %%mm1, %%mm1\n\t"
+    "mov       %3, %%eax\n\t"
+    "punpcklwd %%mm0, %%mm0\n\t"
+    "punpcklwd %%mm1, %%mm1\n\t"
+    "psrlw     $1, %%mm0\n\t"
+    "psrlw     $1, %%mm1\n\t"
+
+    // horiz
+    "psubw     %%mm2, %%mm3\n\t"
+    "psubw     %%mm4, %%mm5\n\t"
+    "pmulhw    %%mm0, %%mm3\n\t"
+    "pmulhw    %%mm0, %%mm5\n\t"
+    "psllw     $1, %%mm3\n\t"
+    "psllw     $1, %%mm5\n\t"
+    "paddw     %%mm3, %%mm2\n\t"
+    "paddw     %%mm5, %%mm4\n\t"
+
+    // vert+write
+    "psubw     %%mm2, %%mm4\n\t"
+    "paddw     %%mm6, %%mm2\n\t"
+    "pmulhw    %%mm1, %%mm4\n\t"
+    "psllw     $1, %%mm4\n\t"
+    "paddw     %%mm4, %%mm2\n\t"
+    "psubusw   %%mm6, %%mm2\n\t"
+    "movntq    %%mm2, (%%eax)\n\t"
+
+    "emms\n\t"
+    :
+    : "m" (u), "m" (v),
+      "m" (adjust), "m" (r),
+      "m" (ctx),
+      DECLARE_STRUCT_OFFSET(BilinearContext, Src),
+      DECLARE_STRUCT_OFFSET(BilinearContext, XShift),
+      DECLARE_STRUCT_OFFSET(BilinearContext, YAm),
+      DECLARE_STRUCT_OFFSET(BilinearContext, YSize1),
+      DECLARE_STRUCT_OFFSET(BilinearContext, XSize1),
+      DECLARE_STRUCT_OFFSET(BilinearContext, XAm)
+  );
+#endif
+#else
   __asm
   {
     mov       esi, [ctx];
@@ -328,6 +514,7 @@ ok4:
     
     emms;
   }
+#endif
 }
 
 static sInt GammaTable[1025];
@@ -387,6 +574,344 @@ void __stdcall Bitmap_Inner(sU64 *d,sU64 *s,sInt count,sInt mode,sU64 *x=0)
 {
   static const sU64 mask1 = 0x8000800080008000;
 
+#ifdef __GNUC__
+#if defined(__i386__)
+  asm (
+    "emms\n\t"
+
+    "mov       %0, %%esi\n\t"
+    "mov       %1, %%edi\n\t"
+    "mov       %2, %%ebx\n\t"
+    "mov       %3, %%ecx\n\t"
+    "mov       %4, %%edx\n\t"
+
+    "pcmpeqb   %%mm3, %%mm3\n\t"
+	"psrlw	   $1, %%mm3\n\t"          // mm3 = 0x7fff7fff7fff7fff
+    "pcmpeqb   %%mm4, %%mm4\n\t"
+    "psrlq	   $16, %%mm4\n\t"         // mm4 = 0x00007fff7fff7fff
+    "pcmpeqb   %%mm5, %%mm5\n\t"
+    "pxor	   %%mm4, %%mm5\n\t"       // mm5 = 0x7fff000000000000
+    "psrlw     $1, %%mm4\n\t"
+    "psrlw     $1, %%mm5\n\t"
+    "movq      (%%esi), %%mm2\n\t"     // mm2 = data[0]
+    "pcmpeqb   %%mm7, %%mm7\n\t"
+	"psrlw	   $2, %%mm7\n\t"          // mm7 = 0x3fff3fff3fff3fff
+    "pxor      %%mm6, %%mm6\n\t"       // mm6 = 0x0000000000000000
+
+    "shl       $3, %%ecx\n\t"          // ecx = number of bytes
+    "add       %%ecx, %%esi\n\t"       // esi = end of source
+    "add       %%ecx, %%edi\n\t"       // edi = end of dest
+    "add       %%ecx, %%ebx\n\t"       // ebx = end of source2
+    "neg       %%ecx\n\t"
+
+    "lea       loop0, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop1, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop2, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop3, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop4, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop5, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop6, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop7, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop8, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop9, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loopa, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loopb, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loopc, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loopd, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop0e, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop0f, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop10, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop11, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "lea       loop12, %%eax\n\t"
+    "dec       %%edx\n\t"
+    "js        loop_start\n\t"
+
+    "movq      8(%%esi, %%ecx), %%mm7\n\t"             // mm7 = data[1]
+    "psubsw    %%mm2, %%mm7\n\t"
+    "pxor      %%mm1, %%mm1\n\t"
+    "lea       loop13, %%eax\n\t"
+
+"loop_start:\n\t"
+    "jmp       *%%eax\n\t"
+"loop0:\n\t"                        // add
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+    "paddsw    (%%esi, %%ecx), %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop1:\n\t"                        // sub
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+    "psubusw   (%%esi, %%ecx), %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop2:\n\t"                        // mul
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+    "pmulhw    (%%esi, %%ecx), %%mm0\n\t"
+	"psllw	   $1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop3:\n\t"                        // diff
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+    "psubw     (%%esi, %%ecx), %%mm0\n\t"
+    "paddw     %%mm3, %%mm0\n\t"
+    "psrlw     $1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop4:\n\t"                        // alpha
+    "movq      (%%esi, %%ecx), %%mm0\n\t"
+    "movq      (%%ebx, %%ecx), %%mm1\n\t"
+	"movq	   %%mm0, %%mm6\n\t"
+	"movq	   %%mm0, %%mm7\n\t"
+
+	"psrlq	   $16, %%mm6\n\t"
+	"psrlq	   $32, %%mm7\n\t"
+	"paddw	   %%mm6, %%mm0\n\t"
+	"paddw	   %%mm6, %%mm7\n\t"
+	"psrlw	   $1, %%mm0\n\t"
+	"psrlw	   $1, %%mm7\n\t"
+	"paddw	   %%mm7, %%mm0\n\t"
+	"pand	   %%mm4, %%mm1\n\t"
+	"psllq	   $47, %%mm0\n\t"
+	"pand	   %%mm5, %%mm0\n\t"
+	"por	   %%mm1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop5:\n\t"                      // mul color
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+	"pmulhw	   %%mm2, %%mm0\n\t"
+	"psllw	   $1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop6:\n\t"                      // add color
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+    "paddsw    %%mm2, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop7:\n\t"                      // sub color
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+    "psubusw   %%mm2, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop8:\n\t"                      // gray color
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+	"movq	   %%mm0, %%mm6\n\t"
+	"movq	   %%mm0, %%mm7\n\t"
+
+	"psrlq	   $16, %%mm6\n\t"
+	"psrlq	   $32, %%mm7\n\t"
+	"paddw	   %%mm6, %%mm0\n\t"
+	"paddw	   %%mm7, %%mm6\n\t"
+	"psrlw	   $1, %%mm0\n\t"
+	"psrlw	   $1, %%mm7\n\t"
+	"paddw	   %%mm7, %%mm0\n\t"
+	"psrlw	   $1, %%mm0\n\t"
+
+	"punpcklwd %%mm0, %%mm0\n\t"
+	"punpcklwd %%mm0, %%mm0\n\t"
+	"por	   %%mm5, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop9:\n\t"                      // invert color
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+    "pxor      %%mm3, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loopa:\n\t"                      // scale color
+	"movq	   (%%ebx, %%ecx), %%mm0\n\t"
+	"movq	   %%mm0, %%mm1\n\t"
+	"pmullw	   %%mm2, %%mm0\n\t"
+	"pmulhw	   %%mm2, %%mm1\n\t"
+	"movq	   %%mm0, %%mm6\n\t"
+	"punpcklwd %%mm1, %%mm0\n\t"
+	"punpckhwd %%mm1, %%mm6\n\t"
+	"psrld	   $11, %%mm0\n\t"
+	"psrld	   $11, %%mm6\n\t"
+	"packssdw  %%mm6, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loopb:\n\t"                      // merge
+    "movq      (%%edi, %%ecx), %%mm0\n\t"
+    "movq      (%%esi, %%ecx), %%mm4\n\t"
+    "movq      (%%ebx, %%ecx), %%mm5\n\t"
+    "movq      %%mm3, %%mm1\n\t"
+    "psubsw    %%mm0, %%mm1\n\t"
+    "pmulhw    %%mm4, %%mm0\n\t"
+    "pmulhw    %%mm5, %%mm1\n\t"
+    "paddsw    %%mm1, %%mm0\n\t"
+    "psllw     $1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loopc:\n\t"                      // brigtness
+    "movq      (%%esi, %%ecx), %%mm0\n\t"
+    "movq      (%%ebx, %%ecx), %%mm1\n\t"
+    "movq      %%mm0, %%mm2\n\t"
+    "pcmpgtw   %%mm7, %%mm2\n\t"
+    "psrlw     $1, %%mm2\n\t"
+
+    "pxor      %%mm2, %%mm0\n\t"
+    "pxor      %%mm2, %%mm1\n\t"
+	"pmulhw	   %%mm1, %%mm0\n\t"
+	"psllw	   $2, %%mm0\n\t"
+    "pxor      %%mm2, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+
+"loopd:\n\t"                        // subr
+    "movq      (%%esi, %%ecx), %%mm0\n\t"
+    "psubusw   (%%ebx, %%ecx), %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop0e:\n\t"                      // mulmerge
+    "movq      (%%edi, %%ecx), %%mm0\n\t"
+    "movq      (%%esi, %%ecx), %%mm4\n\t"
+    "movq      (%%ebx, %%ecx), %%mm5\n\t"
+    "movq      %%mm3, %%mm1\n\t"
+    "pmulhw    %%mm5, %%mm4\n\t"
+    "psllw     $1, %%mm4\n\t"
+    "psubsw    %%mm0, %%mm1\n\t"
+    "pmulhw    %%mm4, %%mm0\n\t"
+    "pmulhw    %%mm5, %%mm1\n\t"
+    "paddsw    %%mm1, %%mm0\n\t"
+    "psllw     $1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop0f:\n\t"                     // sharpen
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+    "movq      %%mm0, %%mm3\n\t"
+    "psubusw   (%%edi, %%ecx), %%mm0\n\t"
+
+	"movq	   %%mm0, %%mm1\n\t"
+	"pmullw	   %%mm2, %%mm0\n\t"
+	"pmulhw	   %%mm2, %%mm1\n\t"
+
+    "movq	   %%mm0, %%mm7\n\t"
+	"punpcklwd %%mm1, %%mm0\n\t"
+	"punpckhwd %%mm1, %%mm7\n\t"
+	"psrad	   $11, %%mm0\n\t"
+	"psrad	   $11, %%mm7\n\t"
+	"packssdw  %%mm7, %%mm0\n\t"
+
+    "paddsw    %%mm3, %%mm0\n\t"
+    "pmaxsw    %%mm6, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop10:\n\t"                      // hardlight
+    "movq      (%%esi, %%ecx), %%mm1\n\t"
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+    "psllw     $1, %%mm1\n\t"
+    "movq      %%mm1, %%mm2\n\t"
+    "pand      %%mm3, %%mm1\n\t"
+    "psraw     $15, %%mm2\n\t"
+    "movq      %%mm0, %%mm4\n\t"
+    "pmulhw    %%mm1, %%mm0\n\t"
+    "psllw     $1, %%mm0\n\t"
+    "paddw     %%mm4, %%mm1\n\t"
+    "pxor      %%mm2, %%mm0\n\t"
+    "pand      %%mm2, %%mm1\n\t"
+    "paddw     %%mm1, %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop11:\n\t"                      // over
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+    "movq      (%%esi, %%ecx), %%mm1\n\t"
+    "movq      %%mm1, %%mm2\n\t"
+    "psubsw    %%mm0, %%mm1\n\t"
+    "punpckhwd %%mm2, %%mm2\n\t"
+    "punpckhwd %%mm2, %%mm2\n\t"
+    "pmulhw    %%mm2, %%mm1\n\t"
+    "psllw     $1, %%mm1\n\t"
+    "paddsw    %%mm1, %%mm0\n\t"
+    "pmaxsw    %%mm6, %%mm0\n\t"
+//    "paddw     [mask1], %%mm0\n\t"
+//    "psubsw    [mask1], %%mm0\n\t"
+    "jmp       loopo\n\t"
+
+"loop12:\n\t"                      // addsmooth (screen)
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+    "movq      (%%esi, %%ecx), %%mm1\n\t"
+    "pxor      %%mm3, %%mm0\n\t"
+    "pxor      %%mm3, %%mm1\n\t"
+    "pmulhw    %%mm1, %%mm0\n\t"
+    "psllw     $1, %%mm0\n\t"
+    "pxor      %%mm3, %%mm0\n\t"
+
+    "jmp       loopo;\n\t"
+
+"loop13:\n\t"                      // color range
+    "movq      (%%ebx, %%ecx), %%mm0\n\t"
+    "pmulhw    %%mm7, %%mm0\n\t"
+    "psllw     $1, %%mm0\n\t"
+    "paddsw    %%mm2, %%mm0\n\t"
+    "pmaxsw    %%mm1, %%mm0\n\t"
+//    "paddw     %%mm6, %%mm0\n\t"
+//    "psubusw   %%mm6, %%mm0\n\t"
+
+"loopo:\n\t"
+    "movq      %%mm0, (%%edi, %%ecx)\n\t"
+    "add       $8, %%ecx\n\t"
+    "je        ende\n\t"
+    "jmp       *%%eax\n\t"
+
+"ende:\n\t"
+    "emms\n\t"
+    :
+    : "m" (s), "m" (d), "m" (x), "m" (count), "m" (mode)
+  );
+#endif
+#else
   __asm
   {
     emms
@@ -721,6 +1246,7 @@ loopo:
 ende:
     emms
   }
+#endif
 }
 
 GenBitmap * __stdcall Bitmap_Merge(sInt mode,sInt count,GenBitmap *b0,...)
@@ -1329,7 +1855,11 @@ GenBitmap * __stdcall Bitmap_Blur(GenBitmap *bm,sInt flags,sF32 sx,sF32 sy,sF32 
   }
   while(repeat--);
   
+#ifdef __GNUC__
+  asm ("emms");
+#else
   __asm { emms };
+#endif
   sVERIFY(qq!=(sU16 *)bm->Data);
   delete[] qq;
 

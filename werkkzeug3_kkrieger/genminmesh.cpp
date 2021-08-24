@@ -2110,6 +2110,15 @@ GenMinMesh * __stdcall MinMesh_Perlin(GenMinMesh *mesh,sInt mask,sFSRT srt,sF323
 
   // setup fpu: single precision, round towards neg. infinity
 
+#ifdef __GNUC__
+  sInt cw = 0x143f;
+  asm (
+    "fstcw   %0\n\t"
+    "fldcw   %1\n\t"
+    : "=m" (oldcw)
+    : "m" (cw)
+  );
+#else
   __asm
   {
     fstcw   [oldcw];
@@ -2117,6 +2126,7 @@ GenMinMesh * __stdcall MinMesh_Perlin(GenMinMesh *mesh,sInt mask,sFSRT srt,sF323
     fldcw   [esp];
     pop     eax;
   }
+#endif
 
 	for(sInt i=0;i<mesh->Vertices.Count;i++)
 	{
@@ -2167,10 +2177,17 @@ GenMinMesh * __stdcall MinMesh_Perlin(GenMinMesh *mesh,sInt mask,sFSRT srt,sF323
 	}
 
   // restore fpu state
+#ifdef __GNUC__
+  asm (
+    "fldcw   %0\n\t"
+    : : "m" (oldcw)
+  );
+#else
   __asm
   {
     fldcw   [oldcw];
   }
+#endif
 
   mesh->ChangeGeo();
   return mesh;
