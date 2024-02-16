@@ -23,6 +23,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "player_mobile", "player_mobile\player_mobile.vcxproj", "{38067567-F305-45BB-B9ED-54B86F559BF7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "player_intro", "player_intro\player_intro.vcxproj", "{62520ADF-98B0-40B5-9A6C-53F7320012DB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{12FDFC35-AC48-453D-9FCC-32DBA9AAEEAD} = {12FDFC35-AC48-453D-9FCC-32DBA9AAEEAD}
+		{16396944-DE4D-4146-9594-B5FF265DE9BF} = {16396944-DE4D-4146-9594-B5FF265DE9BF}
+		{D945E86F-50EB-4D36-BD8B-CB2FFA167A1A} = {D945E86F-50EB-4D36-BD8B-CB2FFA167A1A}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pngloader", "pngloader\pngloader.vcxproj", "{B85F145B-0635-4ED9-8BB5-45C0CDF69CD3}"
 EndProject
