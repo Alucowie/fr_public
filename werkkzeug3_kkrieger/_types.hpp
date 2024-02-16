@@ -920,8 +920,8 @@ sNORETURN void __cdecl sFatal(char *format,...);
 #define sVERIFY(x) {if(!(x)) {sVerifyFalse(sTXT(__FILE__),__LINE__);asm( "int3" );}}
 #define sVERIFYFALSE {sVerifyFalse(sTXT(__FILE__),__LINE__);asm( "int3" );}
 #else
-#define sVERIFY(x) {if(!(x)){__asm { int 3 };sVerifyFalse(sTXT(__FILE__),__LINE__);}}
-#define sVERIFYFALSE {__asm{ int 3 };sVerifyFalse(sTXT(__FILE__),__LINE__);}
+#define sVERIFY(x) {if(!(x)){sVerifyFalse(sTXT(__FILE__),__LINE__);__asm { int 3 };}}
+#define sVERIFYFALSE {sVerifyFalse(sTXT(__FILE__),__LINE__);__asm{ int 3 };}
 #endif
 #endif
 #else
