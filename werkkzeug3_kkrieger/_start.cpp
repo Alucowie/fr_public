@@ -1717,6 +1717,7 @@ int APIENTRY WinMain(HINSTANCE inst,HINSTANCE prev,LPSTR cmdline,int show)
   sSetMem(((sU8 *)sSystem)+4,0,sizeof(sSystem_)-4);
 
 #if !sCONFIGDIALOG
+  sAppHandler(sAPPCODE_CONFIG, 0);
   sSystem->InitX();
 #else
   if(sAppHandler(sAPPCODE_CONFIG,0))
