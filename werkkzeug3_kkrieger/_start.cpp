@@ -395,24 +395,24 @@ void checkHeap()
 
 void * __cdecl operator new(unsigned int size)
 {
-	return HeapAlloc(GetProcessHeap(),HEAP_NO_SERIALIZE,size);
+	return HeapAlloc(GetProcessHeap(),HEAP_GENERATE_EXCEPTIONS,size);
 }
 
 void * __cdecl operator new[](unsigned int size)
 {
-  return HeapAlloc(GetProcessHeap(),HEAP_NO_SERIALIZE,size);
+  return HeapAlloc(GetProcessHeap(),HEAP_GENERATE_EXCEPTIONS,size);
 }
 
 void __cdecl operator delete(void *ptr)
 {
   if(ptr)
-  	HeapFree(GetProcessHeap(),HEAP_NO_SERIALIZE,ptr);
+  	HeapFree(GetProcessHeap(),HEAP_GENERATE_EXCEPTIONS,ptr);
 }
 
 void __cdecl operator delete[](void *ptr)
 {
   if(ptr)
-  	HeapFree(GetProcessHeap(),HEAP_NO_SERIALIZE,ptr);
+  	HeapFree(GetProcessHeap(),HEAP_GENERATE_EXCEPTIONS,ptr);
 }
 
 int __cdecl _purecall()
