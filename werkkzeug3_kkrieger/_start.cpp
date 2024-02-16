@@ -5175,7 +5175,9 @@ void sSystem_::Sample3DListener(const sVector &pos,const sVector &vel,const sVec
   params.flRolloffFactor = rolloff;
   params.flDopplerFactor = doppler;
 
+#if !sINTRO
   Listener->SetAllParameters(&params,DS3D_DEFERRED);
+#endif
 }
 
 void sSystem_::Sample3DCommit()
@@ -5206,7 +5208,9 @@ void sSystem_::Sample3DCommit()
   }
 
   // commit settings
+#if !sINTRO
   Listener->CommitDeferredSettings();
+#endif
   SoundTime = sSystem->GetTime();
 }
 
