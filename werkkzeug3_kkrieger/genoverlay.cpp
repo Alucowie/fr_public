@@ -299,7 +299,6 @@ GenOverlayManagerClass::GenOverlayManagerClass()
   Mtrl[GENOVER_SHARPEN]->SetTex(0,0);
   Mtrl[GENOVER_SHARPEN]->SetTex(1,0);
 #else
-  Mtrl[GENOVER_SHARPEN] = new sMaterial11;
   Mtrl[GENOVER_SHARPEN]->CopyFrom(Mtrl[GENOVER_TEX1]);
 #endif
 
