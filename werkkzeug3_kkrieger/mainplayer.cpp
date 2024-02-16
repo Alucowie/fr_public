@@ -352,7 +352,7 @@ sBool sAppHandler(sInt code,sDInt value)
     sFloatFix();
 #if sLINK_KKRIEGER
     Game->OnTick(Environment,max);
-    sSystem->Sample3DCommit();
+    //sSystem->Sample3DCommit();
 #endif
     LastTime = ThisTime;
 
