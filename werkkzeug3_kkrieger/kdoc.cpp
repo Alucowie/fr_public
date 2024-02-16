@@ -1576,14 +1576,14 @@ static sBool DistributeAnimR(KOp *start)
 
 #if sPLAYER
 
-void KDoc::Init(const sU8 *&dataPtr)
+void KDoc::Init(const sU8 *&dataPtr, sInt dataSize)
 {
-  const sU8 *data;
+  const sU8 *data, *dataEnd;
   sChar *pack;
   sInt i,j,k,in,nOps,nSplines,typeByte,delta,nClasses,max;
   sInt eventCount;
   sU32 conv;
-  KClass *cls;
+  KClass *cls, *clsend;
   KEvent *event;
   KSpline *spline;
   KOp *op,*dest;
@@ -1591,16 +1591,21 @@ void KDoc::Init(const sU8 *&dataPtr)
   sInt flags;
 
   data = dataPtr;
+  dataEnd = data + dataSize;
 
   flags = *(sU32 *)data; data+=4;
   BuzzTiming = (flags&4);
   if(flags&1) data+=32;
   SongSize = *(sU32 *)data; data+=4;
   SongData = (sU8 *)data; data+=sAlign(SongSize,4);
+  if (data >= dataEnd)
+      sDPrintF("dataEnd\n");
   if(flags&2)
   {
     SampleSize = *(sU32 *)data; data+=4;
     SampleData = (sU8 *)data; data+=sAlign(SampleSize,4);
+    if (data >= dataEnd)
+        sDPrintF("%d: dataEnd\n", __LINE__);
   }
   SongBPM = *(sU32 *)data; data+=4;
   SongLength = *(sU32 *)data; data+=4;
@@ -1613,6 +1618,7 @@ void KDoc::Init(const sU8 *&dataPtr)
   Splines.Init(nSplines); Splines.Count = nSplines;
 
   cls = KClasses;
+  clsend = &KClasses[255];
   nClasses = 0;
 
   while((conv = *((sU32 *) data)))
@@ -1622,6 +1628,8 @@ void KDoc::Init(const sU8 *&dataPtr)
     i = *((sU16 *)data); data+=2;
     cls->Packing = (sChar *) data;
     while(*data++);
+    if (data >= dataEnd)
+        sDPrintF("%d: dataEnd\n", __LINE__);
 
     KHandler *handler = KHandlers;
     while(handler->Id && handler->Id != i)
@@ -1639,7 +1647,11 @@ void KDoc::Init(const sU8 *&dataPtr)
     cls->InitHandler = handler->InitHandler;
     cls->ExecHandler = handler->ExecHandler;
     cls++;
+    if (cls == clsend)
+        sDPrintF("%d: clsend\n", __LINE__);
     nClasses++;
+    if (nClasses == 255)
+        sDPrintF("%d: nClasses 255\n", __LINE__);
   }
 
   data += 4;
@@ -1648,6 +1660,8 @@ void KDoc::Init(const sU8 *&dataPtr)
   for(i=0;i<nOps;i++)
   {
     typeByte = *data++;
+    if ((typeByte & 0x7f) >= nClasses)
+        sDPrintF("%d: nClasses\n", __LINE__);
     cls = KClasses + (typeByte & 0x7f);
 
     op = &Ops[i];
@@ -1669,6 +1683,8 @@ void KDoc::Init(const sU8 *&dataPtr)
     for(in=0;in<max;in++)
     {
       delta = (typeByte & 0x80) ? 0 : sReadShort(data);
+      if ((i - 1 - delta) < 0 || (i - 1 -delta) >= nOps)
+          sDPrintF("%d: delta\n", __LINE__);
       dest = &Ops[i - 1 - delta];
 
       op->AddInput(dest);
@@ -1682,6 +1698,8 @@ void KDoc::Init(const sU8 *&dataPtr)
     for(in=0;in<OPC_GETLINK(op->Convention);in++)
     {
       delta = sReadShort(data);
+      if (delta != 0 && ((delta - 1) < 0 || (delta - 1) >= nOps))
+          sDPrintF("%d: delta: %d\n", __LINE__, delta);
       dest = delta ? &Ops[delta - 1] : 0;
       op->SetLink(in,dest);
       if(dest)
@@ -1724,6 +1742,8 @@ void KDoc::Init(const sU8 *&dataPtr)
           op->SetString(j,(sChar *)data);
           while(*data)
             data++;
+          if (data >= dataEnd)
+              sDPrintF("%d: dataEnd\n", __LINE__);
           data++;
         }
 
@@ -1748,6 +1768,8 @@ void KDoc::Init(const sU8 *&dataPtr)
     j = CalcCodeSize((sU8*)data);
     Ops[i].SetAnimCode((sU8*)data,j);
     data += j;
+    if (data >= dataEnd)
+        sDPrintF("%d: dataEnd\n", __LINE__);
   }
 
   // read events
@@ -1788,7 +1810,8 @@ void KDoc::Init(const sU8 *&dataPtr)
     event->StartInterval = sReadF16(data);
     event->EndInterval = sReadF16(data);
   }
-
+  if (data > dataEnd)
+      sDPrintF("%d: dataEnd\n", __LINE__);
   // read splines
   for(i=0;i<nSplines;i++)
   {
@@ -1811,6 +1834,8 @@ void KDoc::Init(const sU8 *&dataPtr)
       }
     }
   }
+  if (data > dataEnd)
+      sDPrintF("%d: dataEnd\n", __LINE__);
 
   // read blobs
   for(i=0;i<nOps;i++)
@@ -1835,6 +1860,8 @@ void KDoc::Init(const sU8 *&dataPtr)
   }
   CurrentRoot = 0;
 
+  if (data > dataEnd)
+      sDPrintF("%d: dataEnd\n", __LINE__);
   dataPtr = data;
 }
 

@@ -167,6 +167,7 @@ sBool sAppHandler(sInt code,sDInt value)
 
   sInt beat;
   static const sU8 *data;
+  static sInt dataSize;
   sViewport vp,clearvp;
   sInt i,max;
   sF32 curfps;
@@ -187,10 +188,10 @@ sBool sAppHandler(sInt code,sDInt value)
 //#if !sINTRO
     if(((sInt)data)==0x54525450)
     {
-      data = sSystem->LoadFile(sSystem->GetCmdLine());
+      data = sSystem->LoadFile(sSystem->GetCmdLine(), dataSize);
       if(data==0)
       {
-        data = sSystem->LoadFile("bpopening_05.kx");
+        data = sSystem->LoadFile("bpopening_05.kx", dataSize);
         if(data==0)
           sSystem->Abort("need data file");
       }
@@ -209,7 +210,7 @@ sBool sAppHandler(sInt code,sDInt value)
   case sAPPCODE_INIT:
     Document = new KDoc;
 
-    Document->Init(data);
+    Document->Init(data, dataSize);
     Environment = new KEnvironment;
     Sound = 0;
 

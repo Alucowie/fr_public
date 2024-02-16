@@ -336,19 +336,39 @@ void * __cdecl operator new(unsigned int size)
   void *p;
 
 #if !sRELEASE
-  p = _malloc_dbg(size,_NORMAL_BLOCK,"unknown",1);
+  p = _malloc_dbg(size+16,_NORMAL_BLOCK,"unknown",1);
 #else
   p = malloc(size);
 #endif
   if(p==0)
     sFatal("ran out of virtual memory...");
 
-  //sSetMem(p,0x12,size);
-  //sDPrintF("%10d : (%d)\n",MemoryUsedCount,size);
+  sSetMem(p,0x12,size+16);
+  sDPrintF("%10d : (%d)\n",MemoryUsedCount,size);
 
   MemoryUsedCount+=_msize(p); 
 
-  return p;
+  return (void *)((char *)p + 8);
+}
+
+void* __cdecl operator new[](unsigned int size)
+{
+    void* p;
+
+#if !sRELEASE
+    p = _malloc_dbg(size+16, _NORMAL_BLOCK, "unknown", 1);
+#else
+    p = malloc(size);
+#endif
+    if (p == 0)
+        sFatal("ran out of virtual memory...");
+
+    sSetMem(p, 0x12, size+16);
+    sDPrintF("%10d : (%d)\n", MemoryUsedCount, size);
+
+    MemoryUsedCount += _msize(p);
+
+    return (void *)((char *)p + 8);
 }
 
 void * __cdecl operator new(unsigned int size,const char *file,int line)
@@ -356,31 +376,75 @@ void * __cdecl operator new(unsigned int size,const char *file,int line)
   void *p;
 
 #if !sRELEASE
-  p = _malloc_dbg(size,_NORMAL_BLOCK,file,line);
+  p = _malloc_dbg(size+16,_NORMAL_BLOCK,file,line);
 #else
   p = malloc(size);
 #endif
   if(p==0)
     sFatal("ran out of virtual memory...");
 
-  //sSetMem(p,0x12,size);
-  //sDPrintF("%10d : %d\n",MemoryUsedCount,size);
+  sSetMem(p,0x12,size+16);
+  sDPrintF("%10d : %d\n",MemoryUsedCount,size);
 
   MemoryUsedCount+=_msize(p); 
-  return p;
+  return (void *)((char *)p+8);
+}
+
+void* __cdecl operator new[](unsigned int size, const char* file, int line)
+{
+    void* p;
+
+#if !sRELEASE
+    p = _malloc_dbg(size+16, _NORMAL_BLOCK, file, line);
+#else
+    p = malloc(size);
+#endif
+    if (p == 0)
+        sFatal("ran out of virtual memory...");
+
+    sSetMem(p, 0x12, size+16);
+    sDPrintF("%10d : %d\n", MemoryUsedCount, size);
+
+    MemoryUsedCount += _msize(p);
+    return (void *)((char *)p+8);
 }
 
 void __cdecl operator delete(void *p)
 {
   if(p)
 	{
-		MemoryUsedCount-=_msize(p);
+      char* pp = (char*)p - 8;
+      unsigned int size = _msize((void *)pp);
+		MemoryUsedCount-= size;
+        if (*((unsigned long long*) pp) != 0x1212121212121212)
+            sDPrintF("delete error!\n");
+        if (*((unsigned long long*) (pp + size - 8)) != 0x1212121212121212)
+            sDPrintF("delete error end!\n");
 #if !sRELEASE
-		_free_dbg(p,_NORMAL_BLOCK);
+		_free_dbg((void *)pp,_NORMAL_BLOCK);
 #else
     free(p);
 #endif
 	}
+}
+
+void __cdecl operator delete[](void* p)
+{
+    if (p)
+    {
+        char* pp = (char*)p - 8;
+        unsigned int size = _msize((void *)pp);
+        MemoryUsedCount -= size;
+        if (*((unsigned long long*) pp) != 0x1212121212121212)
+            sDPrintF("delete[] error!\n");
+        if (*((unsigned long long*) (pp + size - 8)) != 0x1212121212121212)
+            sDPrintF("delete error end!\n");
+#if !sRELEASE
+        _free_dbg((void *)pp, _NORMAL_BLOCK);
+#else
+        free(p);
+#endif
+    }
 }
 
 #define new new(__FILE__,__LINE__)
@@ -393,26 +457,46 @@ void checkHeap()
   HeapValidate(GetProcessHeap(),0,0);
 }
 
-void * __cdecl operator new(unsigned int size)
+void* __cdecl operator new(unsigned int size)
 {
-	return HeapAlloc(GetProcessHeap(),HEAP_GENERATE_EXCEPTIONS,size);
+    void* p;
+    if (size == 0) {
+        //sDPrintF("new 0x%08x\n", size);
+        return 0;
+    }
+    p = HeapAlloc(GetProcessHeap(), HEAP_GENERATE_EXCEPTIONS, size);
+    //p = malloc(size);
+    sSetMem(p, 0, size);
+    return p;
 }
 
 void * __cdecl operator new[](unsigned int size)
 {
-  return HeapAlloc(GetProcessHeap(),HEAP_GENERATE_EXCEPTIONS,size);
+        void* p;
+        if (size == 0) {
+            //sDPrintF("new[] 0x%08x\n", size);
+            return 0;
+        }
+        p = HeapAlloc(GetProcessHeap(), HEAP_GENERATE_EXCEPTIONS, size);
+        //p = malloc(size);
+        sSetMem(p, 0, size);
+        return p;
 }
 
 void __cdecl operator delete(void *ptr)
 {
-  if(ptr)
-  	HeapFree(GetProcessHeap(),HEAP_GENERATE_EXCEPTIONS,ptr);
+    if (ptr)
+        HeapFree(GetProcessHeap(), HEAP_GENERATE_EXCEPTIONS,ptr);
+        //free(ptr);
+  //sDPrintF("delete %p\n", ptr);
 }
 
 void __cdecl operator delete[](void *ptr)
 {
-  if(ptr)
-  	HeapFree(GetProcessHeap(),HEAP_GENERATE_EXCEPTIONS,ptr);
+    if (ptr)
+        HeapFree(GetProcessHeap(), HEAP_GENERATE_EXCEPTIONS,ptr);
+        //free(ptr);
+  //sDPrintF("delete[] %p\n", ptr);
 }
 
 int __cdecl _purecall()
